@@ -3,6 +3,16 @@ node_modules
 .pnp
 .pnp.js
 
+# Python cache & virtual environments
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+ENV/
+env/
+.pytest_cache/
+
 # Production build outputs
 dist
 build

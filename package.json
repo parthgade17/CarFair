@@ -1,14 +1,14 @@
 {
   "name": "carfair",
-  "version": "1.0.0",
-  "description": "CarFair - India's Verified Group Car-Buying & Quotation Auditing Platform",
+  "version": "2.0.0",
+  "description": "CarFair - India's Verified Group Car-Buying & Quotation Auditing Platform (FastAPI Python Backend)",
   "private": true,
   "scripts": {
-    "install:all": "npm install --prefix client && npm install --prefix server",
+    "install:all": "npm install --prefix client && python -m pip install -r server/requirements.txt",
     "dev:client": "npm run dev --prefix client",
-    "dev:server": "npm run dev --prefix server",
+    "dev:server": "python server/run.py",
     "build:client": "npm run build --prefix client",
-    "start": "npm start --prefix server"
+    "start": "python server/run.py"
   },
   "repository": {
     "type": "git",
@@ -21,6 +21,8 @@
     "quotetruth",
     "deallock",
     "savingsproof",
+    "fastapi",
+    "python",
     "india-automotive"
   ],
   "author": "Parth Gade",

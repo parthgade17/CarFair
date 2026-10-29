@@ -17,7 +17,7 @@ Buying a new car in India is fraught with information asymmetry, inflated dealer
 
 ## 🚀 Key Modules & Capabilities
 
-### 1. 🔍 QuoteTruth™ — AI Car Quotation Auditor
+### 1. 🔍 QuoteTruth™ — AI Car Quotation Auditor (Python Engine)
 - **MoRTH Handling Fee Detection**: Automatically flags illegal logistics, depot, or PDI charges (often ₹15,000 - ₹35,000).
 - **Insurance Unbundler**: Compares showroom quotes (~₹58,000 - ₹75,000) against direct IRDAI-approved Zero-Dep + RTI policies (~₹29,000 - ₹38,000) with identical coverage.
 - **Forced Accessory Surcharge Buster**: Isolates genuine essentials (₹4,500 for 7D mats + flaps) from dealer junk packs (₹25,000+).
@@ -40,7 +40,7 @@ Buying a new car in India is fraught with information asymmetry, inflated dealer
 
 ### 5. 🧾 SavingsProof™ Post-Purchase Audit + ₹5,000 Fuel Card
 - Solves the post-purchase drop-off: Buyers receive a **guaranteed ₹5,000 HPCL/IOCL PetroCard** + free detailing coupon when they upload their final delivery invoice.
-- CarFair's audit engine checks line-by-line that zero illegal surcharges were sneaked into the invoice.
+- CarFair's Python audit engine checks line-by-line that zero illegal surcharges were sneaked into the invoice.
 
 ### 6. 🔄 Multi-Dealer Old Car Exchange Bidding
 - Eliminates single-dealership trade-in lowballing (often under-valuing old cars by ₹40,000 - ₹60,000).
@@ -54,8 +54,9 @@ Buying a new car in India is fraught with information asymmetry, inflated dealer
 
 ## 🛠️ Tech Stack & Architecture
 
+- **Backend**: Python 3.12, FastAPI, Uvicorn, Pydantic, RESTful API architecture.
 - **Frontend**: React 18, TypeScript, Vite, Tailwind CSS, Lucide Icons.
-- **Backend**: Node.js, Express, ES Modules, RESTful APIs.
+- **Interactive Swagger Docs**: Built-in at `http://localhost:5000/docs`.
 - **Responsive Design**: 100% mobile, tablet, and desktop responsive with touch-friendly navigation and desktop dashboards.
 - **Data Architecture**: Realistic Indian vehicle database (Tata Nexon, Mahindra XUV700, Scorpio-N, Hyundai Creta, Maruti Brezza, Kia Seltos) with state-wise RTO tax brackets (MH, DL, KA, TS, GJ, HR), TCS rules, and MoRTH compliance checks.
 
@@ -64,8 +65,8 @@ Buying a new car in India is fraught with information asymmetry, inflated dealer
 ## 🏁 Quickstart Guide
 
 ### Prerequisites
-- Node.js (v18 or higher)
-- npm or pnpm
+- Python 3.10+ (with pip)
+- Node.js (v18+) for client
 
 ### Installation
 
@@ -74,35 +75,37 @@ Buying a new car in India is fraught with information asymmetry, inflated dealer
 git clone https://github.com/parthgade17/CarFair.git
 cd CarFair-1
 
-# 2. Install all dependencies
+# 2. Install all frontend & Python backend dependencies
 npm run install:all
 ```
+*(Or manually install Python packages via `pip install -r server/requirements.txt`)*
 
 ### Running Locally
 
 ```bash
 # Option A: Run Full-Stack Simultaneously
-# In terminal 1:
+# In terminal 1 (Python FastAPI Backend):
 npm run dev:server
+# (or: python server/run.py)
 
-# In terminal 2:
+# In terminal 2 (Vite React Frontend):
 npm run dev:client
 ```
 
-- **Client**: `http://localhost:5173`
-- **Backend API**: `http://localhost:5000`
+- **Frontend Client**: `http://localhost:5173`
+- **Python Backend API**: `http://localhost:5000`
+- **Interactive Swagger API Docs**: `http://localhost:5000/docs`
 
-### Building for Production
+### Building & Running Production Mode (Single Port)
 
 ```bash
-# Build frontend bundle
+# 1. Build React frontend bundle
 npm run build:client
 
-# Start production server (serves frontend + API on single port)
-npm start
+# 2. Start Python server (FastAPI serves both the API & built React frontend on port 5000)
+python server/run.py
 ```
-
-Open `http://localhost:5000` to access the live unified production app.
+Open `http://localhost:5000` to access the live app.
 
 ---
 
