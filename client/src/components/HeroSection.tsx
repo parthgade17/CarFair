@@ -1,18 +1,12 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { 
   Users, 
   FileCheck, 
   CheckCircle2, 
   ArrowRight,
-  Sparkles,
   ShieldCheck,
-  TrendingDown,
-  Building,
-  Check,
-  Fuel,
-  ChevronRight
+  Check
 } from 'lucide-react';
-import { CarFairLogo } from './Logo';
 
 interface HeroSectionProps {
   onExploreGroups: () => void;
@@ -25,57 +19,13 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
   onAuditQuote,
   selectedCity
 }) => {
-  // Active preview car for interactive hero showcase card
-  const [activeCarTab, setActiveCarTab] = useState<'nexon' | 'creta' | 'xuv700'>('nexon');
-
-  const previewCars = {
-    nexon: {
-      name: 'Tata Nexon Creative+ AMT',
-      segment: 'Compact SUV',
-      image: 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=800&q=80',
-      showroomPrice: 1362000,
-      groupPrice: 1294000,
-      savings: 68000,
-      joined: 18,
-      target: 20,
-      bids: 3,
-      perk: 'Free 5-Yr Warranty + Mats'
-    },
-    creta: {
-      name: 'Hyundai Creta SX (O) 1.5 Petrol',
-      segment: 'Mid-Size SUV',
-      image: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=800&q=80',
-      showroomPrice: 1985000,
-      groupPrice: 1904000,
-      savings: 81000,
-      joined: 16,
-      target: 20,
-      bids: 4,
-      perk: 'Zero Handling Fee + Fast Delivery'
-    },
-    xuv700: {
-      name: 'Mahindra XUV700 AX7 Diesel AT',
-      segment: 'Premium 7-Seater',
-      image: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=800&q=80',
-      showroomPrice: 2540000,
-      groupPrice: 2445000,
-      savings: 95000,
-      joined: 19,
-      target: 25,
-      bids: 4,
-      perk: 'Priority VIN Allocation'
-    }
-  };
-
-  const currentCar = previewCars[activeCarTab];
-
   return (
     <div className="relative bg-gradient-to-b from-slate-50 via-white to-slate-50/80 border-b border-slate-200 overflow-hidden pt-8 pb-16">
       {/* Subtle Background Accent Pattern */}
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#f1f5f9_1px,transparent_1px),linear-gradient(to_bottom,#f1f5f9_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-70 pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 space-y-12">
-        {/* Main Hero Grid: Left Content + Right Interactive Showcase */}
+        {/* Main Hero Grid: Left Content + Right Brand Logo Showcase */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
           {/* Left Column: Headlines & Call to Actions */}
           <div className="lg:col-span-7 space-y-6 text-left">
@@ -136,121 +86,29 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
             </div>
           </div>
 
-          {/* Right Column: Interactive Live Showcase Card */}
-          <div className="lg:col-span-5">
-            <div className="bg-white border-2 border-slate-200 rounded-3xl p-5 sm:p-6 shadow-xl relative overflow-hidden">
-              {/* Top Selector Tabs */}
-              <div className="flex items-center justify-between pb-4 border-b border-slate-100">
-                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-                  Live Active Pools ({selectedCity})
+          {/* Right Column: Official Brand Logo Display (Replacing active pools box) */}
+          <div className="lg:col-span-5 flex items-center justify-center">
+            <div className="relative w-full max-w-md bg-white/80 backdrop-blur-sm border border-slate-200/90 rounded-3xl p-6 sm:p-8 shadow-lg hover:shadow-xl transition-all duration-300 flex flex-col items-center justify-center group">
+              {/* Soft ambient brand color glow */}
+              <div className="absolute -inset-1 bg-gradient-to-r from-blue-600/10 via-emerald-500/15 to-blue-600/10 rounded-3xl blur-xl -z-10 opacity-70 group-hover:opacity-100 transition-opacity" />
+
+              {/* Official CarFair Logo Image with Transparent Background */}
+              <img
+                src="/carfair-logo.png"
+                alt="CarFair — Smart Buyers Ki Smart Deal"
+                className="w-full max-w-[300px] sm:max-w-[340px] h-auto object-contain drop-shadow-sm transition-transform duration-300 group-hover:scale-105"
+              />
+
+              {/* Verified Trust Badges Footer inside card */}
+              <div className="mt-6 pt-4 border-t border-slate-100 w-full flex items-center justify-between text-xs text-slate-500">
+                <span className="flex items-center gap-1.5 font-semibold text-slate-700">
+                  <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                  Verified Dealership Network
                 </span>
-                <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
-                  Verified Savings
+                <span className="font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
+                  Zero Brokerage
                 </span>
               </div>
-
-              {/* Car Selection Pills */}
-              <div className="flex gap-2 my-3">
-                <button
-                  onClick={() => setActiveCarTab('nexon')}
-                  className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                    activeCarTab === 'nexon' ? 'bg-blue-700 text-white shadow-xs' : 'bg-slate-100 text-slate-600 hover:text-slate-900'
-                  }`}
-                >
-                  Nexon
-                </button>
-                <button
-                  onClick={() => setActiveCarTab('creta')}
-                  className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                    activeCarTab === 'creta' ? 'bg-blue-700 text-white shadow-xs' : 'bg-slate-100 text-slate-600 hover:text-slate-900'
-                  }`}
-                >
-                  Creta
-                </button>
-                <button
-                  onClick={() => setActiveCarTab('xuv700')}
-                  className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                    activeCarTab === 'xuv700' ? 'bg-blue-700 text-white shadow-xs' : 'bg-slate-100 text-slate-600 hover:text-slate-900'
-                  }`}
-                >
-                  XUV700
-                </button>
-              </div>
-
-              {/* Showcase Card Image & Details */}
-              <div className="relative h-44 rounded-2xl overflow-hidden bg-slate-100 mb-4 border border-slate-200">
-                <img
-                  src={currentCar.image}
-                  alt={currentCar.name}
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent" />
-                <div className="absolute bottom-3 left-3 right-3 text-white">
-                  <span className="text-[10px] uppercase font-bold tracking-wider text-blue-200">
-                    {currentCar.segment}
-                  </span>
-                  <h3 className="text-base font-bold drop-shadow">{currentCar.name}</h3>
-                </div>
-              </div>
-
-              {/* Pricing Breakdown */}
-              <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-3">
-                <div className="flex items-baseline justify-between">
-                  <div>
-                    <span className="text-[11px] text-slate-400 line-through font-mono">
-                      Showroom Price: ₹{currentCar.showroomPrice.toLocaleString('en-IN')}
-                    </span>
-                    <div className="text-2xl font-black text-emerald-700 font-mono">
-                      ₹{currentCar.groupPrice.toLocaleString('en-IN')}
-                    </div>
-                  </div>
-
-                  <div className="text-right">
-                    <span className="text-[10px] text-slate-500 font-medium">Group Discount</span>
-                    <div className="text-xs font-black font-mono text-emerald-800 bg-emerald-100/80 px-2 py-0.5 rounded border border-emerald-300">
-                      Save ₹{currentCar.savings.toLocaleString('en-IN')}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Progress bar */}
-                <div className="space-y-1">
-                  <div className="flex justify-between text-xs text-slate-600">
-                    <span className="font-semibold text-slate-800">
-                      {currentCar.joined} of {currentCar.target} buyers joined
-                    </span>
-                    <span className="text-amber-700 font-bold text-[11px]">
-                      {currentCar.target - currentCar.joined} spots left
-                    </span>
-                  </div>
-                  <div className="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
-                    <div
-                      className="bg-blue-600 h-full rounded-full transition-all duration-500"
-                      style={{ width: `${(currentCar.joined / currentCar.target) * 100}%` }}
-                    />
-                  </div>
-                </div>
-
-                <div className="text-[11px] text-slate-600 flex items-center justify-between pt-1">
-                  <span className="flex items-center gap-1 font-medium text-slate-700">
-                    <Sparkles className="w-3.5 h-3.5 text-amber-600" />
-                    {currentCar.perk}
-                  </span>
-                  <span className="font-semibold text-blue-700">
-                    {currentCar.bids} Showrooms Bidding
-                  </span>
-                </div>
-              </div>
-
-              {/* Quick Action Button */}
-              <button
-                onClick={onExploreGroups}
-                className="mt-4 w-full py-3 rounded-xl bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-xs transition-all cursor-pointer"
-              >
-                <span>View {currentCar.name} Group</span>
-                <ChevronRight className="w-4 h-4" />
-              </button>
             </div>
           </div>
         </div>
