@@ -88,16 +88,16 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
             </div>
 
             {/* Main Design Heading */}
-            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-slate-900 leading-[1.12]">
-              Buy Your Next Car Together.{' '}
+            <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight text-slate-900 leading-[1.15]">
+              Smart Buyers Ki{' '}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-700 via-blue-600 to-indigo-700">
-                Save ₹50,000 to ₹1,00,000.
+                Smart Deal!
               </span>
             </h1>
 
             {/* Modern Punchy Tagline */}
             <p className="text-lg sm:text-xl text-slate-600 font-medium leading-relaxed max-w-2xl">
-              <span className="text-slate-900 font-bold">Never negotiate alone.</span> Group together with verified buyers in {selectedCity === 'All Cities' ? 'your city' : selectedCity}, let authorized showrooms compete, and drive home for less.
+              <span className="text-slate-900 font-bold">Never negotiate alone.</span> Group together with verified buyers in {selectedCity === 'All Cities' ? 'your city' : selectedCity}, let authorized showrooms compete, and save ₹50,000 to ₹1,00,000 on your new car.
             </p>
 
             {/* CTA Buttons */}
