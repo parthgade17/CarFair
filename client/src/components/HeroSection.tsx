@@ -95,11 +95,6 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
               </span>
             </h1>
 
-            {/* Modern Punchy Tagline */}
-            <p className="text-lg sm:text-xl text-slate-600 font-medium leading-relaxed max-w-2xl">
-              <span className="text-slate-900 font-bold">Never negotiate alone.</span> Group together with verified buyers in {selectedCity === 'All Cities' ? 'your city' : selectedCity}, let authorized showrooms compete, and save ₹50,000 to ₹1,00,000 on your new car.
-            </p>
-
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-2">
               <button
