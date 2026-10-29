@@ -7,7 +7,9 @@ import {
   Check, 
   ShieldCheck, 
   Sparkles, 
-  UploadCloud 
+  UploadCloud,
+  CheckCircle2,
+  AlertCircle
 } from 'lucide-react';
 import { DealLockVoucher, SavingsProofResult } from '../types';
 import { auditFinalInvoice } from '../services/api';
@@ -88,17 +90,17 @@ export const SavingsProofAuditor: React.FC<SavingsProofAuditorProps> = ({
             onClick={onBack}
             className="text-xs text-blue-700 hover:text-blue-800 font-bold mb-2 inline-block cursor-pointer"
           >
-            ← Back
+            ← Back to Car Groups
           </button>
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200 mb-2">
-            <Award className="w-3.5 h-3.5" />
-            <span>Post-Purchase Audit & Verification</span>
+            <Fuel className="w-3.5 h-3.5" />
+            <span>Buyer Delivery Reward</span>
           </div>
           <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-            SavingsProof: Real Savings Audit + ₹5,000 Fuel Reward
+            Claim Your ₹5,000 Free Petrol Card
           </h2>
-          <p className="text-sm text-slate-600 mt-1">
-            Upload your final dealership delivery invoice. We cross-verify zero hidden showroom charges and unlock your verified fuel card.
+          <p className="text-sm text-slate-600 mt-1 max-w-2xl">
+            Took delivery of your new car? Enter your final showroom bill amounts below. We verify that the dealer didn't sneak in any extra charges, and unlock your <strong>₹5,000 HPCL/IOCL fuel voucher</strong>.
           </p>
         </div>
       </div>
@@ -109,16 +111,16 @@ export const SavingsProofAuditor: React.FC<SavingsProofAuditorProps> = ({
           <div className="flex items-center justify-between border-b border-slate-100 pb-3">
             <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
               <UploadCloud className="w-4 h-4 text-emerald-700" />
-              <span>Final Invoice Audit Form</span>
+              <span>Final Showroom Bill Checker</span>
             </h3>
             <span className="text-[11px] text-emerald-800 font-bold bg-emerald-100 px-2 py-0.5 rounded">
-              + ₹5,000 Reward
+              + ₹5,000 Gift Card
             </span>
           </div>
 
           <form onSubmit={handleAuditSubmit} className="space-y-4 text-xs">
             <div>
-              <label className="block text-slate-700 font-semibold mb-1">Invoice Number</label>
+              <label className="block text-slate-700 font-semibold mb-1">Invoice / Bill Number</label>
               <input
                 type="text"
                 required
@@ -130,7 +132,7 @@ export const SavingsProofAuditor: React.FC<SavingsProofAuditorProps> = ({
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-slate-700 font-semibold mb-1">Ex-Showroom Paid (₹)</label>
+                <label className="block text-slate-700 font-semibold mb-1">Base Car Price (Ex-Showroom) (₹)</label>
                 <input
                   type="number"
                   value={actualExShowroom}
@@ -160,7 +162,7 @@ export const SavingsProofAuditor: React.FC<SavingsProofAuditorProps> = ({
               </div>
 
               <div>
-                <label className="block text-slate-700 font-semibold mb-1">Handling Fee Charged (₹)</label>
+                <label className="block text-slate-700 font-semibold mb-1">Handling Fee (Should be ₹0)</label>
                 <input
                   type="number"
                   value={actualHandling}
@@ -172,7 +174,7 @@ export const SavingsProofAuditor: React.FC<SavingsProofAuditorProps> = ({
             </div>
 
             <div>
-              <label className="block text-emerald-800 font-bold mb-1">Final Total Invoice Amount Paid (₹)</label>
+              <label className="block text-emerald-800 font-bold mb-1">Final Total Amount Paid to Showroom (₹)</label>
               <input
                 type="number"
                 required
@@ -188,7 +190,7 @@ export const SavingsProofAuditor: React.FC<SavingsProofAuditorProps> = ({
               className="w-full py-3 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-xs transition-all cursor-pointer"
             >
               <FileCheck className="w-4 h-4" />
-              <span>{loading ? 'Auditing Line by Line...' : 'Verify Invoice & Claim ₹5,000 Fuel Card'}</span>
+              <span>{loading ? 'Checking your bill numbers...' : 'Verify Bill & Claim ₹5,000 Petrol Card'}</span>
             </button>
           </form>
         </div>
@@ -197,7 +199,7 @@ export const SavingsProofAuditor: React.FC<SavingsProofAuditorProps> = ({
         <div className="lg:col-span-7 space-y-6">
           {auditResult ? (
             <div className="space-y-6">
-              {/* Reward Unlocked Banner - Elegant Emerald Card */}
+              {/* Reward Unlocked Banner */}
               <div className="bg-emerald-50/80 border-2 border-emerald-300 rounded-2xl p-6 shadow-sm relative overflow-hidden">
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex items-center gap-3">
@@ -206,13 +208,13 @@ export const SavingsProofAuditor: React.FC<SavingsProofAuditorProps> = ({
                     </div>
                     <div>
                       <span className="text-[10px] font-black uppercase tracking-wider text-emerald-800 bg-white px-2 py-0.5 rounded border border-emerald-200 shadow-xs">
-                        AUDITED & REWARD UNLOCKED
+                        BILL VERIFIED • CARD UNLOCKED
                       </span>
                       <h3 className="text-xl font-black text-slate-900 mt-1">
-                        ₹5,000 HPCL / IOCL Fuel Card Dispatched!
+                        ₹5,000 HPCL / IOCL Petrol Card Ready!
                       </h3>
                       <p className="text-xs text-slate-600 mt-0.5">
-                        Zero hidden showroom charges detected. DealLock promise honored by dealer.
+                        Zero illegal showroom fees found. The dealer honored your guaranteed group price.
                       </p>
                     </div>
                   </div>
@@ -221,7 +223,7 @@ export const SavingsProofAuditor: React.FC<SavingsProofAuditorProps> = ({
                 {/* Coupon Code Box */}
                 <div className="mt-5 p-4 rounded-xl bg-white border border-emerald-300 flex items-center justify-between shadow-xs">
                   <div>
-                    <span className="text-[10px] text-slate-500 uppercase tracking-wider font-semibold">Your PetroCard Voucher Code</span>
+                    <span className="text-[10px] text-slate-500 uppercase tracking-wider font-semibold">Your Petrol Card Digital Voucher</span>
                     <div className="font-mono font-black text-lg text-emerald-700 tracking-wider">
                       {auditResult.rewardUnlocked.couponCode}
                     </div>
@@ -231,14 +233,14 @@ export const SavingsProofAuditor: React.FC<SavingsProofAuditorProps> = ({
                     className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-700 hover:bg-emerald-800 text-white transition-colors cursor-pointer"
                   >
                     {copiedCoupon ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-                    <span>{copiedCoupon ? 'Copied!' : 'Copy Code'}</span>
+                    <span>{copiedCoupon ? 'Copied!' : 'Copy Voucher Code'}</span>
                   </button>
                 </div>
 
-                {/* Plus Free Detailing Perk */}
+                {/* Bonus Perk */}
                 <div className="mt-3 flex items-center gap-2 text-xs text-emerald-800 font-medium">
                   <Sparkles className="w-4 h-4 text-amber-600" />
-                  <span>Bonus: {auditResult.rewardUnlocked.perk} added to your account!</span>
+                  <span>Bonus Gift: {auditResult.rewardUnlocked.perk} added to your account!</span>
                 </div>
               </div>
 
@@ -247,47 +249,48 @@ export const SavingsProofAuditor: React.FC<SavingsProofAuditorProps> = ({
                 <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                   <div className="flex items-center gap-2">
                     <ShieldCheck className="w-5 h-5 text-blue-700" />
-                    <h4 className="text-sm font-bold text-slate-900">CarFair Savings Certificate</h4>
+                    <h4 className="text-sm font-bold text-slate-900">Your Official Savings Certificate</h4>
                   </div>
                   <span className="font-mono text-xs text-slate-500">
-                    {auditResult.summaryCertificate.certificateId}
+                    ID: {auditResult.summaryCertificate.certificateId}
                   </span>
                 </div>
 
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 text-xs">
                   <div>
-                    <span className="text-slate-500">Baseline Showroom Quote</span>
+                    <span className="text-slate-500">Normal Showroom Price</span>
                     <div className="text-base font-bold text-slate-400 line-through font-mono mt-0.5">
                       ₹{auditResult.baselineShowroomPrice.toLocaleString('en-IN')}
                     </div>
                   </div>
 
                   <div>
-                    <span className="text-slate-500">Actual Invoice Paid</span>
+                    <span className="text-slate-500">Actual Amount You Paid</span>
                     <div className="text-base font-bold text-slate-900 font-mono mt-0.5">
                       ₹{auditResult.actualInvoiceAmount.toLocaleString('en-IN')}
                     </div>
                   </div>
 
                   <div>
-                    <span className="text-emerald-800 font-bold">Net Verified Savings</span>
+                    <span className="text-emerald-800 font-bold">Total Money Saved</span>
                     <div className="text-xl font-black text-emerald-700 font-mono mt-0.5">
                       ₹{auditResult.realizedSavingsAmount.toLocaleString('en-IN')}
                     </div>
                   </div>
                 </div>
 
-                <p className="text-xs text-slate-500 pt-2 border-t border-slate-100">
-                  This transaction has been mathematically audited against manufacturer RTO slabs and baseline showroom pricing.
-                </p>
+                <div className="p-3 bg-emerald-50 rounded-xl border border-emerald-200 text-xs text-emerald-900 flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-700 shrink-0" />
+                  <span>Congratulations! You beat the solo showroom negotiation and saved money with your CarFair group.</span>
+                </div>
               </div>
             </div>
           ) : (
             <div className="bg-white border border-dashed border-slate-300 rounded-2xl p-12 text-center text-slate-500 space-y-3 shadow-xs">
               <Award className="w-12 h-12 text-slate-400 mx-auto" />
-              <h4 className="text-base font-bold text-slate-800">No Final Invoice Audited Yet</h4>
+              <h4 className="text-base font-bold text-slate-800">Ready to Claim Your ₹5,000 Petrol Card?</h4>
               <p className="text-xs max-w-sm mx-auto text-slate-500">
-                Fill the invoice details on the left and click "Verify Invoice" to audit line items and unlock your ₹5,000 fuel reward card.
+                Click "Verify Bill" on the left to test this with sample showroom bill figures and watch the reward unlock immediately.
               </p>
             </div>
           )}

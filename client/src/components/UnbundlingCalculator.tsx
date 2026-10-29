@@ -2,7 +2,10 @@ import React, { useState } from 'react';
 import { 
   Calculator, 
   Sparkles, 
-  CheckCircle2 
+  CheckCircle2,
+  ShieldAlert,
+  HelpCircle,
+  TrendingDown
 } from 'lucide-react';
 
 export const UnbundlingCalculator: React.FC = () => {
@@ -75,13 +78,13 @@ export const UnbundlingCalculator: React.FC = () => {
       <div className="text-center max-w-3xl mx-auto space-y-3">
         <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-blue-50 text-blue-800 border border-blue-200">
           <Calculator className="w-3.5 h-3.5" />
-          <span>The Dealer Profit Secret</span>
+          <span>Save Money Before Even Negotiating</span>
         </div>
         <h2 className="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
-          How Unbundling Saves You ₹45,000 - ₹85,000 Instantly
+          4 Showroom Secrets That Cost You ₹50,000+
         </h2>
         <p className="text-sm text-slate-600">
-          Car dealerships make almost zero margin on ex-showroom sticker prices. Their real profit comes from four padded add-ons. See how unbundling them changes everything.
+          Showrooms make very little profit on the car price itself. Their real profits come from 4 extra items added to your quotation. Here is how CarFair helps you avoid paying them.
         </p>
       </div>
 
@@ -93,7 +96,7 @@ export const UnbundlingCalculator: React.FC = () => {
             carSegment === 'COMPACT' ? 'bg-blue-700 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
           }`}
         >
-          Compact (₹10-14L)
+          Compact (₹10–14L)
         </button>
         <button
           onClick={() => setCarSegment('MID_SUV')}
@@ -101,7 +104,7 @@ export const UnbundlingCalculator: React.FC = () => {
             carSegment === 'MID_SUV' ? 'bg-blue-700 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
           }`}
         >
-          Mid SUV (₹15-20L)
+          Mid SUV (₹15–20L)
         </button>
         <button
           onClick={() => setCarSegment('PREMIUM')}
@@ -109,7 +112,7 @@ export const UnbundlingCalculator: React.FC = () => {
             carSegment === 'PREMIUM' ? 'bg-blue-700 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
           }`}
         >
-          Premium (₹21-28L)
+          Premium (₹21–28L)
         </button>
       </div>
 
@@ -118,7 +121,7 @@ export const UnbundlingCalculator: React.FC = () => {
         {/* The 4 Unbundling Levers */}
         <div className="lg:col-span-7 space-y-4">
           <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider">
-            Toggle Add-on Unbundling Levers
+            Tick or untick to see your savings:
           </h3>
 
           {/* Lever 1: Insurance */}
@@ -130,14 +133,14 @@ export const UnbundlingCalculator: React.FC = () => {
                   id="insuranceToggle"
                   checked={optOutInsurance}
                   onChange={(e) => setOptOutInsurance(e.target.checked)}
-                  className="w-5 h-5 rounded text-blue-700 border-slate-300"
+                  className="w-5 h-5 rounded text-blue-700 border-slate-300 cursor-pointer"
                 />
                 <label htmlFor="insuranceToggle" className="cursor-pointer">
-                  <h4 className="text-sm font-bold text-slate-900">1. Direct IRDAI Zero-Dep Insurance</h4>
-                  <p className="text-xs text-slate-500">Dealers inflate comprehensive insurance by 50-65% via agency kickbacks.</p>
+                  <h4 className="text-sm font-bold text-slate-900">1. Showroom Insurance vs Direct Online</h4>
+                  <p className="text-xs text-slate-500">Showrooms charge high insurance rates due to commissions. Online rates for zero-dep are much lower.</p>
                 </label>
               </div>
-              <span className="text-xs font-bold font-mono text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">
+              <span className="text-xs font-bold font-mono text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200 shrink-0">
                 Save ₹{(current.dealerInsurance - current.fairInsurance).toLocaleString('en-IN')}
               </span>
             </div>
@@ -148,7 +151,7 @@ export const UnbundlingCalculator: React.FC = () => {
                 <div className="font-mono text-red-700 line-through font-semibold">₹{current.dealerInsurance.toLocaleString('en-IN')}</div>
               </div>
               <div>
-                <span className="text-slate-500 font-medium">Direct Online Rate (Acko/Tata AIG):</span>
+                <span className="text-slate-600 font-medium">Direct Online Fair Price:</span>
                 <div className="font-mono text-emerald-700 font-bold">₹{current.fairInsurance.toLocaleString('en-IN')}</div>
               </div>
             </div>
@@ -163,30 +166,30 @@ export const UnbundlingCalculator: React.FC = () => {
                   id="handlingToggle"
                   checked={waiveHandling}
                   onChange={(e) => setWaiveHandling(e.target.checked)}
-                  className="w-5 h-5 rounded text-blue-700 border-slate-300"
+                  className="w-5 h-5 rounded text-blue-700 border-slate-300 cursor-pointer"
                 />
                 <label htmlFor="handlingToggle" className="cursor-pointer">
                   <h4 className="text-sm font-bold text-slate-900 flex items-center gap-1.5">
-                    <span>2. Waive Illegal Handling/Depot Charges</span>
-                    <span className="text-[10px] bg-red-100 text-red-800 font-bold px-1.5 py-0.2 rounded">
-                      MoRTH Circular
+                    <span>2. Illegal 'Handling & Depot' Charges</span>
+                    <span className="text-[10px] bg-red-100 text-red-800 font-bold px-1.5 py-0.5 rounded">
+                      Illegal
                     </span>
                   </h4>
-                  <p className="text-xs text-slate-500">Supreme Court & transport departments prohibit depot/handling fees.</p>
+                  <p className="text-xs text-slate-500">Supreme Court and Ministry of Road Transport (MoRTH) have banned depot/handling fees.</p>
                 </label>
               </div>
-              <span className="text-xs font-bold font-mono text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">
+              <span className="text-xs font-bold font-mono text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200 shrink-0">
                 Save ₹{current.dealerHandling.toLocaleString('en-IN')}
               </span>
             </div>
 
             <div className="grid grid-cols-2 gap-3 text-xs pt-2 border-t border-slate-100">
               <div>
-                <span className="text-slate-400">Showroom Surcharge:</span>
+                <span className="text-slate-400">Showroom Charges:</span>
                 <div className="font-mono text-red-700 line-through font-semibold">₹{current.dealerHandling.toLocaleString('en-IN')}</div>
               </div>
               <div>
-                <span className="text-slate-500 font-medium">CarFair Protected Fee:</span>
+                <span className="text-slate-600 font-medium">Legal Govt Approved Fee:</span>
                 <div className="font-mono text-emerald-700 font-bold">₹0 (Zero)</div>
               </div>
             </div>
@@ -201,25 +204,25 @@ export const UnbundlingCalculator: React.FC = () => {
                   id="accToggle"
                   checked={optOutAccessories}
                   onChange={(e) => setOptOutAccessories(e.target.checked)}
-                  className="w-5 h-5 rounded text-blue-700 border-slate-300"
+                  className="w-5 h-5 rounded text-blue-700 border-slate-300 cursor-pointer"
                 />
                 <label htmlFor="accToggle" className="cursor-pointer">
-                  <h4 className="text-sm font-bold text-slate-900">3. Unbundle Mandatory Accessory Kit</h4>
-                  <p className="text-xs text-slate-500">Dealers force ₹25k kits with cheap mudflaps, chrome trim, and perfume.</p>
+                  <h4 className="text-sm font-bold text-slate-900">3. Forced Mandatory Accessory Kits</h4>
+                  <p className="text-xs text-slate-500">Showrooms pack cheap perfume and chrome strips for ₹25k. Buy only essential mats for ₹4,500.</p>
                 </label>
               </div>
-              <span className="text-xs font-bold font-mono text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">
+              <span className="text-xs font-bold font-mono text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200 shrink-0">
                 Save ₹{(current.dealerAccessories - current.fairAccessories).toLocaleString('en-IN')}
               </span>
             </div>
 
             <div className="grid grid-cols-2 gap-3 text-xs pt-2 border-t border-slate-100">
               <div>
-                <span className="text-slate-400">Forced Dealer Kit:</span>
+                <span className="text-slate-400">Showroom Forced Pack:</span>
                 <div className="font-mono text-red-700 line-through font-semibold">₹{current.dealerAccessories.toLocaleString('en-IN')}</div>
               </div>
               <div>
-                <span className="text-slate-500 font-medium">Quality Essential Mats & Mudflaps:</span>
+                <span className="text-slate-600 font-medium">Actual Essential Accessories:</span>
                 <div className="font-mono text-emerald-700 font-bold">₹{current.fairAccessories.toLocaleString('en-IN')}</div>
               </div>
             </div>
@@ -234,49 +237,49 @@ export const UnbundlingCalculator: React.FC = () => {
                   id="warrToggle"
                   checked={negotiateWarranty}
                   onChange={(e) => setNegotiateWarranty(e.target.checked)}
-                  className="w-5 h-5 rounded text-blue-700 border-slate-300"
+                  className="w-5 h-5 rounded text-blue-700 border-slate-300 cursor-pointer"
                 />
                 <label htmlFor="warrToggle" className="cursor-pointer">
-                  <h4 className="text-sm font-bold text-slate-900">4. OEM Direct Extended Warranty</h4>
-                  <p className="text-xs text-slate-500">Buy official OEM package without dealership internal markup.</p>
+                  <h4 className="text-sm font-bold text-slate-900">4. Overpriced Extended Warranty</h4>
+                  <p className="text-xs text-slate-500">Pay official car manufacturer rates instead of dealership internal markups.</p>
                 </label>
               </div>
-              <span className="text-xs font-bold font-mono text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">
+              <span className="text-xs font-bold font-mono text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200 shrink-0">
                 Save ₹{(current.dealerWarranty - current.fairWarranty).toLocaleString('en-IN')}
               </span>
             </div>
           </div>
         </div>
 
-        {/* Real Savings Summary Card - Professional Clean White with Emerald Details */}
+        {/* Real Savings Summary Card */}
         <div className="lg:col-span-5 bg-white border border-slate-200 rounded-3xl p-6 sm:p-7 space-y-6 shadow-sm sticky top-24">
           <div className="flex items-center gap-2">
             <Sparkles className="w-5 h-5 text-emerald-700" />
-            <h3 className="text-base font-bold text-slate-900">Your Unbundled Real Savings</h3>
+            <h3 className="text-base font-bold text-slate-900">Your Extra Savings</h3>
           </div>
 
           <div className="bg-emerald-50 border border-emerald-300 rounded-2xl p-5 text-center">
             <span className="text-xs text-emerald-900 font-bold uppercase tracking-wider">
-              Immediate Extra Savings In Your Pocket
+              Cash Saved Right in Your Pocket
             </span>
             <div className="text-4xl sm:text-5xl font-black text-emerald-700 font-mono mt-1">
               ₹{totalUnbundledSavings.toLocaleString('en-IN')}
             </div>
             <p className="text-[11px] text-emerald-800 mt-1 font-medium">
-              Calculated without even counting the group ex-showroom discount!
+              And this is BEFORE counting your group discount!
             </p>
           </div>
 
           <div className="space-y-3 text-xs border-t border-slate-100 pt-4">
             <div className="flex justify-between">
-              <span className="text-slate-500 font-medium">Total Showroom Add-on Cost:</span>
+              <span className="text-slate-500 font-medium">Total Showroom Add-on Charges:</span>
               <span className="font-mono line-through text-red-700 font-bold">
                 ₹{standardShowroomMarkupTotal.toLocaleString('en-IN')}
               </span>
             </div>
 
             <div className="flex justify-between">
-              <span className="text-slate-800 font-semibold">CarFair Unbundled Equivalent:</span>
+              <span className="text-slate-800 font-semibold">What You Fairly Pay:</span>
               <span className="font-mono text-emerald-700 font-bold">
                 ₹{unbundledSmartTotal.toLocaleString('en-IN')}
               </span>
@@ -284,9 +287,9 @@ export const UnbundlingCalculator: React.FC = () => {
           </div>
 
           <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-[11px] text-slate-600 space-y-1">
-            <p className="font-bold text-slate-800">The Power of CarFair Group Buying:</p>
+            <p className="font-bold text-slate-800">Why CarFair Groups Win:</p>
             <p>
-              When you join a CarFair group, dealers automatically agree to these unbundled rates and compete on ex-showroom discounts too!
+              When you join a CarFair group, dealers agree upfront to remove all 4 of these markups AND give you a bulk group discount on the car price too!
             </p>
           </div>
         </div>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShieldCheck } from 'lucide-react';
+import { ShieldCheck, Heart } from 'lucide-react';
 
 interface FooterProps {
   onNavigate: (tab: string) => void;
@@ -19,40 +19,40 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
               <span className="text-lg font-extrabold text-white">CarFair</span>
             </div>
             <p className="text-slate-400 leading-relaxed text-[11px]">
-              India's first verified group car-buying network and AI quotation auditor. Turning fragmented buyers into a formidable collective bargaining force.
+              India's first group car-buying network and quotation checker. We help car buyers come together so authorized showrooms offer bulk fleet discounts.
             </p>
             <p className="text-[10px] text-slate-500">
-              Developed by Parth Gade for modern Indian car buyers.
+              Built for Indian car buyers and families.
             </p>
           </div>
 
           {/* Core Modules */}
           <div className="space-y-2">
-            <h4 className="text-xs font-bold text-white uppercase tracking-wider">Features</h4>
+            <h4 className="text-xs font-bold text-white uppercase tracking-wider">Helpful Tools</h4>
             <ul className="space-y-1.5 text-[11px]">
               <li>
                 <button onClick={() => onNavigate('quotetruth')} className="hover:text-blue-400 transition-colors cursor-pointer">
-                  QuoteTruth AI Auditor
+                  Showroom Bill Checker
                 </button>
               </li>
               <li>
                 <button onClick={() => onNavigate('groups')} className="hover:text-blue-400 transition-colors cursor-pointer">
-                  Verified Buying Groups
+                  Car Buying Groups
                 </button>
               </li>
               <li>
                 <button onClick={() => onNavigate('bidding')} className="hover:text-blue-400 transition-colors cursor-pointer">
-                  Live Reverse Bidding Arena
+                  Showrooms Competing
                 </button>
               </li>
               <li>
                 <button onClick={() => onNavigate('unbundling')} className="hover:text-blue-400 transition-colors cursor-pointer">
-                  Unbundling Savings Calculator
+                  4 Showroom Secrets Calculator
                 </button>
               </li>
               <li>
                 <button onClick={() => onNavigate('savingsproof')} className="hover:text-blue-400 transition-colors cursor-pointer">
-                  SavingsProof Invoice Audit
+                  Claim ₹5,000 Free Petrol Card
                 </button>
               </li>
             </ul>
@@ -60,7 +60,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
 
           {/* Indian Cities Covered */}
           <div className="space-y-2">
-            <h4 className="text-xs font-bold text-white uppercase tracking-wider">Active Metros</h4>
+            <h4 className="text-xs font-bold text-white uppercase tracking-wider">Active Cities</h4>
             <ul className="space-y-1 text-[11px] text-slate-400">
               <li>Pune (MH-12 / MH-14) — Flagship Hub</li>
               <li>Mumbai (MH-01 / MH-02 / MH-03)</li>
@@ -73,13 +73,13 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
 
           {/* Legal and Compliance */}
           <div className="space-y-2">
-            <h4 className="text-xs font-bold text-white uppercase tracking-wider">Compliance & Ethics</h4>
+            <h4 className="text-xs font-bold text-white uppercase tracking-wider">Our Trust Promise</h4>
             <p className="text-[11px] text-slate-400 leading-relaxed">
-              CarFair operates strictly within the framework of the Ministry of Road Transport and Highways (MoRTH), IRDAI guidelines for insurance unbundling, and CCPA transparent pricing standards.
+              CarFair follows the guidelines of the Ministry of Road Transport and Highways (MoRTH) and IRDAI insurance rules. We ensure you never pay illegal handling charges.
             </p>
             <div className="pt-2 text-[10px] text-emerald-400 flex items-center gap-1 font-semibold">
               <ShieldCheck className="w-3.5 h-3.5" />
-              <span>Zero consumer fees • Transparent dealer referral fees</span>
+              <span>100% Free for buyers • No hidden fees</span>
             </div>
           </div>
         </div>
@@ -87,12 +87,12 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
         {/* Bottom bar */}
         <div className="pt-8 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-slate-500">
           <div>
-            © 2026 CarFair India Technologies. All rights reserved.
+            © 2026 CarFair India. All rights reserved.
           </div>
           <div className="flex items-center gap-4">
             <span className="hover:text-slate-300 cursor-pointer">Privacy Policy</span>
             <span className="hover:text-slate-300 cursor-pointer">Terms of Service</span>
-            <span className="hover:text-slate-300 cursor-pointer">MoRTH Anti-Handling Advisory</span>
+            <span className="hover:text-slate-300 cursor-pointer">Fair Pricing Guidelines</span>
           </div>
         </div>
       </div>

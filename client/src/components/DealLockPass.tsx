@@ -9,7 +9,9 @@ import {
   Printer, 
   FileCheck, 
   Fuel, 
-  Car 
+  Car,
+  HelpCircle,
+  AlertTriangle
 } from 'lucide-react';
 import { DealLockVoucher } from '../types';
 
@@ -47,7 +49,7 @@ export const DealLockPass: React.FC<DealLockPassProps> = ({
           onClick={onBack}
           className="text-xs text-blue-700 hover:text-blue-800 font-bold cursor-pointer"
         >
-          ← Back to Arena
+          ← Back to Car Groups
         </button>
         <div className="flex items-center gap-2">
           <button
@@ -55,14 +57,14 @@ export const DealLockPass: React.FC<DealLockPassProps> = ({
             className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-white border border-slate-300 text-slate-700 hover:text-slate-900 flex items-center gap-1.5 shadow-xs cursor-pointer"
           >
             <Printer className="w-3.5 h-3.5" />
-            <span>Print Pass</span>
+            <span>Print Pass / Save PDF</span>
           </button>
         </div>
       </div>
 
-      {/* Main Voucher Card - Elegant High-End Trust Document */}
-      <div className="bg-white border-2 border-slate-300 rounded-3xl p-6 sm:p-8 shadow-md relative overflow-hidden">
-        {/* Security Header */}
+      {/* Main Pass Document */}
+      <div className="bg-white border-2 border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm relative overflow-hidden">
+        {/* Pass Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-6">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 rounded-2xl bg-blue-700 flex items-center justify-center shadow-md text-white">
@@ -70,17 +72,17 @@ export const DealLockPass: React.FC<DealLockPassProps> = ({
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-xl font-black tracking-tight text-slate-900">CarFair DealLock™</span>
+                <span className="text-xl font-black tracking-tight text-slate-900">CarFair Price Lock Pass</span>
                 <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-900 border border-emerald-300">
-                  PRICE FROZEN
+                  PRICE LOCKED
                 </span>
               </div>
-              <p className="text-xs text-slate-500">Official Non-Alterable Price & Allocation Certificate</p>
+              <p className="text-xs text-slate-500">Official Showroom Price Guarantee Certificate</p>
             </div>
           </div>
 
           <div className="text-right sm:border-l sm:border-slate-200 sm:pl-6">
-            <span className="text-[10px] text-slate-400 uppercase tracking-wider font-bold">Voucher Reference</span>
+            <span className="text-[10px] text-slate-400 uppercase tracking-wider font-bold">Pass Number</span>
             <div className="flex items-center gap-2 mt-0.5 justify-end">
               <span className="font-mono font-bold text-sm text-blue-800">{voucher.voucherCode}</span>
               <button onClick={copyCode} className="text-slate-500 hover:text-slate-800 cursor-pointer">
@@ -91,52 +93,54 @@ export const DealLockPass: React.FC<DealLockPassProps> = ({
           </div>
         </div>
 
-        {/* Vehicle & Dealer Info */}
+        {/* Vehicle & Showroom Info */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 my-6 p-5 rounded-2xl bg-slate-50 border border-slate-200">
           <div>
-            <span className="text-[10px] text-slate-500 uppercase tracking-wider font-bold">Allocated Vehicle</span>
+            <span className="text-[10px] text-slate-500 uppercase tracking-wider font-bold">Your Selected Car</span>
             <div className="text-lg font-bold text-slate-900 mt-0.5 flex items-center gap-2">
               <Car className="w-4 h-4 text-blue-700" />
               <span>{voucher.vehicle.carName}</span>
             </div>
             <p className="text-xs text-slate-600">{voucher.vehicle.variantName}</p>
-            <p className="text-xs text-slate-500 mt-1">Buyer: <strong className="text-slate-800">{voucher.buyer.name}</strong> ({voucher.buyer.phone})</p>
+            <p className="text-xs text-slate-500 mt-1">
+              Registered Buyer: <strong className="text-slate-800">{voucher.buyer.name}</strong> ({voucher.buyer.phone})
+            </p>
           </div>
 
           <div>
-            <span className="text-[10px] text-slate-500 uppercase tracking-wider font-bold">Fulfilling Dealership</span>
+            <span className="text-[10px] text-slate-500 uppercase tracking-wider font-bold">Assigned Showroom</span>
             <div className="text-base font-bold text-slate-900 mt-0.5">{voucher.dealer.dealerName}</div>
-            <p className="text-xs text-slate-500">{voucher.dealer.city} Region • Authorized OEM Partner</p>
+            <p className="text-xs text-slate-500">{voucher.dealer.city} Region • Official Authorised Dealership</p>
             <p className="text-xs text-emerald-800 mt-1 flex items-center gap-1 font-bold">
               <CheckCircle2 className="w-3.5 h-3.5 text-emerald-700" />
-              Guaranteed Delivery SLA: {voucher.fulfillment.guaranteedDeliveryDays} Days
+              Guaranteed Delivery: Within {voucher.fulfillment.guaranteedDeliveryDays} Days
             </p>
           </div>
         </div>
 
-        {/* Financial Price Freeze Breakdown */}
+        {/* Pricing Summary */}
         <div className="my-6 space-y-3">
           <h4 className="text-xs font-bold text-slate-600 uppercase tracking-wider">
-            Protected Price Architecture
+            Price Comparison & Total Savings
           </h4>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="bg-slate-50 border border-slate-200 rounded-xl p-4">
-              <span className="text-xs text-slate-500">Solo Showroom Baseline</span>
+              <span className="text-xs text-slate-500">Regular Showroom Price</span>
               <div className="text-lg font-bold text-slate-400 line-through font-mono mt-1">
                 ₹{voucher.financialLock.baselineShowroomPrice.toLocaleString('en-IN')}
               </div>
             </div>
 
             <div className="bg-emerald-50 border border-emerald-300 rounded-xl p-4">
-              <span className="text-xs text-emerald-800 font-bold">DealLocked On-Road Total</span>
+              <span className="text-xs text-emerald-800 font-bold">Your Group Locked Price</span>
               <div className="text-2xl font-black text-emerald-700 font-mono mt-1">
                 ₹{voucher.financialLock.lockedOnRoadPrice.toLocaleString('en-IN')}
               </div>
             </div>
 
-            <div className="bg-blue-50 border border-blue-300 rounded-xl p-4">
-              <span className="text-xs text-blue-800 font-bold">Verified Guaranteed Savings</span>
+            <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+              <span className="text-xs text-blue-800 font-bold">Your Total Money Saved</span>
               <div className="text-2xl font-black text-blue-700 font-mono mt-1">
                 ₹{voucher.financialLock.guaranteedSavings.toLocaleString('en-IN')}
               </div>
@@ -144,33 +148,19 @@ export const DealLockPass: React.FC<DealLockPassProps> = ({
           </div>
         </div>
 
-        {/* Price Protection Legal Clauses */}
-        <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-700 space-y-2">
-          <div className="flex items-center gap-2 font-bold text-emerald-800">
-            <Lock className="w-4 h-4 text-emerald-700" />
-            <span>Anti-Tamper & Showroom Price Freeze Conditions</span>
-          </div>
-          <ul className="list-disc pl-5 space-y-1 text-slate-600 text-[11px]">
-            <li><strong>Handling Charges:</strong> Dealership has agreed in writing to waive ₹18,000+ logistics and depot fees.</li>
-            <li><strong>Zero-Dep Insurance:</strong> Price matched with IRDAI direct benchmark; showroom cannot mandate internal policy.</li>
-            <li><strong>Accessories:</strong> Only agreed OEM accessories included ({voucher.fulfillment.promisedPerks.join(', ')}). No forced chrome pack.</li>
-            <li><strong>Digital Audit Hash:</strong> <span className="font-mono text-[10px] text-blue-700 font-bold">{voucher.verificationSecurity.digitalSignature}</span></li>
-          </ul>
-        </div>
-
-        {/* Anti-Disintermediation Dealer OTP */}
+        {/* The 6-Digit PIN Box */}
         <div className="mt-6 p-5 rounded-2xl bg-amber-50/80 border border-amber-300 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="space-y-1">
             <div className="flex items-center gap-2 text-amber-900 font-bold text-xs">
               <Key className="w-4 h-4 text-amber-700" />
-              <span>Showroom Delivery Check-in OTP</span>
+              <span>Show This 6-Digit PIN to the Showroom Manager</span>
             </div>
             <p className="text-[11px] text-slate-700 max-w-md">
-              Hand this 6-digit OTP to the Sales Head when paying booking amount. They must enter this in their dealer portal to honor the group price.
+              When you visit the showroom to pay your booking deposit or take delivery, show this 6-digit PIN. The sales manager will enter it into their system to confirm your locked group price.
             </p>
           </div>
 
-          <div className="flex items-center gap-2 bg-white px-4 py-2.5 rounded-xl border border-amber-300 shadow-xs">
+          <div className="flex items-center gap-2 bg-white px-5 py-3 rounded-xl border border-amber-300 shadow-xs">
             <span className="font-mono font-black text-2xl text-amber-800 tracking-widest">
               {voucher.verificationSecurity.dealerClaimOtp}
             </span>
@@ -180,16 +170,30 @@ export const DealLockPass: React.FC<DealLockPassProps> = ({
           </div>
         </div>
 
-        {/* Anti-Bypass Buyer Reward Banner */}
+        {/* Buyer Protection Terms */}
+        <div className="mt-6 p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-700 space-y-2">
+          <div className="flex items-center gap-2 font-bold text-emerald-800">
+            <ShieldCheck className="w-4 h-4 text-emerald-700" />
+            <span>Our 4-Point Price Guarantee for You:</span>
+          </div>
+          <ul className="list-disc pl-5 space-y-1.5 text-slate-600 text-[11px]">
+            <li><strong>Zero Handling Fees:</strong> The showroom is legally bound to charge ₹0 in logistics, depot, or handling fees.</li>
+            <li><strong>Fair Insurance:</strong> The insurance price is matched with fair direct online rates—no showroom markup.</li>
+            <li><strong>No Forced Accessories:</strong> You only get the agreed free accessories ({voucher.fulfillment.promisedPerks.join(', ')}). No mandatory ₹25,000 accessory pack.</li>
+            <li><strong>Official Warranty:</strong> Direct manufacturer warranty valid at any authorized service center across India.</li>
+          </ul>
+        </div>
+
+        {/* Claim Fuel Card Banner */}
         <div className="mt-6 p-4 rounded-xl bg-blue-50/80 border border-blue-200 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center shrink-0">
               <Fuel className="w-5 h-5" />
             </div>
             <div>
-              <h5 className="text-xs font-bold text-slate-900">Unlock ₹5,000 Fuel Card on Delivery</h5>
+              <h5 className="text-xs font-bold text-slate-900">Claim Your ₹5,000 Free Petrol Card</h5>
               <p className="text-[11px] text-slate-600">
-                Upload your final invoice to verify zero extra showroom charges and immediately claim your HPCL/IOCL card.
+                After taking delivery of your car, upload your final showroom bill to ensure no hidden fees were added and claim your ₹5,000 HPCL/IOCL card.
               </p>
             </div>
           </div>
@@ -199,7 +203,7 @@ export const DealLockPass: React.FC<DealLockPassProps> = ({
             className="px-4 py-2 rounded-xl bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs shrink-0 flex items-center gap-1.5 shadow-xs cursor-pointer"
           >
             <FileCheck className="w-3.5 h-3.5" />
-            <span>Upload Invoice & Audit Savings</span>
+            <span>Check Final Bill & Claim Card</span>
           </button>
         </div>
       </div>
