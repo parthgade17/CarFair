@@ -106,11 +106,84 @@ export const FALLBACK_CARS: Car[] = [
         mileage: '15.2 kmpl'
       }
     ]
+  },
+  {
+    id: 'maruti-brezza',
+    brand: 'Maruti Suzuki',
+    model: 'Brezza',
+    segment: 'Compact SUV',
+    image: 'https://images.unsplash.com/photo-1583121274602-3e2820c69888?auto=format&fit=crop&w=1200&q=80',
+    tagline: 'Urban Compact SUV with Electric Sunroof & 360 Camera',
+    fuelTypes: ['Petrol', 'CNG'],
+    transmissions: ['Manual', 'Automatic'],
+    priceRange: '₹8.34 Lakh - ₹14.14 Lakh',
+    variants: [
+      {
+        id: 'brezza-zxi-plus',
+        name: 'ZXi+ 1.5 DualJet 6AT',
+        exShowroom: 1398000,
+        fuel: 'Petrol',
+        transmission: 'Automatic',
+        engineCc: 1462,
+        seating: 5,
+        mileage: '19.8 kmpl'
+      },
+      {
+        id: 'brezza-vxi',
+        name: 'VXi 1.5 Smart Hybrid 5MT',
+        exShowroom: 969000,
+        fuel: 'Petrol',
+        transmission: 'Manual',
+        engineCc: 1462,
+        seating: 5,
+        mileage: '17.38 kmpl'
+      }
+    ]
   }
 ];
 
 // Fallback Buying Groups for 100% reliable static operation
 export const FALLBACK_GROUPS: BuyingGroup[] = [
+  {
+    id: 'grp-brezza-pune-7721',
+    carId: 'maruti-brezza',
+    variantId: 'brezza-zxi-plus',
+    carName: 'Maruti Suzuki Brezza ZXi+ 1.5 AT',
+    city: 'Pune',
+    state: 'MH',
+    communityName: 'Viman Nagar & Kalyani Nagar Buyers Pool',
+    status: 'ACTIVE_BIDDING',
+    biddingEndsAt: new Date(Date.now() + 6 * 24 * 3600 * 1000).toISOString(),
+    targetBuyers: 20,
+    currentBuyers: 18,
+    verifiedBuyers: 15,
+    baselineShowroomPrice: 1545000,
+    currentBestGroupPrice: 1482000,
+    verifiedSavingsTotal: 63000,
+    discountTiers: [
+      { minBuyers: 5, discountPerBuyer: 25000, perk: 'Free Underbody Coating + Body Cover' },
+      { minBuyers: 10, discountPerBuyer: 42000, perk: 'Extended 5-Yr Warranty Pack' },
+      { minBuyers: 20, discountPerBuyer: 63000, perk: 'Bulk Cash Discount + Free Accessories Kit' }
+    ],
+    currentUnlockedTier: 2,
+    bids: [
+      {
+        id: 'bid-seva-1',
+        dealerId: 'dealer-seva-maruti-pune',
+        dealerName: 'Seva Maruti Suzuki Arena (Shivajinagar)',
+        submittedAt: 'Today',
+        exShowroomDiscount: 45000,
+        corporateExchangeBonus: 18000,
+        freebies: ['5-Yr Extended Warranty', '7D Floor Mats', 'Anti-Rust Coating'],
+        insuranceMatchPrice: 28000,
+        waivedHandlingCharges: true,
+        deliveryDays: 6,
+        finalOnRoadPerUnit: 1482000,
+        isWinning: true,
+        terms: 'Authorized arena delivery batch allocation.'
+      }
+    ]
+  },
   {
     id: 'grp-nexon-pune-8841',
     carId: 'tata-nexon',

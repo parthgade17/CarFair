@@ -67,11 +67,11 @@ export const Navbar: React.FC<NavbarProps> = ({
     <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-xs transition-all">
       {/* Top Banner Alert */}
       <div className="bg-slate-900 px-4 py-1.5 text-xs text-center text-slate-200 flex items-center justify-center gap-2">
-        <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-blue-600 text-white shrink-0 tracking-wide uppercase">
-          OCTOBER DEALS
+        <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-600 text-white shrink-0 tracking-wide uppercase">
+          PILOT LIVE
         </span>
         <span className="text-slate-300 text-xs truncate sm:text-clip">
-          <strong className="text-white font-semibold">{selectedCity === 'All Cities' ? 'Pune & Mumbai' : selectedCity}</strong> {t.topAlert} {t.octoberDeals}
+          <strong className="text-white font-semibold">{selectedCity === 'All Cities' ? 'Pune & Metros' : selectedCity}:</strong> Compare real dealer quotes and see what a collective buyer group could save.
         </span>
       </div>
 
