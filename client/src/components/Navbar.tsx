@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { 
   ShieldCheck, 
-  Car, 
   FileSearch, 
   Gavel, 
   Lock, 
@@ -49,14 +48,14 @@ export const Navbar: React.FC<NavbarProps> = ({
   ];
 
   return (
-    <nav className="sticky top-0 z-50 bg-slate-950/90 backdrop-blur-md border-b border-slate-800 transition-all">
-      {/* Top Banner Alert */}
-      <div className="bg-gradient-to-r from-blue-900/60 via-indigo-900/40 to-slate-900/60 border-b border-blue-500/20 px-4 py-1.5 text-xs text-center text-blue-200 flex items-center justify-center gap-2">
-        <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-semibold bg-blue-500/20 text-blue-300 border border-blue-500/30">
+    <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200/90 shadow-sm transition-all">
+      {/* Top Banner Alert - Professional Slate Navy */}
+      <div className="bg-slate-900 border-b border-slate-800 px-4 py-2 text-xs text-center text-slate-200 flex items-center justify-center gap-2">
+        <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-blue-600 text-white">
           OCTOBER TARGET RUSH
         </span>
-        <span>
-          Dealers are competing for month-end OEM quotas in <strong>{selectedCity === 'All Cities' ? 'Pune & Mumbai' : selectedCity}</strong>. Average savings: ₹68,400 per buyer!
+        <span className="text-slate-300">
+          Authorized dealerships in <strong>{selectedCity === 'All Cities' ? 'Pune & Mumbai' : selectedCity}</strong> are competing for month-end volume quotas. Avg savings: <strong>₹68,400</strong>.
         </span>
       </div>
 
@@ -64,19 +63,19 @@ export const Navbar: React.FC<NavbarProps> = ({
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <div className="flex items-center gap-3 cursor-pointer" onClick={() => setActiveTab('groups')}>
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center shadow-lg shadow-blue-500/20 border border-blue-400/30">
+            <div className="w-10 h-10 rounded-xl bg-blue-700 flex items-center justify-center shadow-md shadow-blue-700/20 text-white">
               <ShieldCheck className="w-6 h-6 text-white" />
             </div>
             <div>
               <div className="flex items-center gap-1.5">
-                <span className="text-xl font-extrabold tracking-tight bg-gradient-to-r from-white via-slate-100 to-blue-200 bg-clip-text text-transparent">
-                  Car<span className="text-blue-500">Fair</span>
+                <span className="text-xl font-extrabold tracking-tight text-slate-900">
+                  Car<span className="text-blue-700">Fair</span>
                 </span>
-                <span className="px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 rounded">
+                <span className="px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-emerald-50 text-emerald-800 border border-emerald-200 rounded">
                   India Verified
                 </span>
               </div>
-              <p className="text-[10px] text-slate-400 hidden sm:block">Group Buying & Quote Auditor</p>
+              <p className="text-[11px] text-slate-500 hidden sm:block">Group Buying & Quotation Auditor</p>
             </div>
           </div>
 
@@ -89,19 +88,19 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <button
                   key={link.id}
                   onClick={() => setActiveTab(link.id)}
-                  className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all relative ${
+                  className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold transition-all relative ${
                     isActive
-                      ? 'text-white bg-blue-600/20 border border-blue-500/40 shadow-sm shadow-blue-500/10'
-                      : 'text-slate-300 hover:text-white hover:bg-slate-900/80 border border-transparent'
+                      ? 'text-blue-700 bg-blue-50 border border-blue-200 shadow-sm'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100 border border-transparent'
                   }`}
                 >
-                  <Icon className={`w-4 h-4 ${isActive ? 'text-blue-400' : 'text-slate-400'}`} />
+                  <Icon className={`w-4 h-4 ${isActive ? 'text-blue-700' : 'text-slate-400'}`} />
                   <span>{link.label}</span>
                   {link.badge && (
-                    <span className={`text-[10px] px-1.5 py-0.2 rounded font-semibold ${
+                    <span className={`text-[10px] px-1.5 py-0.2 rounded font-bold ${
                       isActive 
-                        ? 'bg-blue-500 text-white' 
-                        : 'bg-slate-800 text-blue-300 border border-blue-900/60'
+                        ? 'bg-blue-700 text-white' 
+                        : 'bg-slate-100 text-slate-600 border border-slate-200'
                     }`}>
                       {link.badge}
                     </span>
@@ -117,15 +116,15 @@ export const Navbar: React.FC<NavbarProps> = ({
             <div className="relative">
               <button
                 onClick={() => setIsCityDropdownOpen(!isCityDropdownOpen)}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-900 border border-slate-700/80 text-slate-200 hover:border-slate-500 transition-colors"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-white border border-slate-300 text-slate-700 hover:border-slate-400 shadow-sm transition-colors"
               >
-                <MapPin className="w-3.5 h-3.5 text-blue-400" />
+                <MapPin className="w-3.5 h-3.5 text-blue-700" />
                 <span>{selectedCity}</span>
                 <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
               </button>
 
               {isCityDropdownOpen && (
-                <div className="absolute right-0 mt-2 w-44 rounded-xl bg-slate-900 border border-slate-700 shadow-2xl py-1 z-50">
+                <div className="absolute right-0 mt-2 w-44 rounded-xl bg-white border border-slate-200 shadow-xl py-1 z-50">
                   {CITIES.map((city) => (
                     <button
                       key={city}
@@ -135,8 +134,8 @@ export const Navbar: React.FC<NavbarProps> = ({
                       }}
                       className={`w-full text-left px-3 py-2 text-xs font-medium transition-colors ${
                         selectedCity === city
-                          ? 'bg-blue-600 text-white font-semibold'
-                          : 'text-slate-300 hover:bg-slate-800'
+                          ? 'bg-blue-50 text-blue-700 font-bold'
+                          : 'text-slate-700 hover:bg-slate-50'
                       }`}
                     >
                       {city}
@@ -147,13 +146,13 @@ export const Navbar: React.FC<NavbarProps> = ({
             </div>
 
             {/* Role Switcher */}
-            <div className="flex bg-slate-900 p-1 rounded-xl border border-slate-800">
+            <div className="flex bg-slate-100 p-1 rounded-xl border border-slate-200">
               <button
                 onClick={() => setUserRole('BUYER')}
-                className={`px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center gap-1 transition-all ${
+                className={`px-3 py-1 rounded-lg text-xs font-semibold flex items-center gap-1 transition-all ${
                   userRole === 'BUYER'
-                    ? 'bg-blue-600 text-white shadow-sm'
-                    : 'text-slate-400 hover:text-slate-200'
+                    ? 'bg-blue-700 text-white shadow-sm'
+                    : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
                 <Users className="w-3 h-3" />
@@ -161,10 +160,10 @@ export const Navbar: React.FC<NavbarProps> = ({
               </button>
               <button
                 onClick={() => setUserRole('DEALER')}
-                className={`px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center gap-1 transition-all ${
+                className={`px-3 py-1 rounded-lg text-xs font-semibold flex items-center gap-1 transition-all ${
                   userRole === 'DEALER'
-                    ? 'bg-amber-600 text-white shadow-sm'
-                    : 'text-slate-400 hover:text-slate-200'
+                    ? 'bg-amber-700 text-white shadow-sm'
+                    : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
                 <Building2 className="w-3 h-3" />
@@ -177,7 +176,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           <div className="flex lg:hidden items-center gap-2">
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="p-2 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 hover:text-white"
+              className="p-2 rounded-lg bg-slate-100 border border-slate-200 text-slate-700 hover:text-slate-900"
             >
               {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
@@ -187,14 +186,14 @@ export const Navbar: React.FC<NavbarProps> = ({
 
       {/* Mobile Drawer */}
       {isMobileMenuOpen && (
-        <div className="lg:hidden bg-slate-950 border-b border-slate-800 px-4 pt-2 pb-6 space-y-3">
+        <div className="lg:hidden bg-white border-b border-slate-200 px-4 pt-3 pb-6 space-y-3 shadow-lg">
           {/* City selector on mobile */}
-          <div className="flex items-center justify-between pb-2 border-b border-slate-800">
-            <span className="text-xs text-slate-400">Current City:</span>
+          <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+            <span className="text-xs text-slate-500 font-medium">Select City:</span>
             <select
               value={selectedCity}
               onChange={(e) => setSelectedCity(e.target.value)}
-              className="bg-slate-900 border border-slate-700 text-white text-xs rounded-lg px-2.5 py-1.5"
+              className="bg-slate-50 border border-slate-300 text-slate-800 text-xs rounded-lg px-2.5 py-1.5"
             >
               {CITIES.map((c) => (
                 <option key={c} value={c}>{c}</option>
@@ -203,11 +202,11 @@ export const Navbar: React.FC<NavbarProps> = ({
           </div>
 
           {/* Role switcher on mobile */}
-          <div className="grid grid-cols-2 gap-2 pb-2 border-b border-slate-800">
+          <div className="grid grid-cols-2 gap-2 pb-2 border-b border-slate-100">
             <button
               onClick={() => setUserRole('BUYER')}
-              className={`py-2 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 ${
-                userRole === 'BUYER' ? 'bg-blue-600 text-white' : 'bg-slate-900 text-slate-300'
+              className={`py-2 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 ${
+                userRole === 'BUYER' ? 'bg-blue-700 text-white' : 'bg-slate-100 text-slate-700'
               }`}
             >
               <Users className="w-3.5 h-3.5" />
@@ -215,8 +214,8 @@ export const Navbar: React.FC<NavbarProps> = ({
             </button>
             <button
               onClick={() => setUserRole('DEALER')}
-              className={`py-2 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 ${
-                userRole === 'DEALER' ? 'bg-amber-600 text-white' : 'bg-slate-900 text-slate-300'
+              className={`py-2 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 ${
+                userRole === 'DEALER' ? 'bg-amber-700 text-white' : 'bg-slate-100 text-slate-700'
               }`}
             >
               <Building2 className="w-3.5 h-3.5" />
@@ -236,8 +235,8 @@ export const Navbar: React.FC<NavbarProps> = ({
                     setActiveTab(link.id);
                     setIsMobileMenuOpen(false);
                   }}
-                  className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium ${
-                    isActive ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-900'
+                  className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-semibold ${
+                    isActive ? 'bg-blue-700 text-white' : 'text-slate-700 hover:bg-slate-50'
                   }`}
                 >
                   <div className="flex items-center gap-2.5">
@@ -245,7 +244,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                     <span>{link.label}</span>
                   </div>
                   {link.badge && (
-                    <span className="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-blue-300">
+                    <span className="text-[10px] px-2 py-0.5 rounded bg-slate-100 text-slate-700">
                       {link.badge}
                     </span>
                   )}

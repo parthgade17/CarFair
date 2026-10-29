@@ -9,11 +9,8 @@ import {
   Sparkles, 
   ArrowRight, 
   TrendingDown, 
-  Info,
-  Scale,
-  DollarSign,
-  Upload,
-  Zap
+  Scale, 
+  Zap 
 } from 'lucide-react';
 import { QuoteTruthAudit, Car } from '../types';
 import { auditQuotation, fetchCars } from '../services/api';
@@ -169,38 +166,38 @@ export const QuoteTruthAuditor: React.FC<QuoteTruthAuditorProps> = ({
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-slate-800 pb-6">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-slate-200 pb-6">
         <div>
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 mb-2">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-blue-50 text-blue-800 border border-blue-200 mb-2">
             <Sparkles className="w-3.5 h-3.5" />
             <span>AI Car Quotation Auditor</span>
           </div>
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
             QuoteTruth: Stop Dealer Markup Traps
           </h2>
-          <p className="text-sm text-slate-400 mt-1">
+          <p className="text-sm text-slate-600 mt-1">
             Indian dealers inflate insurance by 60% and charge illegal handling fees. Upload or input any quote to unbundle real costs.
           </p>
         </div>
 
         {/* Quick Presets */}
         <div className="flex flex-wrap items-center gap-2">
-          <span className="text-xs text-slate-400 font-medium">Test Real Quotes:</span>
+          <span className="text-xs text-slate-500 font-semibold">Test Real Quotes:</span>
           <button
             onClick={() => handlePreset('nexon-pune')}
-            className="px-2.5 py-1.5 rounded-lg text-xs font-medium bg-slate-900 border border-slate-700 hover:border-blue-500 text-slate-200 hover:text-white transition-colors"
+            className="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-white border border-slate-300 hover:border-blue-500 text-slate-700 hover:text-blue-700 shadow-xs transition-colors cursor-pointer"
           >
             Tata Nexon (Pune)
           </button>
           <button
             onClick={() => handlePreset('creta-mumbai')}
-            className="px-2.5 py-1.5 rounded-lg text-xs font-medium bg-slate-900 border border-slate-700 hover:border-blue-500 text-slate-200 hover:text-white transition-colors"
+            className="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-white border border-slate-300 hover:border-blue-500 text-slate-700 hover:text-blue-700 shadow-xs transition-colors cursor-pointer"
           >
             Hyundai Creta (Mumbai)
           </button>
           <button
             onClick={() => handlePreset('xuv-blr')}
-            className="px-2.5 py-1.5 rounded-lg text-xs font-medium bg-slate-900 border border-slate-700 hover:border-blue-500 text-slate-200 hover:text-white transition-colors"
+            className="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-white border border-slate-300 hover:border-blue-500 text-slate-700 hover:text-blue-700 shadow-xs transition-colors cursor-pointer"
           >
             XUV700 (Bengaluru)
           </button>
@@ -208,14 +205,14 @@ export const QuoteTruthAuditor: React.FC<QuoteTruthAuditorProps> = ({
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        {/* Input Panel */}
-        <div className="lg:col-span-5 bg-slate-900/80 border border-slate-800 rounded-2xl p-6 space-y-5 shadow-xl">
-          <div className="flex items-center justify-between">
-            <h3 className="text-base font-bold text-white flex items-center gap-2">
-              <FileSearch className="w-4 h-4 text-blue-400" />
+        {/* Input Panel - Clean White */}
+        <div className="lg:col-span-5 bg-white border border-slate-200 rounded-2xl p-6 space-y-5 shadow-xs">
+          <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+            <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+              <FileSearch className="w-4 h-4 text-blue-700" />
               <span>Dealership Quote Input</span>
             </h3>
-            <span className="text-[11px] text-slate-400 bg-slate-800 px-2 py-0.5 rounded">
+            <span className="text-[11px] text-slate-500 bg-slate-100 px-2 py-0.5 rounded font-medium">
               State: {selectedState}
             </span>
           </div>
@@ -223,7 +220,7 @@ export const QuoteTruthAuditor: React.FC<QuoteTruthAuditorProps> = ({
           <div className="space-y-4 text-xs">
             {/* Car Selection */}
             <div>
-              <label className="block text-slate-300 font-medium mb-1">Select Vehicle</label>
+              <label className="block text-slate-700 font-semibold mb-1">Select Vehicle</label>
               <select
                 value={selectedCarId}
                 onChange={(e) => {
@@ -234,7 +231,7 @@ export const QuoteTruthAuditor: React.FC<QuoteTruthAuditorProps> = ({
                     setExShowroom(c.variants[0].exShowroom);
                   }
                 }}
-                className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white text-xs focus:outline-none focus:border-blue-500"
+                className="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-900 text-xs focus:bg-white focus:outline-none focus:border-blue-600 font-medium"
               >
                 {cars.map((car) => (
                   <option key={car.id} value={car.id}>
@@ -247,7 +244,7 @@ export const QuoteTruthAuditor: React.FC<QuoteTruthAuditorProps> = ({
             {/* Variant Selection */}
             {currentCar && (
               <div>
-                <label className="block text-slate-300 font-medium mb-1">Variant</label>
+                <label className="block text-slate-700 font-semibold mb-1">Variant</label>
                 <select
                   value={selectedVariantId}
                   onChange={(e) => {
@@ -255,7 +252,7 @@ export const QuoteTruthAuditor: React.FC<QuoteTruthAuditorProps> = ({
                     const v = currentCar.variants.find(item => item.id === e.target.value);
                     if (v) setExShowroom(v.exShowroom);
                   }}
-                  className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white text-xs focus:outline-none focus:border-blue-500"
+                  className="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-900 text-xs focus:bg-white focus:outline-none focus:border-blue-600 font-medium"
                 >
                   {currentCar.variants.map((v) => (
                     <option key={v.id} value={v.id}>
@@ -269,65 +266,65 @@ export const QuoteTruthAuditor: React.FC<QuoteTruthAuditorProps> = ({
             {/* Two Column Number Inputs */}
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-slate-300 font-medium mb-1">Ex-Showroom (₹)</label>
+                <label className="block text-slate-700 font-medium mb-1">Ex-Showroom (₹)</label>
                 <input
                   type="number"
                   value={exShowroom}
                   onChange={(e) => setExShowroom(Number(e.target.value))}
-                  className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white text-xs font-mono"
+                  className="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-900 text-xs font-mono font-medium focus:bg-white focus:border-blue-600"
                 />
               </div>
 
               <div>
-                <label className="block text-slate-300 font-medium mb-1">Quoted RTO Tax (₹)</label>
+                <label className="block text-slate-700 font-medium mb-1">Quoted RTO Tax (₹)</label>
                 <input
                   type="number"
                   value={rto}
                   onChange={(e) => setRto(Number(e.target.value))}
-                  className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white text-xs font-mono"
+                  className="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-900 text-xs font-mono font-medium focus:bg-white focus:border-blue-600"
                 />
               </div>
 
               <div>
-                <label className="block text-slate-300 font-medium mb-1">Dealer Insurance (₹)</label>
+                <label className="block text-slate-700 font-medium mb-1">Dealer Insurance (₹)</label>
                 <input
                   type="number"
                   value={insurance}
                   onChange={(e) => setInsurance(Number(e.target.value))}
-                  className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white text-xs font-mono"
+                  className="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-900 text-xs font-mono font-medium focus:bg-white focus:border-blue-600"
                 />
               </div>
 
               <div>
-                <label className="block text-rose-300 font-medium mb-1 flex items-center justify-between">
-                  <span>Handling/Depot (₹)</span>
-                  <span className="text-[10px] text-rose-400 font-bold">ILLEGAL</span>
+                <label className="block text-red-700 font-semibold mb-1 flex items-center justify-between">
+                  <span>Handling Fee (₹)</span>
+                  <span className="text-[10px] text-red-700 font-bold bg-red-100 px-1 py-0.2 rounded">ILLEGAL</span>
                 </label>
                 <input
                   type="number"
                   value={handlingCharges}
                   onChange={(e) => setHandlingCharges(Number(e.target.value))}
-                  className="w-full bg-slate-950 border border-rose-500/50 rounded-lg px-3 py-2 text-rose-300 text-xs font-mono"
+                  className="w-full bg-red-50/50 border border-red-300 rounded-lg px-3 py-2 text-red-900 text-xs font-mono font-medium focus:bg-white focus:border-red-500"
                 />
               </div>
 
               <div>
-                <label className="block text-slate-300 font-medium mb-1">Accessory Kit (₹)</label>
+                <label className="block text-slate-700 font-medium mb-1">Accessory Kit (₹)</label>
                 <input
                   type="number"
                   value={accessoryPack}
                   onChange={(e) => setAccessoryPack(Number(e.target.value))}
-                  className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white text-xs font-mono"
+                  className="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-900 text-xs font-mono font-medium focus:bg-white focus:border-blue-600"
                 />
               </div>
 
               <div>
-                <label className="block text-slate-300 font-medium mb-1">Dealer Discount (₹)</label>
+                <label className="block text-emerald-800 font-medium mb-1">Dealer Discount (₹)</label>
                 <input
                   type="number"
                   value={discounts}
                   onChange={(e) => setDiscounts(Number(e.target.value))}
-                  className="w-full bg-slate-950 border border-emerald-500/50 rounded-lg px-3 py-2 text-emerald-300 text-xs font-mono"
+                  className="w-full bg-emerald-50/50 border border-emerald-300 rounded-lg px-3 py-2 text-emerald-900 text-xs font-mono font-medium focus:bg-white focus:border-emerald-600"
                 />
               </div>
             </div>
@@ -335,7 +332,7 @@ export const QuoteTruthAuditor: React.FC<QuoteTruthAuditorProps> = ({
             <button
               onClick={runAudit}
               disabled={loading}
-              className="w-full py-3 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-blue-600/30 transition-all"
+              className="w-full py-3 rounded-xl bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-sm transition-all cursor-pointer"
             >
               <Zap className="w-4 h-4" />
               <span>{loading ? 'Auditing with QuoteTruth AI...' : 'Run QuoteTruth Audit Now'}</span>
@@ -348,30 +345,30 @@ export const QuoteTruthAuditor: React.FC<QuoteTruthAuditorProps> = ({
           {auditResult ? (
             <div className="space-y-6">
               {/* Score and Savings Header */}
-              <div className="bg-gradient-to-br from-slate-900 to-slate-950 border border-slate-800 rounded-2xl p-6 shadow-xl relative overflow-hidden">
+              <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs relative overflow-hidden">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div>
-                    <span className="text-xs text-slate-400 uppercase tracking-wider font-semibold">
+                    <span className="text-xs text-slate-500 uppercase tracking-wider font-bold">
                       Quote Integrity Score
                     </span>
                     <div className="flex items-baseline gap-3 mt-1">
                       <span className={`text-4xl font-extrabold font-mono ${
                         auditResult.quoteHealthScore >= 80 
-                          ? 'text-emerald-400' 
+                          ? 'text-emerald-700' 
                           : auditResult.quoteHealthScore >= 60 
-                            ? 'text-amber-400' 
-                            : 'text-rose-400'
+                            ? 'text-amber-700' 
+                            : 'text-red-700'
                       }`}>
                         {auditResult.quoteHealthScore}
-                        <span className="text-lg text-slate-500">/100</span>
+                        <span className="text-lg text-slate-400">/100</span>
                       </span>
 
-                      <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider ${
+                      <span className={`px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${
                         auditResult.healthRating === 'CLEAN_DEAL'
-                          ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'
+                          ? 'bg-emerald-100 text-emerald-800 border border-emerald-200'
                           : auditResult.healthRating === 'MODERATE_MARKUP'
-                            ? 'bg-amber-500/10 text-amber-400 border border-amber-500/30'
-                            : 'bg-rose-500/10 text-rose-400 border border-rose-500/30'
+                            ? 'bg-amber-100 text-amber-800 border border-amber-200'
+                            : 'bg-red-100 text-red-800 border border-red-200'
                       }`}>
                         {auditResult.healthRating.replace('_', ' ')}
                       </span>
@@ -379,36 +376,36 @@ export const QuoteTruthAuditor: React.FC<QuoteTruthAuditorProps> = ({
                   </div>
 
                   {/* Savings pill */}
-                  <div className="bg-emerald-950/60 border border-emerald-500/40 rounded-xl p-3.5 text-right sm:min-w-[200px]">
-                    <span className="text-[11px] text-emerald-300 font-medium">Unbundled Potential Savings</span>
-                    <div className="text-2xl font-extrabold text-emerald-400 font-mono">
+                  <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-3.5 text-right sm:min-w-[200px]">
+                    <span className="text-[11px] text-emerald-800 font-semibold">Unbundled Potential Savings</span>
+                    <div className="text-2xl font-extrabold text-emerald-700 font-mono">
                       ₹{auditResult.totalPossibleSavings.toLocaleString('en-IN')}
                     </div>
-                    <span className="text-[10px] text-emerald-300/80">Waive traps & buy insurance direct</span>
+                    <span className="text-[10px] text-emerald-600">Waive traps & buy insurance direct</span>
                   </div>
                 </div>
 
                 {/* Side by side comparison */}
-                <div className="mt-6 grid grid-cols-2 gap-4 pt-4 border-t border-slate-800/80">
+                <div className="mt-6 grid grid-cols-2 gap-4 pt-4 border-t border-slate-100">
                   <div>
-                    <span className="text-xs text-slate-400">Dealer Quoted On-Road:</span>
-                    <div className="text-lg font-bold text-rose-400 font-mono mt-0.5">
+                    <span className="text-xs text-slate-500">Dealer Quoted On-Road:</span>
+                    <div className="text-lg font-bold text-red-700 font-mono mt-0.5">
                       ₹{auditResult.dealerQuotedTotal.toLocaleString('en-IN')}
                     </div>
                   </div>
                   <div>
-                    <span className="text-xs text-slate-400">CarFair Fair On-Road Total:</span>
-                    <div className="text-lg font-bold text-emerald-400 font-mono mt-0.5">
+                    <span className="text-xs text-slate-500">CarFair Fair On-Road Total:</span>
+                    <div className="text-lg font-bold text-emerald-700 font-mono mt-0.5">
                       ₹{auditResult.unbundledRecommendedTotal.toLocaleString('en-IN')}
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* Red & Yellow Audit Flags */}
+              {/* Detected Flags */}
               <div className="space-y-3">
-                <h4 className="text-sm font-bold text-white flex items-center gap-2">
-                  <ShieldAlert className="w-4 h-4 text-amber-400" />
+                <h4 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                  <ShieldAlert className="w-4 h-4 text-amber-600" />
                   <span>Detected Markup Traps & Illegal Surcharges ({auditResult.auditFlags.length})</span>
                 </h4>
 
@@ -417,70 +414,70 @@ export const QuoteTruthAuditor: React.FC<QuoteTruthAuditorProps> = ({
                     key={flag.id} 
                     className={`rounded-xl p-4 border transition-all ${
                       flag.severity === 'CRITICAL'
-                        ? 'bg-rose-950/30 border-rose-500/40 text-rose-200'
+                        ? 'bg-red-50/70 border-red-200 text-red-950'
                         : flag.severity === 'HIGH'
-                          ? 'bg-amber-950/30 border-amber-500/40 text-amber-200'
-                          : 'bg-slate-900 border-slate-800 text-slate-200'
+                          ? 'bg-amber-50/70 border-amber-200 text-amber-950'
+                          : 'bg-white border-slate-200 text-slate-800'
                     }`}
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex items-center gap-2">
                         <AlertTriangle className={`w-4 h-4 shrink-0 ${
-                          flag.severity === 'CRITICAL' ? 'text-rose-400' : 'text-amber-400'
+                          flag.severity === 'CRITICAL' ? 'text-red-600' : 'text-amber-600'
                         }`} />
-                        <span className="font-bold text-sm text-white">{flag.title}</span>
+                        <span className="font-bold text-sm text-slate-900">{flag.title}</span>
                       </div>
-                      <span className="font-mono font-bold text-xs px-2 py-0.5 rounded bg-black/40 text-rose-400">
+                      <span className="font-mono font-bold text-xs px-2.5 py-0.5 rounded bg-white text-red-700 border border-slate-200">
                         +₹{flag.excessPaid.toLocaleString('en-IN')}
                       </span>
                     </div>
 
-                    <p className="text-xs text-slate-300 mt-2 leading-relaxed">
+                    <p className="text-xs text-slate-700 mt-2 leading-relaxed">
                       {flag.explanation}
                     </p>
 
-                    <div className="mt-3 pt-2 border-t border-slate-800/60 flex items-center gap-2 text-xs font-semibold text-emerald-400">
+                    <div className="mt-3 pt-2 border-t border-slate-200/60 flex items-center gap-2 text-xs font-semibold text-emerald-800">
                       <span>Action:</span>
-                      <span className="text-slate-300 font-normal">{flag.actionToTake}</span>
+                      <span className="text-slate-700 font-normal">{flag.actionToTake}</span>
                     </div>
                   </div>
                 ))}
               </div>
 
               {/* AI Negotiation Script */}
-              <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-3">
+              <div className="bg-white border border-slate-200 rounded-2xl p-5 space-y-3 shadow-xs">
                 <div className="flex items-center justify-between">
-                  <h4 className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
-                    <Sparkles className="w-4 h-4 text-blue-400" />
+                  <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-blue-700" />
                     <span>AI Negotiation Script (Send to Dealer on WhatsApp)</span>
                   </h4>
                   <button
                     onClick={copyNegotiationScript}
-                    className="flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold bg-blue-600 hover:bg-blue-500 text-white transition-colors"
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-700 hover:bg-blue-800 text-white transition-colors cursor-pointer"
                   >
                     {copiedScript ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
                     <span>{copiedScript ? 'Copied to Clipboard!' : 'Copy Script'}</span>
                   </button>
                 </div>
 
-                <div className="bg-slate-950 rounded-xl p-4 text-xs font-mono text-slate-300 leading-relaxed border border-slate-800">
+                <div className="bg-slate-50 rounded-xl p-4 text-xs font-mono text-slate-800 leading-relaxed border border-slate-200">
                   {auditResult.aiNegotiationScript}
                 </div>
               </div>
 
               {/* Convert Solo to Group Action */}
-              <div className="bg-gradient-to-r from-blue-900/50 via-indigo-900/40 to-slate-900 border border-blue-500/30 rounded-2xl p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="bg-blue-50/70 border border-blue-200 rounded-2xl p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div>
-                  <h4 className="text-sm font-bold text-white">
+                  <h4 className="text-sm font-bold text-slate-900">
                     Want Even Bigger Savings Than Individual Negotiation?
                   </h4>
-                  <p className="text-xs text-slate-300 mt-0.5">
+                  <p className="text-xs text-slate-600 mt-0.5">
                     Join {selectedCity}'s verified group for this vehicle. Dealerships bid in reverse auction.
                   </p>
                 </div>
                 <button
                   onClick={() => onJoinGroupForCar(selectedCarId)}
-                  className="px-5 py-2.5 rounded-xl font-bold text-xs bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-500/20 shrink-0 flex items-center gap-1.5"
+                  className="px-5 py-2.5 rounded-xl font-bold text-xs bg-blue-700 hover:bg-blue-800 text-white shadow-xs shrink-0 flex items-center gap-1.5 cursor-pointer"
                 >
                   <span>View Group Bids for this Car</span>
                   <ArrowRight className="w-3.5 h-3.5" />
@@ -488,10 +485,10 @@ export const QuoteTruthAuditor: React.FC<QuoteTruthAuditorProps> = ({
               </div>
             </div>
           ) : (
-            <div className="bg-slate-900/50 border border-dashed border-slate-800 rounded-2xl p-12 text-center text-slate-400 space-y-3">
-              <FileSearch className="w-12 h-12 text-slate-600 mx-auto" />
-              <h4 className="text-base font-semibold text-white">No Quotation Audited Yet</h4>
-              <p className="text-xs max-w-sm mx-auto">
+            <div className="bg-white border border-dashed border-slate-300 rounded-2xl p-12 text-center text-slate-500 space-y-3 shadow-xs">
+              <FileSearch className="w-12 h-12 text-slate-400 mx-auto" />
+              <h4 className="text-base font-bold text-slate-800">No Quotation Audited Yet</h4>
+              <p className="text-xs max-w-sm mx-auto text-slate-500">
                 Select a preset on top or enter your showroom quotation details on the left and click "Run QuoteTruth Audit".
               </p>
             </div>

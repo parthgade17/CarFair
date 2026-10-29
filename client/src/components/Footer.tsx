@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShieldCheck, Heart, ExternalLink, FileText } from 'lucide-react';
+import { ShieldCheck } from 'lucide-react';
 
 interface FooterProps {
   onNavigate: (tab: string) => void;
@@ -7,7 +7,7 @@ interface FooterProps {
 
 export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
   return (
-    <footer className="bg-slate-950 border-t border-slate-800 text-slate-400 text-xs py-12">
+    <footer className="bg-slate-900 border-t border-slate-800 text-slate-300 text-xs py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Brand info */}
@@ -31,27 +31,27 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
             <h4 className="text-xs font-bold text-white uppercase tracking-wider">Features</h4>
             <ul className="space-y-1.5 text-[11px]">
               <li>
-                <button onClick={() => onNavigate('quotetruth')} className="hover:text-blue-400 transition-colors">
+                <button onClick={() => onNavigate('quotetruth')} className="hover:text-blue-400 transition-colors cursor-pointer">
                   QuoteTruth AI Auditor
                 </button>
               </li>
               <li>
-                <button onClick={() => onNavigate('groups')} className="hover:text-blue-400 transition-colors">
+                <button onClick={() => onNavigate('groups')} className="hover:text-blue-400 transition-colors cursor-pointer">
                   Verified Buying Groups
                 </button>
               </li>
               <li>
-                <button onClick={() => onNavigate('bidding')} className="hover:text-blue-400 transition-colors">
+                <button onClick={() => onNavigate('bidding')} className="hover:text-blue-400 transition-colors cursor-pointer">
                   Live Reverse Bidding Arena
                 </button>
               </li>
               <li>
-                <button onClick={() => onNavigate('unbundling')} className="hover:text-blue-400 transition-colors">
+                <button onClick={() => onNavigate('unbundling')} className="hover:text-blue-400 transition-colors cursor-pointer">
                   Unbundling Savings Calculator
                 </button>
               </li>
               <li>
-                <button onClick={() => onNavigate('savingsproof')} className="hover:text-blue-400 transition-colors">
+                <button onClick={() => onNavigate('savingsproof')} className="hover:text-blue-400 transition-colors cursor-pointer">
                   SavingsProof Invoice Audit
                 </button>
               </li>
@@ -85,7 +85,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
         </div>
 
         {/* Bottom bar */}
-        <div className="pt-8 border-t border-slate-900 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-slate-500">
+        <div className="pt-8 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-slate-500">
           <div>
             © 2026 CarFair India Technologies. All rights reserved.
           </div>
