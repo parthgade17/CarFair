@@ -1,4 +1,5 @@
 import { CarImageItem } from '../types';
+import { supabase, isSupabaseConfigured } from './supabase';
 
 const STORAGE_KEY = 'carfair_showroom_photos';
 
@@ -241,6 +242,20 @@ export function addShowroomPhoto(
 
   customMap[normalizedId] = [newItem, ...existingList];
   localStorage.setItem(STORAGE_KEY, JSON.stringify(customMap));
+
+  // Sync to Supabase PostgreSQL database if configured
+  if (isSupabaseConfigured()) {
+    supabase.from('showroom_photos').insert({
+      car_id: normalizedId,
+      url: photo.url,
+      caption: photo.caption || 'Showroom Vehicle Stock',
+      category: photo.category || 'SHOWROOM_FLOOR',
+      uploaded_by: photo.uploadedBy || 'Authorized Showroom Partner'
+    }).then(({ error }) => {
+      if (error) console.warn('Supabase showroom photo insert error:', error.message);
+    });
+  }
+
   return newItem;
 }
 
@@ -259,5 +274,12 @@ export function deleteShowroomPhoto(carIdOrName: string, photoId: string): boole
 
   customMap[normalizedId] = customMap[normalizedId].filter(p => p.id !== photoId);
   localStorage.setItem(STORAGE_KEY, JSON.stringify(customMap));
+
+  if (isSupabaseConfigured() && photoId) {
+    supabase.from('showroom_photos').delete().eq('id', photoId).then(({ error }) => {
+      if (error) console.warn('Supabase photo delete:', error.message);
+    });
+  }
+
   return true;
 }
