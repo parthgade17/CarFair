@@ -3,8 +3,11 @@
   "version": "2.0.0",
   "description": "CarFair - India's Verified Group Car-Buying & Quotation Auditing Platform (FastAPI Python Backend)",
   "private": true,
+  "workspaces": [
+    "client"
+  ],
   "scripts": {
-    "build": "npm run build --prefix client",
+    "build": "npm --prefix client install && npm --prefix client run build",
     "install:all": "npm install --prefix client && python -m pip install -r server/requirements.txt",
     "dev:client": "npm run dev --prefix client",
     "dev:server": "python server/run.py",
