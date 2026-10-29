@@ -9,11 +9,13 @@ import { SavingsProofAuditor } from './components/SavingsProofAuditor';
 import { UnbundlingCalculator } from './components/UnbundlingCalculator';
 import { TradeInExchange } from './components/TradeInExchange';
 import { DealerPortalView } from './components/DealerPortalView';
+import { AccountView } from './components/AccountView';
 import { Footer } from './components/Footer';
 import { BuyingGroup, ReverseBid, DealLockVoucher } from './types';
 import { generateDealLockVoucher, fetchGroups } from './services/api';
+import { LanguageProvider } from './context/LanguageContext';
 
-export function App() {
+function AppContent() {
   const [activeTab, setActiveTab] = useState('groups');
   const [selectedCity, setSelectedCity] = useState('Pune');
   const [userRole, setUserRole] = useState<'BUYER' | 'DEALER' | 'COMMUNITY'>('BUYER');
@@ -99,7 +101,12 @@ export function App() {
       />
 
       <main className="flex-1">
-        {userRole === 'DEALER' ? (
+        {activeTab === 'account' ? (
+          <AccountView
+            onNavigateToTab={(tab) => setActiveTab(tab)}
+            selectedCity={selectedCity}
+          />
+        ) : userRole === 'DEALER' ? (
           <DealerPortalView />
         ) : (
           <>
@@ -207,5 +214,13 @@ export function App() {
 
       <Footer onNavigate={(tab) => setActiveTab(tab)} />
     </div>
+  );
+}
+
+export function App() {
+  return (
+    <LanguageProvider>
+      <AppContent />
+    </LanguageProvider>
   );
 }

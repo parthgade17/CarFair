@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { BuyingGroup, Car } from '../types';
 import { fetchGroups, joinGroup, createGroup, fetchCars } from '../services/api';
+import { useLanguage } from '../context/LanguageContext';
 
 interface GroupBuyingArenaProps {
   selectedCity: string;
@@ -28,6 +29,7 @@ export const GroupBuyingArena: React.FC<GroupBuyingArenaProps> = ({
   onLockDealForGroup,
   onViewBidsForGroup
 }) => {
+  const { t } = useLanguage();
   const [groups, setGroups] = useState<BuyingGroup[]>([]);
   const [cars, setCars] = useState<Car[]>([]);
   const [loading, setLoading] = useState(true);
@@ -110,13 +112,13 @@ export const GroupBuyingArena: React.FC<GroupBuyingArenaProps> = ({
         <div>
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-blue-50 text-blue-800 border border-blue-200 mb-2">
             <Users className="w-3.5 h-3.5" />
-            <span>Active Car Buying Groups in {selectedCity}</span>
+            <span>{selectedCity} {t.groupsBadge}</span>
           </div>
           <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-            Buy Together, Save More Money
+            {t.groupsTitle}
           </h2>
           <p className="text-sm text-slate-600 mt-1 max-w-2xl">
-            Join verified car pools in {selectedCity} and unlock bulk showroom discounts with zero agent fees.
+            {t.groupsSubtitle}
           </p>
         </div>
 
@@ -126,7 +128,7 @@ export const GroupBuyingArena: React.FC<GroupBuyingArenaProps> = ({
           className="px-4 py-2.5 rounded-xl font-bold text-xs bg-blue-700 hover:bg-blue-800 text-white shadow-xs flex items-center gap-2 self-start md:self-auto shrink-0 transition-all cursor-pointer"
         >
           <PlusCircle className="w-4 h-4" />
-          <span>Start Group for Society / Office</span>
+          <span>{t.btnStartGroup}</span>
         </button>
       </div>
 
@@ -258,7 +260,7 @@ export const GroupBuyingArena: React.FC<GroupBuyingArenaProps> = ({
                     <div className="mt-3 flex items-baseline justify-between pt-2 border-t border-slate-100">
                       <div>
                         <span className="text-[10px] text-slate-400 line-through font-mono">
-                          Showroom: ₹{group.baselineShowroomPrice.toLocaleString('en-IN')}
+                          {t.cardShowroomPrice} ₹{group.baselineShowroomPrice.toLocaleString('en-IN')}
                         </span>
                         <div className="text-lg font-black text-emerald-700 font-mono">
                           ₹{group.currentBestGroupPrice.toLocaleString('en-IN')}
@@ -266,7 +268,7 @@ export const GroupBuyingArena: React.FC<GroupBuyingArenaProps> = ({
                       </div>
 
                       <div className="text-right">
-                        <span className="text-[10px] text-slate-500 font-medium">Your Total Saving</span>
+                        <span className="text-[10px] text-slate-500 font-medium">{t.cardYourSaving}</span>
                         <div className="text-xs font-bold font-mono text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded">
                           -₹{group.verifiedSavingsTotal.toLocaleString('en-IN')}
                         </div>
@@ -278,10 +280,10 @@ export const GroupBuyingArena: React.FC<GroupBuyingArenaProps> = ({
                       <div className="flex items-center justify-between text-xs">
                         <span className="text-slate-700 font-medium flex items-center gap-1">
                           <Users className="w-3.5 h-3.5 text-blue-700" />
-                          <strong>{group.currentBuyers} Buyers Joined</strong>
+                          <strong>{group.currentBuyers} {t.cardBuyersJoined}</strong>
                         </span>
                         <span className="text-amber-700 font-semibold text-[11px] bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200">
-                          {spotsRemaining > 0 ? `${spotsRemaining} spots left` : 'Goal Reached'}
+                          {spotsRemaining > 0 ? `${spotsRemaining} ${t.cardSpotsLeft}` : 'Goal Reached'}
                         </span>
                       </div>
 
@@ -304,9 +306,9 @@ export const GroupBuyingArena: React.FC<GroupBuyingArenaProps> = ({
                     {winningBid && (
                       <div className="mt-4 bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs space-y-1">
                         <div className="flex items-center justify-between">
-                          <span className="text-slate-500 font-medium">Lowest Showroom Offer:</span>
+                          <span className="text-slate-500 font-medium">{t.cardLowestOffer}</span>
                           <span className="text-[10px] text-emerald-800 font-bold bg-emerald-100 px-1.5 py-0.5 rounded">
-                            Delivery in {winningBid.deliveryDays} Days
+                            {t.cardDeliveryIn} {winningBid.deliveryDays} Days
                           </span>
                         </div>
                         <p className="font-bold text-slate-900 truncate">{winningBid.dealerName}</p>
@@ -324,12 +326,12 @@ export const GroupBuyingArena: React.FC<GroupBuyingArenaProps> = ({
                       className="flex-1 py-2.5 rounded-xl font-bold text-xs bg-blue-700 hover:bg-blue-800 text-white shadow-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer"
                     >
                       <Users className="w-3.5 h-3.5" />
-                      <span>Join Group (Free)</span>
+                      <span>{t.btnJoinGroup}</span>
                     </button>
 
                     <button
                       onClick={() => onViewBidsForGroup(group)}
-                      title="See All Showroom Offers"
+                      title={t.btnSeeOffers}
                       className="p-2.5 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 transition-colors cursor-pointer"
                     >
                       <Gavel className="w-4 h-4 text-amber-600" />
@@ -337,7 +339,7 @@ export const GroupBuyingArena: React.FC<GroupBuyingArenaProps> = ({
 
                     <button
                       onClick={() => onLockDealForGroup(group)}
-                      title="Get Price Lock Pass"
+                      title={t.btnGetPriceLock}
                       className="p-2.5 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 transition-colors cursor-pointer"
                     >
                       <ShieldCheck className="w-4 h-4 text-emerald-700" />
@@ -367,7 +369,7 @@ export const GroupBuyingArena: React.FC<GroupBuyingArenaProps> = ({
             ) : (
               <form onSubmit={handleJoinSubmit} className="space-y-4 text-xs">
                 <div>
-                  <label className="block text-slate-700 font-semibold mb-1">Your Full Name</label>
+                  <label className="block text-slate-700 font-semibold mb-1">{t.modalFullName}</label>
                   <input
                     type="text"
                     required
@@ -379,7 +381,7 @@ export const GroupBuyingArena: React.FC<GroupBuyingArenaProps> = ({
                 </div>
 
                 <div>
-                  <label className="block text-slate-700 font-semibold mb-1">WhatsApp / Mobile Number</label>
+                  <label className="block text-slate-700 font-semibold mb-1">{t.modalPhone}</label>
                   <input
                     type="tel"
                     required
@@ -392,7 +394,7 @@ export const GroupBuyingArena: React.FC<GroupBuyingArenaProps> = ({
                 </div>
 
                 <div>
-                  <label className="block text-slate-700 font-semibold mb-1">When are you planning to buy?</label>
+                  <label className="block text-slate-700 font-semibold mb-1">{t.modalTimeline}</label>
                   <select
                     value={purchaseTimeline}
                     onChange={(e) => setPurchaseTimeline(e.target.value)}
@@ -414,14 +416,14 @@ export const GroupBuyingArena: React.FC<GroupBuyingArenaProps> = ({
                     className="w-4 h-4 rounded text-blue-700 border-slate-300 cursor-pointer"
                   />
                   <label htmlFor="financePreApprove" className="text-slate-700 text-[11px] font-medium cursor-pointer">
-                    I have cash ready or bank loan pre-approved (Gives you priority delivery)
+                    {t.modalPreApproved}
                   </label>
                 </div>
 
                 <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200 text-[11px] text-slate-600 space-y-1">
-                  <p className="font-bold text-slate-800">100% Free & Direct:</p>
-                  <p>• Zero joining fee, zero commissions from you.</p>
-                  <p>• You buy directly from official brand showrooms with full warranty.</p>
+                  <p className="font-bold text-slate-800">CarFair Guarantee:</p>
+                  <p>• {t.modalGuaranteeFree}</p>
+                  <p>• {t.modalGuaranteeDirect}</p>
                 </div>
 
                 <div className="flex items-center gap-3 pt-2">
@@ -430,13 +432,13 @@ export const GroupBuyingArena: React.FC<GroupBuyingArenaProps> = ({
                     onClick={() => setActiveJoinGroup(null)}
                     className="flex-1 py-2.5 rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 font-semibold cursor-pointer"
                   >
-                    Cancel
+                    {t.btnCancel}
                   </button>
                   <button
                     type="submit"
                     className="flex-1 py-2.5 rounded-xl bg-blue-700 hover:bg-blue-800 text-white font-bold cursor-pointer"
                   >
-                    Save My Spot (Free)
+                    {t.btnSaveSpot}
                   </button>
                 </div>
               </form>

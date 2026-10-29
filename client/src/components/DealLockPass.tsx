@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { DealLockVoucher } from '../types';
 import { CarFairLogo } from './Logo';
+import { useLanguage } from '../context/LanguageContext';
 
 interface DealLockPassProps {
   voucher: DealLockVoucher;
@@ -27,6 +28,7 @@ export const DealLockPass: React.FC<DealLockPassProps> = ({
   onProceedToInvoiceAudit,
   onBack
 }) => {
+  const { t } = useLanguage();
   const [copiedOtp, setCopiedOtp] = useState(false);
   const [copiedCode, setCopiedCode] = useState(false);
 
@@ -71,17 +73,17 @@ export const DealLockPass: React.FC<DealLockPassProps> = ({
             <CarFairLogo size="md" showTagline={false} />
             <div className="border-l border-slate-200 pl-3">
               <div className="flex items-center gap-2">
-                <span className="text-lg font-black tracking-tight text-slate-900">Price Lock Pass</span>
+                <span className="text-lg font-black tracking-tight text-slate-900">{t.passTitle}</span>
                 <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-900 border border-emerald-300">
-                  PRICE LOCKED
+                  {t.passLockedBadge}
                 </span>
               </div>
-              <p className="text-xs text-slate-500">Official Showroom Price Guarantee Certificate</p>
+              <p className="text-xs text-slate-500">{t.passCertificateDesc}</p>
             </div>
           </div>
 
           <div className="text-right sm:border-l sm:border-slate-200 sm:pl-6">
-            <span className="text-[10px] text-slate-400 uppercase tracking-wider font-bold">Pass Number</span>
+            <span className="text-[10px] text-slate-400 uppercase tracking-wider font-bold">{t.passNumber}</span>
             <div className="flex items-center gap-2 mt-0.5 justify-end">
               <span className="font-mono font-bold text-sm text-blue-800">{voucher.voucherCode}</span>
               <button onClick={copyCode} className="text-slate-500 hover:text-slate-800 cursor-pointer">
@@ -125,21 +127,21 @@ export const DealLockPass: React.FC<DealLockPassProps> = ({
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="bg-slate-50 border border-slate-200 rounded-xl p-4">
-              <span className="text-xs text-slate-500">Regular Showroom Price</span>
+              <span className="text-xs text-slate-500">{t.passSoloPrice}</span>
               <div className="text-lg font-bold text-slate-400 line-through font-mono mt-1">
                 ₹{voucher.financialLock.baselineShowroomPrice.toLocaleString('en-IN')}
               </div>
             </div>
 
             <div className="bg-emerald-50 border border-emerald-300 rounded-xl p-4">
-              <span className="text-xs text-emerald-800 font-bold">Your Group Locked Price</span>
+              <span className="text-xs text-emerald-800 font-bold">{t.passGroupPrice}</span>
               <div className="text-2xl font-black text-emerald-700 font-mono mt-1">
                 ₹{voucher.financialLock.lockedOnRoadPrice.toLocaleString('en-IN')}
               </div>
             </div>
 
             <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
-              <span className="text-xs text-blue-800 font-bold">Your Total Money Saved</span>
+              <span className="text-xs text-blue-800 font-bold">{t.passSavings}</span>
               <div className="text-2xl font-black text-blue-700 font-mono mt-1">
                 ₹{voucher.financialLock.guaranteedSavings.toLocaleString('en-IN')}
               </div>
@@ -152,10 +154,10 @@ export const DealLockPass: React.FC<DealLockPassProps> = ({
           <div className="space-y-1">
             <div className="flex items-center gap-2 text-amber-900 font-bold text-xs">
               <Key className="w-4 h-4 text-amber-700" />
-              <span>Show This 6-Digit PIN to the Showroom Manager</span>
+              <span>{t.passPinNotice}</span>
             </div>
             <p className="text-[11px] text-slate-700 max-w-md">
-              When you visit the showroom to pay your booking deposit or take delivery, show this 6-digit PIN. The sales manager will enter it into their system to confirm your locked group price.
+              {t.passPinDesc}
             </p>
           </div>
 

@@ -7,8 +7,10 @@ import {
   HelpCircle,
   TrendingDown
 } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
 
 export const UnbundlingCalculator: React.FC = () => {
+  const { t } = useLanguage();
   const [carSegment, setCarSegment] = useState<'COMPACT' | 'MID_SUV' | 'PREMIUM'>('MID_SUV');
   const [optOutInsurance, setOptOutInsurance] = useState(true);
   const [optOutAccessories, setOptOutAccessories] = useState(true);
@@ -78,13 +80,13 @@ export const UnbundlingCalculator: React.FC = () => {
       <div className="text-center max-w-3xl mx-auto space-y-3">
         <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-blue-50 text-blue-800 border border-blue-200">
           <Calculator className="w-3.5 h-3.5" />
-          <span>Save Money Before Even Negotiating</span>
+          <span>{t.secretsBadge}</span>
         </div>
         <h2 className="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
-          4 Showroom Secrets That Cost You ₹50,000+
+          {t.secretsTitle}
         </h2>
         <p className="text-sm text-slate-600">
-          Showrooms make very little profit on the car price itself. Their real profits come from 4 extra items added to your quotation. Here is how CarFair helps you avoid paying them.
+          {t.secretsSubtitle}
         </p>
       </div>
 

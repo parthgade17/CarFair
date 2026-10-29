@@ -7,6 +7,7 @@ import {
   ShieldCheck,
   Check
 } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
 
 interface HeroSectionProps {
   onExploreGroups: () => void;
@@ -19,6 +20,8 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
   onAuditQuote,
   selectedCity
 }) => {
+  const { t } = useLanguage();
+
   return (
     <div className="relative bg-gradient-to-b from-slate-50 via-white to-slate-50/80 border-b border-slate-200 overflow-hidden pt-8 pb-16">
       {/* Subtle Background Accent Pattern */}
@@ -46,16 +49,16 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
             {/* Pill Badge with City */}
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-50 border border-blue-200 text-blue-800 text-xs font-semibold shadow-xs">
               <span className="w-2 h-2 rounded-full bg-blue-600 animate-pulse"></span>
-              <span>India's Verified Group Car-Buying Platform</span>
+              <span>{t.heroBadge}</span>
               <span className="text-slate-400">•</span>
               <span className="text-slate-700 font-bold">{selectedCity === 'All Cities' ? 'Pan-India' : selectedCity}</span>
             </div>
 
             {/* Main Design Heading */}
             <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight text-slate-900 leading-[1.15]">
-              Smart Buyers Ki{' '}
+              {t.heroHeadlineMain}{' '}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-700 via-blue-600 to-emerald-600">
-                Smart Deal!
+                {t.heroHeadlineHighlight}
               </span>
             </h1>
 
@@ -66,7 +69,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                 className="px-7 py-4 rounded-xl font-bold text-sm bg-blue-700 hover:bg-blue-800 text-white shadow-md shadow-blue-700/20 flex items-center justify-center gap-2 transition-all cursor-pointer"
               >
                 <Users className="w-4 h-4" />
-                <span>Join a Car Group for Free</span>
+                <span>{t.btnJoinGroupFree}</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
 
@@ -75,7 +78,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                 className="px-7 py-4 rounded-xl font-bold text-sm bg-white hover:bg-slate-50 text-slate-800 border border-slate-300 shadow-xs flex items-center justify-center gap-2 transition-all cursor-pointer"
               >
                 <FileCheck className="w-4 h-4 text-emerald-700" />
-                <span>Check My Showroom Quote</span>
+                <span>{t.btnCheckQuote}</span>
               </button>
             </div>
 
@@ -83,19 +86,19 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
             <div className="pt-4 grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs text-slate-600">
               <div className="flex items-center gap-1.5">
                 <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                <span className="font-medium">100% Free for Buyers</span>
+                <span className="font-medium">{t.trustFree}</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                <span className="font-medium">Official Showroom Delivery</span>
+                <span className="font-medium">{t.trustDelivery}</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                <span className="font-medium">Full Factory Warranty</span>
+                <span className="font-medium">{t.trustWarranty}</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                <span className="font-medium">₹5,000 Free Petrol Card</span>
+                <span className="font-medium">{t.trustFuelCard}</span>
               </div>
             </div>
           </div>
@@ -105,8 +108,8 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
         <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-xs">
           <div className="text-center max-w-xl mx-auto mb-8">
             <span className="text-xs font-bold text-blue-700 uppercase tracking-wider">How It Works</span>
-            <h3 className="text-xl sm:text-2xl font-black text-slate-900 mt-1">3 Simple Steps to Group Savings</h3>
-            <p className="text-xs text-slate-500 mt-1">Direct from official showrooms with zero middleman hassle.</p>
+            <h3 className="text-xl sm:text-2xl font-black text-slate-900 mt-1">{t.howItWorksTitle}</h3>
+            <p className="text-xs text-slate-500 mt-1">{t.howItWorksSubtitle}</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative">
@@ -115,9 +118,9 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
               <div className="w-10 h-10 rounded-2xl bg-blue-700 text-white font-black flex items-center justify-center mx-auto text-sm shadow-sm">
                 1
               </div>
-              <h4 className="font-bold text-slate-900 text-sm">Join a Car Group (Free)</h4>
+              <h4 className="font-bold text-slate-900 text-sm">{t.step1Title}</h4>
               <p className="text-xs text-slate-600 leading-relaxed">
-                Choose your desired car model and reserve your spot in a group of 15–20 buyers in your city. No advance fees required.
+                {t.step1Desc}
               </p>
             </div>
 
@@ -126,9 +129,9 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
               <div className="w-10 h-10 rounded-2xl bg-blue-700 text-white font-black flex items-center justify-center mx-auto text-sm shadow-sm">
                 2
               </div>
-              <h4 className="font-bold text-slate-900 text-sm">Showrooms Compete</h4>
+              <h4 className="font-bold text-slate-900 text-sm">{t.step2Title}</h4>
               <p className="text-xs text-slate-600 leading-relaxed">
-                Official dealerships in your region submit bulk offers to win the group. You unlock maximum cash discounts and free official perks.
+                {t.step2Desc}
               </p>
             </div>
 
@@ -137,9 +140,9 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
               <div className="w-10 h-10 rounded-2xl bg-emerald-600 text-white font-black flex items-center justify-center mx-auto text-sm shadow-sm">
                 3
               </div>
-              <h4 className="font-bold text-slate-900 text-sm">Pick Up at Showroom & Save</h4>
+              <h4 className="font-bold text-slate-900 text-sm">{t.step3Title}</h4>
               <p className="text-xs text-slate-600 leading-relaxed">
-                Show your 6-digit Price Lock PIN at the dealership. Pay directly, take delivery with full factory warranty, and save ₹50k–₹1L!
+                {t.step3Desc}
               </p>
             </div>
           </div>
@@ -148,20 +151,20 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
         {/* Real Metrics Banner */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="bg-white border border-slate-200 rounded-2xl p-4 text-center shadow-xs">
-            <div className="text-2xl sm:text-3xl font-black text-emerald-700 font-mono">₹1.42 Cr+</div>
-            <div className="text-xs text-slate-500 mt-1 font-medium">Saved by Indian Car Buyers</div>
+            <div className="text-2xl sm:text-3xl font-black text-emerald-700 font-mono">{t.statSaved}</div>
+            <div className="text-xs text-slate-500 mt-1 font-medium">{t.statSavedDesc}</div>
           </div>
           <div className="bg-white border border-slate-200 rounded-2xl p-4 text-center shadow-xs">
-            <div className="text-2xl sm:text-3xl font-black text-blue-700 font-mono">₹68,400</div>
-            <div className="text-xs text-slate-500 mt-1 font-medium">Average Savings Per Car</div>
+            <div className="text-2xl sm:text-3xl font-black text-blue-700 font-mono">{t.statAvgSaving}</div>
+            <div className="text-xs text-slate-500 mt-1 font-medium">{t.statAvgSavingDesc}</div>
           </div>
           <div className="bg-white border border-slate-200 rounded-2xl p-4 text-center shadow-xs">
-            <div className="text-2xl sm:text-3xl font-black text-slate-900 font-mono">24 Showrooms</div>
-            <div className="text-xs text-slate-500 mt-1 font-medium">Authorised Partner Dealerships</div>
+            <div className="text-2xl sm:text-3xl font-black text-slate-900 font-mono">{t.statShowrooms}</div>
+            <div className="text-xs text-slate-500 mt-1 font-medium">{t.statShowroomsDesc}</div>
           </div>
           <div className="bg-white border border-slate-200 rounded-2xl p-4 text-center shadow-xs">
-            <div className="text-2xl sm:text-3xl font-black text-indigo-700 font-mono">7 Days</div>
-            <div className="text-xs text-slate-500 mt-1 font-medium">Average Stock Delivery Time</div>
+            <div className="text-2xl sm:text-3xl font-black text-indigo-700 font-mono">{t.statDeliveryTime}</div>
+            <div className="text-xs text-slate-500 mt-1 font-medium">{t.statDeliveryTimeDesc}</div>
           </div>
         </div>
       </div>

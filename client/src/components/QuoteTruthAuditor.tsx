@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { QuoteTruthAudit, Car } from '../types';
 import { auditQuotation, fetchCars } from '../services/api';
+import { useLanguage } from '../context/LanguageContext';
 
 interface QuoteTruthAuditorProps {
   onJoinGroupForCar: (carId: string) => void;
@@ -23,6 +24,7 @@ export const QuoteTruthAuditor: React.FC<QuoteTruthAuditorProps> = ({
   onJoinGroupForCar,
   selectedCity
 }) => {
+  const { t } = useLanguage();
   const [cars, setCars] = useState<Car[]>([]);
   const [selectedCarId, setSelectedCarId] = useState('tata-nexon');
   const [selectedVariantId, setSelectedVariantId] = useState('nexon-creative-plus');
@@ -169,36 +171,30 @@ export const QuoteTruthAuditor: React.FC<QuoteTruthAuditorProps> = ({
         <div>
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-blue-50 text-blue-800 border border-blue-200 mb-2">
             <Sparkles className="w-3.5 h-3.5" />
-            <span>100% Free Showroom Bill Checker</span>
+            <span>{t.quoteBadge}</span>
           </div>
           <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-            Check Your Showroom Quotation in 10 Seconds
+            {t.quoteTitle}
           </h2>
           <p className="text-sm text-slate-600 mt-1 max-w-2xl">
-            Did a dealership give you a price sheet? Most Indian car buyers overpay by <strong>₹40,000 to ₹80,000</strong> without knowing it. Enter the numbers below to see exactly where you are overpaying.
+            {t.quoteSubtitle}
           </p>
         </div>
 
         {/* Quick Sample Quotes */}
         <div className="flex flex-wrap items-center gap-2">
-          <span className="text-xs text-slate-500 font-semibold">Try A Real Example:</span>
+          <span className="text-xs text-slate-500 font-semibold">Try:</span>
           <button
             onClick={() => handlePreset('nexon-pune')}
             className="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-white border border-slate-300 hover:border-blue-500 text-slate-700 hover:text-blue-700 shadow-xs transition-colors cursor-pointer"
           >
-            Nexon (Saved ₹75k)
+            {t.quickSampleNexon}
           </button>
           <button
             onClick={() => handlePreset('creta-mumbai')}
             className="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-white border border-slate-300 hover:border-blue-500 text-slate-700 hover:text-blue-700 shadow-xs transition-colors cursor-pointer"
           >
-            Creta (Saved ₹86k)
-          </button>
-          <button
-            onClick={() => handlePreset('xuv-blr')}
-            className="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-white border border-slate-300 hover:border-blue-500 text-slate-700 hover:text-blue-700 shadow-xs transition-colors cursor-pointer"
-          >
-            XUV700 (Saved ₹95k)
+            {t.quickSampleCreta}
           </button>
         </div>
       </div>

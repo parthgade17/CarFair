@@ -8,8 +8,10 @@ import {
   ShieldCheck
 } from 'lucide-react';
 import { estimateOldCarExchange } from '../services/api';
+import { useLanguage } from '../context/LanguageContext';
 
 export const TradeInExchange: React.FC = () => {
+  const { t } = useLanguage();
   const [make, setMake] = useState('Maruti Suzuki');
   const [model, setModel] = useState('Swift VXi');
   const [year, setYear] = useState('2019');
@@ -41,13 +43,13 @@ export const TradeInExchange: React.FC = () => {
       <div className="text-center max-w-3xl mx-auto space-y-3">
         <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">
           <Repeat className="w-3.5 h-3.5" />
-          <span>Multi-Buyer Car Exchange</span>
+          <span>{t.tradeBadge}</span>
         </div>
         <h2 className="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
-          Sell Your Old Car at the Highest Price
+          {t.tradeTitle}
         </h2>
         <p className="text-sm text-slate-600">
-          Never accept a single showroom's exchange offer. Showrooms routinely under-value old cars by ₹40,000 to ₹70,000 to offset new car discounts. We get 3 verified networks to bid against each other for you.
+          {t.tradeSubtitle}
         </p>
       </div>
 

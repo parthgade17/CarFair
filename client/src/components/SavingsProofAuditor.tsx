@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { DealLockVoucher, SavingsProofResult } from '../types';
 import { auditFinalInvoice } from '../services/api';
+import { useLanguage } from '../context/LanguageContext';
 
 interface SavingsProofAuditorProps {
   initialVoucher?: DealLockVoucher | null;
@@ -23,6 +24,7 @@ export const SavingsProofAuditor: React.FC<SavingsProofAuditorProps> = ({
   initialVoucher,
   onBack
 }) => {
+  const { t } = useLanguage();
   const [invoiceNumber, setInvoiceNumber] = useState('INV-MH12-2026-9811');
   const [actualExShowroom, setActualExShowroom] = useState(1169000);
   const [actualRto, setActualRto] = useState(128500);
@@ -94,13 +96,13 @@ export const SavingsProofAuditor: React.FC<SavingsProofAuditorProps> = ({
           </button>
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200 mb-2">
             <Fuel className="w-3.5 h-3.5" />
-            <span>Buyer Delivery Reward</span>
+            <span>{t.fuelBadge}</span>
           </div>
           <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-            Claim Your ₹5,000 Free Petrol Card
+            {t.fuelTitle}
           </h2>
           <p className="text-sm text-slate-600 mt-1 max-w-2xl">
-            Took delivery of your new car? Enter your final showroom bill amounts below. We verify that the dealer didn't sneak in any extra charges, and unlock your <strong>₹5,000 HPCL/IOCL fuel voucher</strong>.
+            {t.fuelSubtitle}
           </p>
         </div>
       </div>
@@ -111,7 +113,7 @@ export const SavingsProofAuditor: React.FC<SavingsProofAuditorProps> = ({
           <div className="flex items-center justify-between border-b border-slate-100 pb-3">
             <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
               <UploadCloud className="w-4 h-4 text-emerald-700" />
-              <span>Final Showroom Bill Checker</span>
+              <span>{t.fuelFormTitle}</span>
             </h3>
             <span className="text-[11px] text-emerald-800 font-bold bg-emerald-100 px-2 py-0.5 rounded">
               + ₹5,000 Gift Card
@@ -120,7 +122,7 @@ export const SavingsProofAuditor: React.FC<SavingsProofAuditorProps> = ({
 
           <form onSubmit={handleAuditSubmit} className="space-y-4 text-xs">
             <div>
-              <label className="block text-slate-700 font-semibold mb-1">Invoice / Bill Number</label>
+              <label className="block text-slate-700 font-semibold mb-1">{t.fuelInvoiceNo}</label>
               <input
                 type="text"
                 required
