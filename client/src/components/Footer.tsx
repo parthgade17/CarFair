@@ -1,5 +1,6 @@
 import React from 'react';
 import { ShieldCheck, Heart } from 'lucide-react';
+import { CarFairLogo } from './Logo';
 
 interface FooterProps {
   onNavigate: (tab: string) => void;
@@ -12,13 +13,8 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Brand info */}
           <div className="space-y-3 md:col-span-1">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold">
-                <ShieldCheck className="w-5 h-5" />
-              </div>
-              <span className="text-lg font-extrabold text-white">CarFair</span>
-            </div>
-            <p className="text-slate-400 leading-relaxed text-[11px]">
+            <CarFairLogo size="sm" variant="dark" showTagline={true} />
+            <p className="text-slate-400 leading-relaxed text-[11px] pt-1">
               India's first group car-buying network and quotation checker. We help car buyers come together so authorized showrooms offer bulk fleet discounts.
             </p>
             <p className="text-[10px] text-slate-500">

@@ -14,6 +14,7 @@ import {
   Building2,
   ChevronDown
 } from 'lucide-react';
+import { CarFairLogo } from './Logo';
 
 interface NavbarProps {
   activeTab: string;
@@ -63,21 +64,8 @@ export const Navbar: React.FC<NavbarProps> = ({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <div className="flex items-center gap-3 cursor-pointer" onClick={() => setActiveTab('groups')}>
-            <div className="w-10 h-10 rounded-xl bg-blue-700 flex items-center justify-center text-white shadow-xs">
-              <ShieldCheck className="w-6 h-6 text-white" />
-            </div>
-            <div>
-              <div className="flex items-center gap-1.5">
-                <span className="text-xl font-extrabold tracking-tight text-slate-900">
-                  Car<span className="text-blue-700">Fair</span>
-                </span>
-                <span className="px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-emerald-50 text-emerald-800 border border-emerald-200 rounded">
-                  Verified
-                </span>
-              </div>
-              <p className="text-[11px] text-slate-500 hidden sm:block">Group Car Buying Made Simple</p>
-            </div>
+          <div className="flex items-center cursor-pointer" onClick={() => setActiveTab('groups')}>
+            <CarFairLogo size="sm" showTagline={true} />
           </div>
 
           {/* Desktop Nav Links */}

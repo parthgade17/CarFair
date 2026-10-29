@@ -14,6 +14,7 @@ import {
   AlertTriangle
 } from 'lucide-react';
 import { DealLockVoucher } from '../types';
+import { CarFairLogo } from './Logo';
 
 interface DealLockPassProps {
   voucher: DealLockVoucher;
@@ -67,12 +68,10 @@ export const DealLockPass: React.FC<DealLockPassProps> = ({
         {/* Pass Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-6">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-2xl bg-blue-700 flex items-center justify-center shadow-md text-white">
-              <ShieldCheck className="w-7 h-7 text-white" />
-            </div>
-            <div>
+            <CarFairLogo size="md" showTagline={false} />
+            <div className="border-l border-slate-200 pl-3">
               <div className="flex items-center gap-2">
-                <span className="text-xl font-black tracking-tight text-slate-900">CarFair Price Lock Pass</span>
+                <span className="text-lg font-black tracking-tight text-slate-900">Price Lock Pass</span>
                 <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-900 border border-emerald-300">
                   PRICE LOCKED
                 </span>
