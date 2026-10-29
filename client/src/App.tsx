@@ -107,7 +107,7 @@ function AppContent() {
             selectedCity={selectedCity}
           />
         ) : userRole === 'DEALER' ? (
-          <DealerPortalView />
+          <DealerPortalView selectedCity={selectedCity} />
         ) : (
           <>
             {activeTab === 'groups' && (
