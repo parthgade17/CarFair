@@ -77,10 +77,10 @@ export const AccountView: React.FC<AccountViewProps> = ({
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
       {/* Page Title & Account Switcher */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-slate-200 pb-6">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-5 border-b border-slate-200 pb-6">
         <div>
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-blue-50 text-blue-800 border border-blue-200 mb-2">
-            <User className="w-3.5 h-3.5" />
+            <User className="w-3.5 h-3.5 text-blue-700" />
             <span>{t.accountTitle}</span>
           </div>
           <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
@@ -92,39 +92,51 @@ export const AccountView: React.FC<AccountViewProps> = ({
         </div>
 
         {/* Role Toggle Button */}
-        <div className="flex bg-slate-100 p-1.5 rounded-2xl border border-slate-200 text-xs self-start md:self-auto shrink-0 shadow-xs">
+        <div className="flex bg-slate-100 p-1 rounded-2xl border border-slate-200 text-xs self-start md:self-auto shrink-0 shadow-xs h-11">
           <button
             onClick={() => setAccountRole('BUYER')}
-            className={`px-4 py-2 rounded-xl font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
+            className={`px-4 py-2 rounded-xl font-bold flex items-center gap-2 transition-all cursor-pointer whitespace-nowrap ${
               accountRole === 'BUYER'
                 ? 'bg-blue-700 text-white shadow-xs'
                 : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            <User className="w-3.5 h-3.5" />
+            <User className="w-4 h-4 shrink-0" />
             <span>{t.roleBuyer}</span>
           </button>
           <button
             onClick={() => setAccountRole('DEALER')}
-            className={`px-4 py-2 rounded-xl font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
+            className={`px-4 py-2 rounded-xl font-bold flex items-center gap-2 transition-all cursor-pointer whitespace-nowrap ${
               accountRole === 'DEALER'
                 ? 'bg-amber-700 text-white shadow-xs'
                 : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            <Building2 className="w-3.5 h-3.5" />
+            <Building2 className="w-4 h-4 shrink-0" />
             <span>{t.roleDealer}</span>
           </button>
         </div>
       </div>
 
       {/* LANGUAGE SELECTOR SECTION - PROMINENT 3 LANGUAGES */}
-      <div className="bg-white border-2 border-blue-200 rounded-3xl p-6 sm:p-7 shadow-sm space-y-4">
-        <div className="flex items-center gap-2.5 border-b border-slate-100 pb-3">
-          <Globe className="w-5 h-5 text-blue-700" />
-          <div>
-            <h3 className="text-base font-bold text-slate-900">{t.langSectionTitle}</h3>
-            <p className="text-xs text-slate-500">{t.langSectionDesc}</p>
+      <div className="bg-white border-2 border-blue-200/80 rounded-3xl p-6 sm:p-8 shadow-xs space-y-5">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-700 shrink-0">
+              <Globe className="w-5 h-5" />
+            </div>
+            <div>
+              <h3 className="text-base font-bold text-slate-900">{t.langSectionTitle}</h3>
+              <p className="text-xs text-slate-500 mt-0.5">{t.langSectionDesc}</p>
+            </div>
+          </div>
+          <div className="self-start sm:self-auto">
+            <span className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-600 bg-slate-100 px-3 py-1.5 rounded-xl border border-slate-200">
+              <span>{t.activeLanguage}</span>
+              <strong className="text-blue-700 uppercase tracking-wide">
+                {language === 'en' ? 'English' : language === 'mr' ? 'मराठी' : 'हिंदी'}
+              </strong>
+            </span>
           </div>
         </div>
 
@@ -132,70 +144,88 @@ export const AccountView: React.FC<AccountViewProps> = ({
           {/* English */}
           <button
             onClick={() => setLanguage('en')}
-            className={`p-4 rounded-2xl border-2 text-left transition-all cursor-pointer relative ${
+            className={`p-5 rounded-2xl border-2 text-left transition-all cursor-pointer flex flex-col justify-between min-h-[144px] ${
               language === 'en'
-                ? 'bg-blue-50/80 border-blue-600 shadow-xs'
+                ? 'bg-blue-50/70 border-blue-600 shadow-xs'
                 : 'bg-slate-50 border-slate-200 hover:border-slate-300 hover:bg-white'
             }`}
           >
-            <div className="flex items-center justify-between">
-              <span className="font-bold text-sm text-slate-900">English</span>
-              {language === 'en' && (
-                <span className="w-6 h-6 rounded-full bg-blue-700 text-white flex items-center justify-center">
-                  <Check className="w-3.5 h-3.5" />
-                </span>
-              )}
+            <div>
+              <div className="flex items-center justify-between">
+                <span className="font-bold text-base text-slate-900">English</span>
+                {language === 'en' ? (
+                  <span className="w-6 h-6 rounded-full bg-blue-700 text-white flex items-center justify-center shadow-xs">
+                    <Check className="w-3.5 h-3.5 stroke-[3]" />
+                  </span>
+                ) : (
+                  <span className="w-5 h-5 rounded-full border border-slate-300" />
+                )}
+              </div>
+              <p className="text-xs text-slate-500 mt-1">Default platform language</p>
             </div>
-            <p className="text-xs text-slate-500 mt-1">Default Platform Language</p>
-            <span className="inline-block mt-2 text-[10px] font-bold text-blue-700 bg-white px-2 py-0.5 rounded border border-blue-200">
-              Active Everywhere
-            </span>
+            <div className="pt-3">
+              <span className="inline-block text-[11px] font-bold text-blue-800 bg-white px-2.5 py-1 rounded-lg border border-blue-200 shadow-2xs">
+                Active Platform
+              </span>
+            </div>
           </button>
 
           {/* Marathi */}
           <button
             onClick={() => setLanguage('mr')}
-            className={`p-4 rounded-2xl border-2 text-left transition-all cursor-pointer relative ${
+            className={`p-5 rounded-2xl border-2 text-left transition-all cursor-pointer flex flex-col justify-between min-h-[144px] ${
               language === 'mr'
-                ? 'bg-emerald-50/80 border-emerald-600 shadow-xs'
+                ? 'bg-emerald-50/70 border-emerald-600 shadow-xs'
                 : 'bg-slate-50 border-slate-200 hover:border-slate-300 hover:bg-white'
             }`}
           >
-            <div className="flex items-center justify-between">
-              <span className="font-bold text-sm text-slate-900">मराठी (Marathi)</span>
-              {language === 'mr' && (
-                <span className="w-6 h-6 rounded-full bg-emerald-700 text-white flex items-center justify-center">
-                  <Check className="w-3.5 h-3.5" />
-                </span>
-              )}
+            <div>
+              <div className="flex items-center justify-between">
+                <span className="font-bold text-base text-slate-900">मराठी (Marathi)</span>
+                {language === 'mr' ? (
+                  <span className="w-6 h-6 rounded-full bg-emerald-700 text-white flex items-center justify-center shadow-xs">
+                    <Check className="w-3.5 h-3.5 stroke-[3]" />
+                  </span>
+                ) : (
+                  <span className="w-5 h-5 rounded-full border border-slate-300" />
+                )}
+              </div>
+              <p className="text-xs text-slate-500 mt-1">महाराष्ट्र, पुणे आणि मुंबईसाठी</p>
             </div>
-            <p className="text-xs text-slate-500 mt-1">महाराष्ट्र, पुणे आणि मुंबईसाठी</p>
-            <span className="inline-block mt-2 text-[10px] font-bold text-emerald-800 bg-white px-2 py-0.5 rounded border border-emerald-200">
-              स्थानिक भाषा
-            </span>
+            <div className="pt-3">
+              <span className="inline-block text-[11px] font-bold text-emerald-800 bg-white px-2.5 py-1 rounded-lg border border-emerald-200 shadow-2xs">
+                स्थानिक भाषा
+              </span>
+            </div>
           </button>
 
           {/* Hindi */}
           <button
             onClick={() => setLanguage('hi')}
-            className={`p-4 rounded-2xl border-2 text-left transition-all cursor-pointer relative ${
+            className={`p-5 rounded-2xl border-2 text-left transition-all cursor-pointer flex flex-col justify-between min-h-[144px] ${
               language === 'hi'
-                ? 'bg-amber-50/80 border-amber-600 shadow-xs'
+                ? 'bg-amber-50/70 border-amber-600 shadow-xs'
                 : 'bg-slate-50 border-slate-200 hover:border-slate-300 hover:bg-white'
             }`}
           >
-            <div className="flex items-center justify-between">
-              <span className="font-bold text-sm text-slate-900">हिंदी (Hindi)</span>
-              {language === 'hi' && (
-                <span className="w-6 h-6 rounded-full bg-amber-700 text-white flex items-center justify-center">
-                  <Check className="w-3.5 h-3.5" />
-                </span>
-              )}
+            <div>
+              <div className="flex items-center justify-between">
+                <span className="font-bold text-base text-slate-900">हिंदी (Hindi)</span>
+                {language === 'hi' ? (
+                  <span className="w-6 h-6 rounded-full bg-amber-700 text-white flex items-center justify-center shadow-xs">
+                    <Check className="w-3.5 h-3.5 stroke-[3]" />
+                  </span>
+                ) : (
+                  <span className="w-5 h-5 rounded-full border border-slate-300" />
+                )}
+              </div>
+              <p className="text-xs text-slate-500 mt-1">सरल और स्पष्ट हिंदी भाषा</p>
             </div>
-            <p className="text-xs text-slate-500 mt-1">सरल और स्पष्ट हिंदी भाषा</p>
-            <span className="inline-block mt-2 text-[10px] font-bold text-amber-800 bg-white px-2 py-0.5 rounded border border-amber-200">
-              राष्ट्रीय भाषा
-            </span>
+            <div className="pt-3">
+              <span className="inline-block text-[11px] font-bold text-amber-800 bg-white px-2.5 py-1 rounded-lg border border-amber-200 shadow-2xs">
+                राष्ट्रीय भाषा
+              </span>
+            </div>
           </button>
         </div>
       </div>
