@@ -25,9 +25,23 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#f1f5f9_1px,transparent_1px),linear-gradient(to_bottom,#f1f5f9_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-70 pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 space-y-12">
-        {/* Main Hero Grid: Left Content + Right Brand Logo Showcase */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
-          {/* Left Column: Headlines & Call to Actions */}
+        {/* Main Hero Grid: Left Logo (Merged with page) + Right Tagline & Actions */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+          {/* Left Column: Official Brand Logo - Merged directly into the page (NO BOX) */}
+          <div className="lg:col-span-5 flex items-center justify-center lg:justify-center">
+            <div className="relative flex items-center justify-center p-2 w-full">
+              {/* Soft ambient light merged into page background */}
+              <div className="absolute inset-0 bg-gradient-to-tr from-blue-500/10 via-emerald-400/10 to-transparent rounded-full blur-3xl -z-10" />
+
+              <img
+                src="/carfair-logo.png"
+                alt="CarFair — Smart Buyers Ki Smart Deal"
+                className="w-full max-w-[320px] sm:max-w-[400px] lg:max-w-[440px] h-auto object-contain drop-shadow-md hover:scale-105 transition-transform duration-500"
+              />
+            </div>
+          </div>
+
+          {/* Right Column: Headlines, Tagline & Call to Actions */}
           <div className="lg:col-span-7 space-y-6 text-left">
             {/* Pill Badge with City */}
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-50 border border-blue-200 text-blue-800 text-xs font-semibold shadow-xs">
@@ -40,7 +54,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
             {/* Main Design Heading */}
             <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight text-slate-900 leading-[1.15]">
               Smart Buyers Ki{' '}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-700 via-blue-600 to-indigo-700">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-700 via-blue-600 to-emerald-600">
                 Smart Deal!
               </span>
             </h1>
@@ -82,32 +96,6 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
               <div className="flex items-center gap-1.5">
                 <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
                 <span className="font-medium">₹5,000 Free Petrol Card</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Right Column: Official Brand Logo Display (Replacing active pools box) */}
-          <div className="lg:col-span-5 flex items-center justify-center">
-            <div className="relative w-full max-w-md bg-white/80 backdrop-blur-sm border border-slate-200/90 rounded-3xl p-6 sm:p-8 shadow-lg hover:shadow-xl transition-all duration-300 flex flex-col items-center justify-center group">
-              {/* Soft ambient brand color glow */}
-              <div className="absolute -inset-1 bg-gradient-to-r from-blue-600/10 via-emerald-500/15 to-blue-600/10 rounded-3xl blur-xl -z-10 opacity-70 group-hover:opacity-100 transition-opacity" />
-
-              {/* Official CarFair Logo Image with Transparent Background */}
-              <img
-                src="/carfair-logo.png"
-                alt="CarFair — Smart Buyers Ki Smart Deal"
-                className="w-full max-w-[300px] sm:max-w-[340px] h-auto object-contain drop-shadow-sm transition-transform duration-300 group-hover:scale-105"
-              />
-
-              {/* Verified Trust Badges Footer inside card */}
-              <div className="mt-6 pt-4 border-t border-slate-100 w-full flex items-center justify-between text-xs text-slate-500">
-                <span className="flex items-center gap-1.5 font-semibold text-slate-700">
-                  <ShieldCheck className="w-4 h-4 text-emerald-600" />
-                  Verified Dealership Network
-                </span>
-                <span className="font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
-                  Zero Brokerage
-                </span>
               </div>
             </div>
           </div>
