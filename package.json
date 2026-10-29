@@ -4,6 +4,7 @@
   "description": "CarFair - India's Verified Group Car-Buying & Quotation Auditing Platform (FastAPI Python Backend)",
   "private": true,
   "scripts": {
+    "build": "npm run build --prefix client",
     "install:all": "npm install --prefix client && python -m pip install -r server/requirements.txt",
     "dev:client": "npm run dev --prefix client",
     "dev:server": "python server/run.py",
