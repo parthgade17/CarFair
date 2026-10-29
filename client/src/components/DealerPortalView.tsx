@@ -7,15 +7,25 @@ import {
   ShieldCheck, 
   Users, 
   Check, 
-  AlertCircle 
+  AlertCircle,
+  Camera,
+  Upload
 } from 'lucide-react';
 import { Dealer, BuyingGroup } from '../types';
 import { fetchDealers, fetchGroups, submitDealerBid } from '../services/api';
+import { getCarPhotos } from '../services/photoStorage';
+import { CarGalleryModal } from './CarGalleryModal';
+import { UploadCarPhotoModal } from './UploadCarPhotoModal';
 
 export const DealerPortalView: React.FC = () => {
   const [dealers, setDealers] = useState<Dealer[]>([]);
   const [groups, setGroups] = useState<BuyingGroup[]>([]);
   const [selectedDealerId, setSelectedDealerId] = useState('dealer-bafna-tata-pune');
+
+  // Photo Management Modals
+  const [galleryCar, setGalleryCar] = useState<{ id: string; name: string } | null>(null);
+  const [uploadCar, setUploadCar] = useState<{ id: string; name: string } | null>(null);
+  const [photoRefreshKey, setPhotoRefreshKey] = useState(0);
 
   // Verify OTP State
   const [otpInput, setOtpInput] = useState('');
@@ -279,6 +289,62 @@ export const DealerPortalView: React.FC = () => {
             )}
           </div>
 
+          {/* Showroom Vehicle Stock Photos Management */}
+          <div className="bg-white border border-slate-200 rounded-2xl p-6 space-y-4 shadow-xs">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div className="flex items-center gap-2">
+                <Camera className="w-4 h-4 text-amber-700" />
+                <h4 className="text-sm font-bold text-slate-900">Showroom Vehicle Photos</h4>
+              </div>
+              <button
+                onClick={() => setUploadCar({ id: 'tata-nexon', name: 'Tata Nexon' })}
+                className="px-2.5 py-1 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs flex items-center gap-1 shadow-xs cursor-pointer"
+              >
+                <Upload className="w-3 h-3" />
+                <span>+ Upload</span>
+              </button>
+            </div>
+
+            <p className="text-xs text-slate-600">
+              Upload photos of cars in your dealership showroom so buyers can inspect stock before booking.
+            </p>
+
+            <div className="space-y-2">
+              {[
+                { id: 'tata-nexon', name: 'Tata Nexon Creative+ / Smart+' },
+                { id: 'hyundai-creta', name: 'Hyundai Creta SX (Tech)' },
+                { id: 'mahindra-xuv700', name: 'Mahindra XUV700 AX7' }
+              ].map((c) => {
+                const photos = getCarPhotos(c.id);
+                return (
+                  <div key={c.id} className="p-2.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <img src={photos[0]?.url} alt={c.name} className="w-10 h-8 object-cover rounded-lg border border-slate-200" />
+                      <div>
+                        <span className="font-bold text-xs text-slate-800 block">{c.name}</span>
+                        <span className="text-[10px] text-slate-500">{photos.length} Verified Photos</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <button
+                        onClick={() => setGalleryCar({ id: c.id, name: c.name })}
+                        className="px-2 py-0.5 rounded bg-white border border-slate-300 text-[11px] font-bold text-slate-700 hover:bg-slate-50 cursor-pointer"
+                      >
+                        View
+                      </button>
+                      <button
+                        onClick={() => setUploadCar({ id: c.id, name: c.name })}
+                        className="px-2 py-0.5 rounded bg-amber-600 text-white text-[11px] font-bold hover:bg-amber-700 cursor-pointer"
+                      >
+                        + Add
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
           {/* Dealership Benefits Card */}
           <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 space-y-3 text-xs text-slate-700">
             <h4 className="font-bold text-slate-900 flex items-center gap-1.5">
@@ -294,6 +360,31 @@ export const DealerPortalView: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Gallery Modal */}
+      {galleryCar && (
+        <CarGalleryModal
+          isOpen={!!galleryCar}
+          onClose={() => setGalleryCar(null)}
+          carId={galleryCar.id}
+          carName={galleryCar.name}
+          images={getCarPhotos(galleryCar.id)}
+          userRole="DEALER"
+          onOpenUpload={(cId, cName) => setUploadCar({ id: cId, name: cName })}
+        />
+      )}
+
+      {/* Upload Modal */}
+      {uploadCar && (
+        <UploadCarPhotoModal
+          isOpen={!!uploadCar}
+          onClose={() => setUploadCar(null)}
+          carId={uploadCar.id}
+          carName={uploadCar.name}
+          dealerName={dealers.find(d => d.id === selectedDealerId)?.name || 'Authorized Dealership'}
+          onPhotoUploaded={() => setPhotoRefreshKey(prev => prev + 1)}
+        />
+      )}
     </div>
   );
 };

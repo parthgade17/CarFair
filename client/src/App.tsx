@@ -123,6 +123,7 @@ function AppContent() {
                 <div id="groups-arena">
                   <GroupBuyingArena
                     selectedCity={selectedCity}
+                    userRole={userRole}
                     onLockDealForGroup={handleLockDealForGroup}
                     onViewBidsForGroup={handleViewBidsForGroup}
                   />

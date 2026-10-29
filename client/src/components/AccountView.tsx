@@ -17,11 +17,16 @@ import {
   Bell,
   MapPin,
   Phone,
-  Mail
+  Mail,
+  Camera,
+  Upload
 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { Language } from '../translations';
 import { CarFairLogo } from './Logo';
+import { getCarPhotos } from '../services/photoStorage';
+import { CarGalleryModal } from './CarGalleryModal';
+import { UploadCarPhotoModal } from './UploadCarPhotoModal';
 
 interface AccountViewProps {
   onNavigateToTab: (tab: string) => void;
@@ -47,6 +52,11 @@ export const AccountView: React.FC<AccountViewProps> = ({
   const [dealerCity, setDealerCity] = useState('Pune (Shivajinagar)');
   const [dealerManager, setDealerManager] = useState('Rajesh Kulkarni (Sales Head)');
   const [dealerPhone, setDealerPhone] = useState('+91 98220 99887');
+
+  // Showroom Photo Management State
+  const [galleryCar, setGalleryCar] = useState<{ id: string; name: string } | null>(null);
+  const [uploadCar, setUploadCar] = useState<{ id: string; name: string } | null>(null);
+  const [photoRefreshKey, setPhotoRefreshKey] = useState(0);
 
   // PIN validation in dealer mode
   const [pinInput, setPinInput] = useState('');
@@ -524,8 +534,107 @@ export const AccountView: React.FC<AccountViewProps> = ({
                 </div>
               )}
             </div>
+
+            {/* Showroom Vehicle Stock Photos Management */}
+            <div className="bg-white border border-slate-200 rounded-3xl p-6 space-y-4 shadow-xs">
+              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                <div className="flex items-center gap-2">
+                  <Camera className="w-4 h-4 text-amber-700" />
+                  <h4 className="text-sm font-bold text-slate-900">Showroom Vehicle Photos & Stock Gallery</h4>
+                </div>
+                <button
+                  onClick={() => setUploadCar({ id: 'tata-nexon', name: 'Tata Nexon' })}
+                  className="px-3 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-xs cursor-pointer transition-all"
+                >
+                  <Upload className="w-3.5 h-3.5" />
+                  <span>+ Upload Photos</span>
+                </button>
+              </div>
+
+              <p className="text-xs text-slate-600">
+                Buyers in car groups can view authentic photos of cars currently in your showroom inventory.
+              </p>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                {[
+                  { id: 'tata-nexon', name: 'Tata Nexon Creative+ / Smart+' },
+                  { id: 'hyundai-creta', name: 'Hyundai Creta SX (Tech)' },
+                  { id: 'mahindra-xuv700', name: 'Mahindra XUV700 AX7' },
+                  { id: 'mahindra-scorpio-n', name: 'Mahindra Scorpio-N Z4' }
+                ].map((item) => {
+                  const photos = getCarPhotos(item.id);
+                  const thumb = photos[0]?.url;
+                  return (
+                    <div
+                      key={item.id}
+                      className="p-3 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-between gap-3 hover:bg-white hover:border-amber-300 transition-all"
+                    >
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        {thumb && (
+                          <img
+                            src={thumb}
+                            alt={item.name}
+                            className="w-12 h-10 object-cover rounded-xl shrink-0 border border-slate-200"
+                          />
+                        )}
+                        <div className="min-w-0">
+                          <h5 className="font-bold text-xs text-slate-900 truncate">{item.name}</h5>
+                          <span className="text-[10px] font-semibold text-slate-500">
+                            {photos.length} Verified Photos
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-1 shrink-0">
+                        <button
+                          onClick={() => setGalleryCar({ id: item.id, name: item.name })}
+                          className="px-2.5 py-1 rounded-lg bg-white border border-slate-300 hover:border-slate-400 text-slate-700 text-[11px] font-bold shadow-2xs cursor-pointer"
+                          title="View buyer gallery preview"
+                        >
+                          View
+                        </button>
+                        <button
+                          onClick={() => setUploadCar({ id: item.id, name: item.name })}
+                          className="px-2.5 py-1 rounded-lg bg-amber-600 hover:bg-amber-700 text-white text-[11px] font-bold shadow-2xs cursor-pointer"
+                          title="Upload new photos"
+                        >
+                          + Add
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
           </div>
         </div>
+      )}
+
+      {/* Car Gallery Modal for Buyer & Dealer Preview */}
+      {galleryCar && (
+        <CarGalleryModal
+          isOpen={!!galleryCar}
+          onClose={() => setGalleryCar(null)}
+          carId={galleryCar.id}
+          carName={galleryCar.name}
+          images={getCarPhotos(galleryCar.id)}
+          userRole={accountRole}
+          onOpenUpload={(cId, cName) => setUploadCar({ id: cId, name: cName })}
+        />
+      )}
+
+      {/* Showroom Upload Photo Modal */}
+      {uploadCar && (
+        <UploadCarPhotoModal
+          isOpen={!!uploadCar}
+          onClose={() => setUploadCar(null)}
+          carId={uploadCar.id}
+          carName={uploadCar.name}
+          dealerName={dealerName}
+          onPhotoUploaded={() => {
+            setPhotoRefreshKey(prev => prev + 1);
+          }}
+        />
       )}
     </div>
   );

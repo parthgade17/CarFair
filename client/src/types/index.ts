@@ -9,12 +9,23 @@ export interface CarVariant {
   mileage: string;
 }
 
+export interface CarImageItem {
+  id: string;
+  url: string;
+  caption?: string;
+  category?: 'EXTERIOR' | 'INTERIOR' | 'COCKPIT' | 'REAR' | 'SHOWROOM_FLOOR' | 'DELIVERY';
+  uploadedBy?: string;
+  uploadedAt?: string;
+}
+
 export interface Car {
   id: string;
   brand: string;
   model: string;
   segment: string;
   image: string;
+  images?: string[];
+  imageDetails?: CarImageItem[];
   tagline: string;
   fuelTypes: string[];
   transmissions: string[];
@@ -49,6 +60,8 @@ export interface BuyingGroup {
   carId: string;
   variantId: string;
   carName: string;
+  images?: string[];
+  imageDetails?: CarImageItem[];
   city: string;
   state: string;
   communityName: string;

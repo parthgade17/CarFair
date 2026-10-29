@@ -47,6 +47,7 @@ app.add_middleware(
 groups_db: List[Dict[str, Any]] = list(INITIAL_BUYING_GROUPS)
 locked_deals_db: List[Dict[str, Any]] = []
 audited_invoices_db: List[Dict[str, Any]] = []
+showroom_car_photos_db: Dict[str, List[Dict[str, Any]]] = {}
 
 
 # -------------------------------------------------------------
@@ -57,6 +58,33 @@ audited_invoices_db: List[Dict[str, Any]] = []
 def get_cars():
     """Retrieve Indian cars catalog with variants, pricing & specifications."""
     return {"success": True, "count": len(CARS_CATALOG), "cars": CARS_CATALOG}
+
+
+@app.get("/api/cars/{car_id}/images")
+def get_car_images(car_id: str):
+    """Retrieve all showroom and catalog images for a car model."""
+    car = next((c for c in CARS_CATALOG if c["id"] == car_id), None)
+    default_imgs = car.get("images", [car.get("image")]) if car else []
+    custom_imgs = showroom_car_photos_db.get(car_id, [])
+    return {"success": True, "carId": car_id, "images": custom_imgs + default_imgs}
+
+
+@app.post("/api/cars/{car_id}/images")
+async def add_car_image(car_id: str, request: Request):
+    """Showroom partner adds/uploads a new car photo."""
+    body = await request.json()
+    image_item = {
+        "id": f"img-{int(time.time()*1000)}",
+        "url": body.get("url"),
+        "caption": body.get("caption", "Showroom Stock Photo"),
+        "category": body.get("category", "SHOWROOM_FLOOR"),
+        "uploadedBy": body.get("uploadedBy", "Authorized Dealership"),
+        "uploadedAt": "Just Now"
+    }
+    if car_id not in showroom_car_photos_db:
+        showroom_car_photos_db[car_id] = []
+    showroom_car_photos_db[car_id].insert(0, image_item)
+    return {"success": True, "image": image_item, "message": "Photo uploaded successfully!"}
 
 
 @app.get("/api/groups")

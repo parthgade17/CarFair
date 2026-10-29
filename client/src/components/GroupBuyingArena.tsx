@@ -12,20 +12,27 @@ import {
   ChevronRight,
   Gift,
   Clock,
-  HelpCircle
+  HelpCircle,
+  Camera,
+  Upload
 } from 'lucide-react';
 import { BuyingGroup, Car } from '../types';
 import { fetchGroups, joinGroup, createGroup, fetchCars } from '../services/api';
 import { useLanguage } from '../context/LanguageContext';
+import { getCarPhotos } from '../services/photoStorage';
+import { CarGalleryModal } from './CarGalleryModal';
+import { UploadCarPhotoModal } from './UploadCarPhotoModal';
 
 interface GroupBuyingArenaProps {
   selectedCity: string;
+  userRole?: 'BUYER' | 'DEALER' | 'COMMUNITY';
   onLockDealForGroup: (group: BuyingGroup) => void;
   onViewBidsForGroup: (group: BuyingGroup) => void;
 }
 
 export const GroupBuyingArena: React.FC<GroupBuyingArenaProps> = ({
   selectedCity,
+  userRole = 'BUYER',
   onLockDealForGroup,
   onViewBidsForGroup
 }) => {
@@ -34,6 +41,11 @@ export const GroupBuyingArena: React.FC<GroupBuyingArenaProps> = ({
   const [cars, setCars] = useState<Car[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedBrand, setSelectedBrand] = useState('All');
+
+  // Photo Gallery and Upload Modal State
+  const [galleryCar, setGalleryCar] = useState<{ id: string; name: string } | null>(null);
+  const [uploadCar, setUploadCar] = useState<{ id: string; name: string } | null>(null);
+  const [photoRefreshKey, setPhotoRefreshKey] = useState(0);
 
   // Join Modal
   const [activeJoinGroup, setActiveJoinGroup] = useState<BuyingGroup | null>(null);
@@ -209,20 +221,26 @@ export const GroupBuyingArena: React.FC<GroupBuyingArenaProps> = ({
             const progressPercent = Math.min(100, Math.round((group.currentBuyers / group.targetBuyers) * 100));
             const winningBid = group.bids.find(b => b.isWinning) || group.bids[0];
             const spotsRemaining = Math.max(0, group.targetBuyers - group.currentBuyers);
+            const carPhotos = getCarPhotos(group.carId);
+            const primaryPhoto = carPhotos.length > 0 ? carPhotos[0].url : imageUrl;
 
             return (
               <div
                 key={group.id}
                 className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-xs hover:shadow-md transition-all flex flex-col group relative"
               >
-                {/* Car Image with Badges */}
-                <div className="relative h-48 overflow-hidden bg-slate-100">
+                {/* Car Image with Badges - Clickable to open gallery */}
+                <div 
+                  onClick={() => setGalleryCar({ id: group.carId, name: group.carName })}
+                  className="relative h-48 overflow-hidden bg-slate-100 cursor-pointer group/img"
+                  title="Click to view full photo gallery"
+                >
                   <img
-                    src={imageUrl}
+                    src={primaryPhoto}
                     alt={group.carName}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    className="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-500"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-900/70 via-transparent to-transparent" />
 
                   {/* Top Badges */}
                   <div className="absolute top-3 left-3 right-3 flex items-center justify-between">
@@ -231,21 +249,53 @@ export const GroupBuyingArena: React.FC<GroupBuyingArenaProps> = ({
                       {group.city}
                     </span>
 
-                    <span className={`px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider backdrop-blur-md border ${
-                      group.status === 'ACTIVE_BIDDING'
-                        ? 'bg-amber-100 text-amber-900 border-amber-300'
-                        : group.status === 'DEAL_LOCKED'
-                          ? 'bg-emerald-100 text-emerald-900 border-emerald-300'
-                          : 'bg-blue-100 text-blue-900 border-blue-300'
-                    }`}>
-                      {group.status === 'ACTIVE_BIDDING' ? 'Showrooms Bidding Now' : group.status.replace('_', ' ')}
-                    </span>
+                    <div className="flex items-center gap-1.5">
+                      {/* Showroom Add Photos Button */}
+                      {userRole === 'DEALER' && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setUploadCar({ id: group.carId, name: group.carName });
+                          }}
+                          className="px-2.5 py-1 rounded-md text-[10px] font-bold bg-amber-600 hover:bg-amber-700 text-white flex items-center gap-1 shadow-xs cursor-pointer transition-all hover:scale-105"
+                          title="Showroom: Upload real car photos"
+                        >
+                          <Upload className="w-3 h-3" />
+                          <span>+ Add Photos</span>
+                        </button>
+                      )}
+
+                      <span className={`px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider backdrop-blur-md border ${
+                        group.status === 'ACTIVE_BIDDING'
+                          ? 'bg-amber-100 text-amber-900 border-amber-300'
+                          : group.status === 'DEAL_LOCKED'
+                            ? 'bg-emerald-100 text-emerald-900 border-emerald-300'
+                            : 'bg-blue-100 text-blue-900 border-blue-300'
+                      }`}>
+                        {group.status === 'ACTIVE_BIDDING' ? 'Showrooms Bidding Now' : group.status.replace('_', ' ')}
+                      </span>
+                    </div>
                   </div>
 
-                  {/* Community Name Tag */}
-                  <div className="absolute bottom-3 left-3 right-3 text-xs font-semibold text-white drop-shadow truncate flex items-center gap-1.5">
-                    <Building className="w-3.5 h-3.5 text-blue-200 shrink-0" />
-                    <span>{group.communityName}</span>
+                  {/* Bottom Overlays: Community Tag + Gallery Icon Button */}
+                  <div className="absolute bottom-2.5 left-3 right-3 flex items-center justify-between gap-2">
+                    <div className="text-xs font-semibold text-white drop-shadow truncate flex items-center gap-1.5 max-w-[62%]">
+                      <Building className="w-3.5 h-3.5 text-blue-200 shrink-0" />
+                      <span className="truncate">{group.communityName}</span>
+                    </div>
+
+                    {/* View Photos Icon Button (Click this icon in the image) */}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setGalleryCar({ id: group.carId, name: group.carName });
+                      }}
+                      className="px-2.5 py-1 rounded-xl bg-slate-900/85 hover:bg-slate-900 text-white backdrop-blur-md border border-white/25 text-[11px] font-bold flex items-center gap-1.5 shadow-md hover:scale-105 transition-all cursor-pointer shrink-0"
+                      title="Click this icon to view car photos"
+                    >
+                      <Camera className="w-3.5 h-3.5 text-amber-300" />
+                      <span>{carPhotos.length} Photos</span>
+                    </button>
                   </div>
                 </div>
 
@@ -519,6 +569,32 @@ export const GroupBuyingArena: React.FC<GroupBuyingArenaProps> = ({
             </form>
           </div>
         </div>
+      )}
+
+      {/* Car Photo Gallery Modal */}
+      {galleryCar && (
+        <CarGalleryModal
+          isOpen={!!galleryCar}
+          onClose={() => setGalleryCar(null)}
+          carId={galleryCar.id}
+          carName={galleryCar.name}
+          images={getCarPhotos(galleryCar.id)}
+          userRole={userRole}
+          onOpenUpload={(cId, cName) => setUploadCar({ id: cId, name: cName })}
+        />
+      )}
+
+      {/* Showroom Upload Photo Modal */}
+      {uploadCar && (
+        <UploadCarPhotoModal
+          isOpen={!!uploadCar}
+          onClose={() => setUploadCar(null)}
+          carId={uploadCar.id}
+          carName={uploadCar.name}
+          onPhotoUploaded={() => {
+            setPhotoRefreshKey(prev => prev + 1);
+          }}
+        />
       )}
     </div>
   );
