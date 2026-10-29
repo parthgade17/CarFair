@@ -126,6 +126,7 @@ function AppContent() {
                     userRole={userRole}
                     onLockDealForGroup={handleLockDealForGroup}
                     onViewBidsForGroup={handleViewBidsForGroup}
+                    onSwitchToShowroom={() => setUserRole('DEALER')}
                   />
                 </div>
               </>

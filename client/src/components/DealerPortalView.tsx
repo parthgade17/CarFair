@@ -16,16 +16,26 @@ import {
   Car as CarIcon,
   Sparkles,
   MapPin,
-  RefreshCw
+  RefreshCw,
+  PlusCircle,
+  Trash2,
+  Image as ImageIcon,
+  X,
+  ExternalLink
 } from 'lucide-react';
-import { Dealer, BuyingGroup, CarImageItem } from '../types';
+import { Dealer, BuyingGroup, CarImageItem, Car } from '../types';
 import { 
   fetchDealers, 
   fetchGroups, 
+  fetchCars,
   submitDealerBid, 
   verifyBuyerPin,
   getDealerInventory,
   saveDealerInventory,
+  addShowroomVehicle,
+  deleteShowroomVehicle,
+  clearAllShowroomData,
+  isDemoCleared,
   DealerInventorySettings
 } from '../services/api';
 import { getCarPhotos } from '../services/photoStorage';
@@ -39,10 +49,11 @@ interface DealerPortalViewProps {
 export const DealerPortalView: React.FC<DealerPortalViewProps> = ({ selectedCity = 'Pune' }) => {
   const [dealers, setDealers] = useState<Dealer[]>([]);
   const [groups, setGroups] = useState<BuyingGroup[]>([]);
+  const [showroomCars, setShowroomCars] = useState<Car[]>([]);
   const [selectedDealerId, setSelectedDealerId] = useState('dealer-bafna-tata-pune');
   const [filterCity, setFilterCity] = useState(selectedCity === 'All Cities' ? 'All' : selectedCity);
 
-  // Dynamic Inventory & Stock State
+  // Dynamic Inventory & Target Stock State
   const [inventory, setInventory] = useState<DealerInventorySettings>(getDealerInventory());
   const [isEditingInventory, setIsEditingInventory] = useState(false);
   const [editFloorStock, setEditFloorStock] = useState(inventory.readyStockCount);
@@ -51,8 +62,34 @@ export const DealerPortalView: React.FC<DealerPortalViewProps> = ({ selectedCity
   const [editTargetCount, setEditTargetCount] = useState(inventory.monthlyTargetCount);
   const [stockSavedNotice, setStockSavedNotice] = useState(false);
 
+  // Add Vehicle Modal & Form State
+  const [isAddCarModalOpen, setIsAddCarModalOpen] = useState(false);
+  const [isClearingData, setIsClearingData] = useState(false);
+  const [statusNotice, setStatusNotice] = useState<string | null>(null);
+
+  const [formBrand, setFormBrand] = useState('Tata');
+  const [formCustomBrand, setFormCustomBrand] = useState('');
+  const [formModel, setFormModel] = useState('');
+  const [formVariant, setFormVariant] = useState('');
+  const [formSegment, setFormSegment] = useState('Compact SUV');
+  const [formPrice, setFormPrice] = useState(1150000);
+  const [formFuel, setFormFuel] = useState('Petrol');
+  const [formTransmission, setFormTransmission] = useState('Manual');
+  const [formMileage, setFormMileage] = useState('18.2 kmpl');
+  const [formEngineCc, setFormEngineCc] = useState(1199);
+  const [formSeating, setFormSeating] = useState(5);
+  const [formTagline, setFormTagline] = useState('Showroom stock available for immediate allocation');
+  const [formImageUrl, setFormImageUrl] = useState('');
+  const [formImageFilePreview, setFormImageFilePreview] = useState<string | null>(null);
+  const [formReadyStock, setFormReadyStock] = useState(4);
+  const [formInTransit, setFormInTransit] = useState(6);
+  const [formCreatePool, setFormCreatePool] = useState(true);
+  const [formPoolTarget, setFormPoolTarget] = useState(15);
+  const [formPoolDiscount, setFormPoolDiscount] = useState(48000);
+  const [isSubmittingVehicle, setIsSubmittingVehicle] = useState(false);
+
   // Photo Management
-  const [selectedPhotoCar, setSelectedPhotoCar] = useState('tata-nexon');
+  const [selectedPhotoCar, setSelectedPhotoCar] = useState('');
   const [galleryCar, setGalleryCar] = useState<{ id: string; name: string } | null>(null);
   const [uploadCar, setUploadCar] = useState<{ id: string; name: string } | null>(null);
   const [photoRefreshKey, setPhotoRefreshKey] = useState(0);
@@ -75,11 +112,11 @@ export const DealerPortalView: React.FC<DealerPortalViewProps> = ({ selectedCity
   const [bidSuccessMessage, setBidSuccessMessage] = useState('');
   const [isSubmittingBid, setIsSubmittingBid] = useState(false);
 
-  const availableCars = [
-    { id: 'tata-nexon', name: 'Tata Nexon Creative+ / Smart+' },
-    { id: 'hyundai-creta', name: 'Hyundai Creta SX (Tech) IVT' },
-    { id: 'mahindra-xuv700', name: 'Mahindra XUV700 AX7 Diesel AT' },
-    { id: 'mahindra-scorpio-n', name: 'Mahindra Scorpio-N Z4 Diesel MT' }
+  const samplePhotoPresets = [
+    { name: 'Red Compact SUV', url: 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=1200&q=80' },
+    { name: 'White Mid-Size SUV', url: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1200&q=80' },
+    { name: 'Silver 7-Seater', url: 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=1200&q=80' },
+    { name: 'Navy Blue Urban SUV', url: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=1200&q=80' }
   ];
 
   useEffect(() => {
@@ -87,17 +124,117 @@ export const DealerPortalView: React.FC<DealerPortalViewProps> = ({ selectedCity
       setDealers(d);
       if (d.length > 0) setSelectedDealerId(d[0].id);
     });
-    loadGroups();
+    loadAllData();
   }, [filterCity]);
 
   useEffect(() => {
-    setCurrentCarPhotos(getCarPhotos(selectedPhotoCar));
-  }, [selectedPhotoCar, photoRefreshKey]);
+    if (selectedPhotoCar) {
+      setCurrentCarPhotos(getCarPhotos(selectedPhotoCar));
+    } else if (showroomCars.length > 0) {
+      setSelectedPhotoCar(showroomCars[0].id);
+      setCurrentCarPhotos(getCarPhotos(showroomCars[0].id));
+    } else {
+      setCurrentCarPhotos([]);
+    }
+  }, [selectedPhotoCar, photoRefreshKey, showroomCars]);
 
-  const loadGroups = async () => {
-    const g = await fetchGroups(filterCity === 'All' ? undefined : filterCity);
+  const loadAllData = async () => {
+    const [g, c] = await Promise.all([
+      fetchGroups(filterCity === 'All' ? undefined : filterCity),
+      fetchCars()
+    ]);
     setGroups(g);
+    setShowroomCars(c);
     if (g.length > 0) setSelectedGroupId(g[0].id);
+    if (c.length > 0 && !selectedPhotoCar) {
+      setSelectedPhotoCar(c[0].id);
+    }
+  };
+
+  const handlePhotoFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const result = reader.result as string;
+        setFormImageFilePreview(result);
+        setFormImageUrl(result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleAddVehicleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const finalBrand = formBrand === 'Other' ? formCustomBrand.trim() : formBrand;
+    if (!finalBrand) {
+      alert('Please enter or select a vehicle brand.');
+      return;
+    }
+    if (!formModel.trim()) {
+      alert('Please enter a vehicle model name (e.g. Brezza, Nexon, Creta).');
+      return;
+    }
+    setIsSubmittingVehicle(true);
+    const currentDealer = dealers.find(d => d.id === selectedDealerId);
+    const finalImage = formImageFilePreview || formImageUrl || samplePhotoPresets[0].url;
+
+    const res = await addShowroomVehicle({
+      brand: finalBrand,
+      model: formModel.trim(),
+      variantName: formVariant.trim() || `${formModel.trim()} ${formFuel} ${formTransmission}`,
+      segment: formSegment,
+      exShowroomPrice: Number(formPrice),
+      fuelType: formFuel,
+      transmission: formTransmission,
+      engineCc: Number(formEngineCc),
+      seating: Number(formSeating),
+      mileage: formMileage,
+      imageUrl: finalImage,
+      tagline: formTagline,
+      city: filterCity === 'All' ? selectedCity : filterCity,
+      dealerId: selectedDealerId,
+      dealerName: currentDealer?.name || 'Authorized Showroom Partner',
+      readyStock: Number(formReadyStock),
+      inTransit: Number(formInTransit),
+      createBuyerPool: formCreatePool,
+      poolTargetBuyers: Number(formPoolTarget),
+      poolDiscount: Number(formPoolDiscount)
+    });
+
+    if (res.success) {
+      setIsAddCarModalOpen(false);
+      setFormModel('');
+      setFormVariant('');
+      setFormImageFilePreview(null);
+      setFormImageUrl('');
+      setStatusNotice(`🎉 "${res.car.brand} ${res.car.model}" has been added! It is now live and visible to buyers on the website.`);
+      await loadAllData();
+      setTimeout(() => setStatusNotice(null), 5000);
+    }
+    setIsSubmittingVehicle(false);
+  };
+
+  const handleDeleteCar = async (carId: string, carName: string) => {
+    if (!confirm(`Are you sure you want to remove "${carName}" from the showroom? This will also remove any linked buyer pools.`)) {
+      return;
+    }
+    await deleteShowroomVehicle(carId);
+    setStatusNotice(`"${carName}" was removed from showroom inventory.`);
+    await loadAllData();
+    setTimeout(() => setStatusNotice(null), 4000);
+  };
+
+  const handleClearAllData = async () => {
+    if (!confirm('Are you sure you want to delete ALL demo vehicles and buyer pools? This clears all static/demo data and leaves a completely clean showroom ready for your own vehicle listings.')) {
+      return;
+    }
+    setIsClearingData(true);
+    const res = await clearAllShowroomData();
+    setStatusNotice(res.message);
+    await loadAllData();
+    setIsClearingData(false);
+    setTimeout(() => setStatusNotice(null), 6000);
   };
 
   const handleSaveInventory = (e: React.FormEvent) => {
@@ -149,7 +286,7 @@ export const DealerPortalView: React.FC<DealerPortalViewProps> = ({ selectedCity
 
     if (res.success) {
       setBidSuccessMessage(`Offer submitted! Your lowest quote is now live for ${res.group.carName}.`);
-      await loadGroups();
+      await loadAllData();
       setTimeout(() => setBidSuccessMessage(''), 4000);
     }
     setIsSubmittingBid(false);
@@ -160,7 +297,7 @@ export const DealerPortalView: React.FC<DealerPortalViewProps> = ({ selectedCity
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-      {/* Header */}
+      {/* Header with Quick Actions */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-slate-200 pb-6">
         <div>
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-50 text-amber-900 border border-amber-200 mb-2">
@@ -175,24 +312,58 @@ export const DealerPortalView: React.FC<DealerPortalViewProps> = ({ selectedCity
           </p>
         </div>
 
-        {/* Dealer Switcher */}
-        {dealers.length > 0 && (
-          <div className="bg-white border border-slate-300 rounded-xl p-2.5 flex items-center gap-2 shadow-xs">
-            <span className="text-xs text-slate-500 font-medium pl-1">Logged-in Showroom:</span>
-            <select
-              value={selectedDealerId}
-              onChange={(e) => setSelectedDealerId(e.target.value)}
-              className="bg-slate-50 border border-slate-300 text-slate-900 text-xs rounded-lg px-2.5 py-1.5 focus:bg-white focus:outline-none focus:border-amber-600 font-bold cursor-pointer"
-            >
-              {dealers.map((d) => (
-                <option key={d.id} value={d.id}>
-                  {d.name} ({d.city})
-                </option>
-              ))}
-            </select>
-          </div>
-        )}
+        {/* Action Controls */}
+        <div className="flex flex-wrap items-center gap-2.5">
+          <button
+            onClick={() => setIsAddCarModalOpen(true)}
+            className="px-4 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold flex items-center gap-2 shadow-sm cursor-pointer transition-all hover:scale-102"
+          >
+            <PlusCircle className="w-4 h-4" />
+            <span>+ Add Vehicle to Showroom</span>
+          </button>
+
+          <button
+            onClick={handleClearAllData}
+            disabled={isClearingData}
+            className="px-3.5 py-2.5 rounded-xl bg-slate-100 hover:bg-red-50 text-slate-600 hover:text-red-700 border border-slate-200 hover:border-red-200 text-xs font-bold flex items-center gap-1.5 cursor-pointer transition-colors"
+            title="Wipe demo data and reset showroom inventory to fresh clean state"
+          >
+            <Trash2 className="w-3.5 h-3.5" />
+            <span>{isClearingData ? 'Clearing...' : 'Clear Demo Data'}</span>
+          </button>
+
+          {/* Dealer Switcher */}
+          {dealers.length > 0 && (
+            <div className="bg-white border border-slate-300 rounded-xl p-2 flex items-center gap-2 shadow-xs">
+              <span className="text-xs text-slate-500 font-medium pl-1">Showroom:</span>
+              <select
+                value={selectedDealerId}
+                onChange={(e) => setSelectedDealerId(e.target.value)}
+                className="bg-slate-50 border border-slate-300 text-slate-900 text-xs rounded-lg px-2 py-1 focus:bg-white focus:outline-none focus:border-amber-600 font-bold cursor-pointer"
+              >
+                {dealers.map((d) => (
+                  <option key={d.id} value={d.id}>
+                    {d.name} ({d.city})
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+        </div>
       </div>
+
+      {/* Global Status Feedback Notice */}
+      {statusNotice && (
+        <div className="p-4 bg-emerald-50 border border-emerald-300 rounded-2xl text-xs text-emerald-950 font-bold flex items-center justify-between shadow-xs animate-in fade-in">
+          <div className="flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+            <span>{statusNotice}</span>
+          </div>
+          <button onClick={() => setStatusNotice(null)} className="text-emerald-700 hover:text-emerald-950 cursor-pointer">
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
 
       {/* Dynamic Target & Live Inventory Bar */}
       <div className="bg-gradient-to-r from-amber-50/90 via-amber-50/60 to-orange-50/70 border border-amber-300 rounded-2xl p-5 shadow-xs space-y-4">
@@ -287,7 +458,148 @@ export const DealerPortalView: React.FC<DealerPortalViewProps> = ({ selectedCity
         )}
       </div>
 
-      {/* Prominent Showroom Vehicle Photography & Upload Section */}
+      {/* DYNAMIC SHOWROOM FLEET & VEHICLE LISTINGS (Visible to Buyers when added) */}
+      <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+          <div>
+            <div className="flex items-center gap-2">
+              <CarIcon className="w-5 h-5 text-emerald-700" />
+              <h3 className="text-base font-extrabold text-slate-900">
+                Showroom Vehicle Stock & Catalog ({showroomCars.length} Models Listed)
+              </h3>
+            </div>
+            <p className="text-xs text-slate-500 mt-0.5">
+              Vehicles listed here appear live on the Buyer Portal with your uploaded photographs, ex-showroom pricing, and delivery readiness.
+            </p>
+          </div>
+
+          <button
+            onClick={() => setIsAddCarModalOpen(true)}
+            className="px-3.5 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs flex items-center gap-1.5 shadow-xs cursor-pointer self-start sm:self-auto"
+          >
+            <PlusCircle className="w-4 h-4" />
+            <span>+ Add New Vehicle</span>
+          </button>
+        </div>
+
+        {showroomCars.length === 0 ? (
+          <div className="py-12 border-2 border-dashed border-slate-200 rounded-2xl text-center space-y-3 bg-slate-50/50">
+            <CarIcon className="w-12 h-12 text-slate-300 mx-auto" />
+            <h4 className="text-base font-bold text-slate-700">No Vehicles Currently Listed</h4>
+            <p className="text-xs text-slate-500 max-w-md mx-auto">
+              Your showroom catalog is clean. Click below to add a vehicle model with specifications and photos. Once added, it will immediately be visible to car buyers on the platform!
+            </p>
+            <button
+              onClick={() => setIsAddCarModalOpen(true)}
+              className="mt-2 px-4 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-bold shadow-xs cursor-pointer inline-flex items-center gap-1.5"
+            >
+              <PlusCircle className="w-4 h-4" />
+              <span>Add First Vehicle Now</span>
+            </button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 pt-1">
+            {showroomCars.map((car) => {
+              const primaryVariant = car.variants && car.variants.length > 0 ? car.variants[0] : null;
+              const linkedGroup = groups.find(g => g.carId === car.id);
+              const carPhotos = getCarPhotos(car.id);
+              const displayImg = carPhotos.length > 0 ? carPhotos[0].url : car.image;
+
+              return (
+                <div
+                  key={car.id}
+                  className="border border-slate-200 rounded-2xl overflow-hidden bg-slate-50/40 hover:bg-white hover:shadow-md transition-all flex flex-col justify-between"
+                >
+                  <div>
+                    {/* Vehicle Photo with Badges */}
+                    <div className="relative h-44 bg-slate-200 overflow-hidden group/img">
+                      <img
+                        src={displayImg}
+                        alt={`${car.brand} ${car.model}`}
+                        className="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-300"
+                      />
+                      <div className="absolute top-2.5 left-2.5 bg-slate-900/80 backdrop-blur-xs text-white text-[10px] font-bold px-2 py-0.5 rounded-md">
+                        {car.segment}
+                      </div>
+                      <div className="absolute top-2.5 right-2.5 flex items-center gap-1">
+                        <button
+                          onClick={() => handleDeleteCar(car.id, `${car.brand} ${car.model}`)}
+                          className="p-1.5 rounded-lg bg-red-600/90 hover:bg-red-700 text-white text-[10px] shadow-xs cursor-pointer transition-colors"
+                          title="Delete vehicle from showroom"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                      <div className="absolute bottom-2 left-2.5 right-2.5 flex items-center justify-between text-[11px] text-white drop-shadow font-semibold">
+                        <span>{car.fuelTypes.join(' / ')} • {car.transmissions.join(' / ')}</span>
+                        <span className="bg-emerald-600/90 px-2 py-0.5 rounded text-[10px] font-bold">Live on Buyer Side</span>
+                      </div>
+                    </div>
+
+                    {/* Details */}
+                    <div className="p-4 space-y-3">
+                      <div>
+                        <h4 className="font-extrabold text-slate-900 text-base">
+                          {car.brand} {car.model}
+                        </h4>
+                        <p className="text-xs text-slate-600 truncate mt-0.5">
+                          {primaryVariant ? primaryVariant.name : car.tagline}
+                        </p>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-2 text-xs bg-white p-2.5 rounded-xl border border-slate-200">
+                        <div>
+                          <span className="text-[10px] text-slate-400 block font-medium">Ex-Showroom Price</span>
+                          <span className="font-bold font-mono text-slate-900 text-xs">
+                            {primaryVariant ? `₹${primaryVariant.exShowroom.toLocaleString('en-IN')}` : car.priceRange}
+                          </span>
+                        </div>
+                        <div>
+                          <span className="text-[10px] text-slate-400 block font-medium">Mileage / Spec</span>
+                          <span className="font-bold text-slate-800 text-xs">
+                            {primaryVariant?.mileage || '18.2 kmpl'}
+                          </span>
+                        </div>
+                      </div>
+
+                      {linkedGroup && (
+                        <div className="p-2.5 rounded-xl bg-amber-50/80 border border-amber-200 text-xs text-amber-950 space-y-1">
+                          <div className="flex items-center justify-between font-bold">
+                            <span>Active Buyer Pool</span>
+                            <span className="text-emerald-800 font-mono">{linkedGroup.currentBuyers} Joined</span>
+                          </div>
+                          <p className="text-[10px] text-slate-600">
+                            Current lowest price: ₹{linkedGroup.currentBestGroupPrice.toLocaleString('en-IN')}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Actions Bar */}
+                  <div className="p-4 pt-0 flex items-center gap-2">
+                    <button
+                      onClick={() => setUploadCar({ id: car.id, name: `${car.brand} ${car.model}` })}
+                      className="flex-1 py-2 rounded-xl bg-amber-700 hover:bg-amber-800 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-xs cursor-pointer transition-colors"
+                    >
+                      <Camera className="w-3.5 h-3.5" />
+                      <span>+ Add Photos</span>
+                    </button>
+                    <button
+                      onClick={() => setGalleryCar({ id: car.id, name: `${car.brand} ${car.model}` })}
+                      className="px-3 py-2 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold text-xs cursor-pointer transition-colors"
+                    >
+                      Gallery ({carPhotos.length})
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* Showroom Vehicle Photography Studio */}
       <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
           <div>
@@ -305,52 +617,49 @@ export const DealerPortalView: React.FC<DealerPortalViewProps> = ({ selectedCity
           <div className="flex items-center gap-2">
             <button
               onClick={() => {
-                const c = availableCars.find(x => x.id === selectedPhotoCar) || availableCars[0];
-                setUploadCar(c);
+                const target = showroomCars.find(x => x.id === selectedPhotoCar) || showroomCars[0];
+                if (target) {
+                  setUploadCar({ id: target.id, name: `${target.brand} ${target.model}` });
+                } else {
+                  setIsAddCarModalOpen(true);
+                }
               }}
               className="px-4 py-2 rounded-xl bg-amber-700 hover:bg-amber-800 text-white font-bold text-xs flex items-center gap-1.5 shadow-sm cursor-pointer"
             >
               <Upload className="w-4 h-4" />
               <span>+ Upload Car Photo</span>
             </button>
-            <button
-              onClick={() => {
-                const c = availableCars.find(x => x.id === selectedPhotoCar) || availableCars[0];
-                setGalleryCar(c);
-              }}
-              className="px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs flex items-center gap-1 cursor-pointer"
-            >
-              <span>View Full Gallery</span>
-            </button>
           </div>
         </div>
 
-        {/* Model Tabs */}
-        <div className="flex flex-wrap gap-2 pt-1">
-          {availableCars.map((car) => {
-            const count = getCarPhotos(car.id).length;
-            const isSelected = selectedPhotoCar === car.id;
-            return (
-              <button
-                key={car.id}
-                onClick={() => setSelectedPhotoCar(car.id)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-2 cursor-pointer transition-all ${
-                  isSelected 
-                    ? 'bg-amber-600 text-white shadow-xs' 
-                    : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
-                }`}
-              >
-                <CarIcon className="w-3.5 h-3.5" />
-                <span>{car.name.split(' ')[0]} {car.name.split(' ')[1]}</span>
-                <span className={`px-1.5 py-0.2 rounded text-[10px] font-mono ${
-                  isSelected ? 'bg-amber-800 text-amber-100' : 'bg-slate-200 text-slate-800'
-                }`}>
-                  {count} photos
-                </span>
-              </button>
-            );
-          })}
-        </div>
+        {/* Dynamic Model Tabs */}
+        {showroomCars.length > 0 && (
+          <div className="flex flex-wrap gap-2 pt-1">
+            {showroomCars.map((car) => {
+              const count = getCarPhotos(car.id).length;
+              const isSelected = selectedPhotoCar === car.id;
+              return (
+                <button
+                  key={car.id}
+                  onClick={() => setSelectedPhotoCar(car.id)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-2 cursor-pointer transition-all ${
+                    isSelected 
+                      ? 'bg-amber-600 text-white shadow-xs' 
+                      : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
+                  }`}
+                >
+                  <CarIcon className="w-3.5 h-3.5" />
+                  <span>{car.brand} {car.model}</span>
+                  <span className={`px-1.5 py-0.2 rounded text-[10px] font-mono ${
+                    isSelected ? 'bg-amber-800 text-amber-100' : 'bg-slate-200 text-slate-800'
+                  }`}>
+                    {count} photos
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        )}
 
         {/* Live Photo Grid for Selected Car */}
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 pt-2">
@@ -373,8 +682,12 @@ export const DealerPortalView: React.FC<DealerPortalViewProps> = ({ selectedCity
           {/* Quick Upload Tile */}
           <button
             onClick={() => {
-              const c = availableCars.find(x => x.id === selectedPhotoCar) || availableCars[0];
-              setUploadCar(c);
+              const target = showroomCars.find(x => x.id === selectedPhotoCar) || showroomCars[0];
+              if (target) {
+                setUploadCar({ id: target.id, name: `${target.brand} ${target.model}` });
+              } else {
+                setIsAddCarModalOpen(true);
+              }
             }}
             className="rounded-xl border-2 border-dashed border-amber-300 hover:border-amber-500 bg-amber-50/50 hover:bg-amber-50 flex flex-col items-center justify-center p-3 text-center aspect-4/3 transition-colors cursor-pointer"
           >
@@ -418,88 +731,98 @@ export const DealerPortalView: React.FC<DealerPortalViewProps> = ({ selectedCity
             </div>
           )}
 
-          <div className="space-y-4">
-            {groups.map((group) => {
-              const winningBid = group.bids && group.bids.length > 0 ? group.bids[0] : null;
-              return (
-                <div
-                  key={group.id}
-                  className="bg-white border border-slate-200 rounded-2xl p-5 space-y-4 shadow-xs hover:shadow-md transition-all"
-                >
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <h4 className="font-bold text-slate-900 text-base">{group.carName}</h4>
-                      <p className="text-xs text-slate-500 flex items-center gap-2 mt-0.5">
-                        <span>{group.communityName}</span> • 
-                        <strong className="text-emerald-700 font-bold">{group.verifiedBuyers} Pre-Approved Buyers</strong>
-                      </p>
+          {groups.length === 0 ? (
+            <div className="bg-white border border-slate-200 rounded-2xl p-8 text-center space-y-2">
+              <Users className="w-8 h-8 text-slate-400 mx-auto" />
+              <h4 className="text-sm font-bold text-slate-700">No Active Buyer Pools in this City</h4>
+              <p className="text-xs text-slate-500">
+                When you list a vehicle above, a corresponding group pool is automatically created for buyers to join!
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {groups.map((group) => {
+                const winningBid = group.bids && group.bids.length > 0 ? group.bids[0] : null;
+                return (
+                  <div
+                    key={group.id}
+                    className="bg-white border border-slate-200 rounded-2xl p-5 space-y-4 shadow-xs hover:shadow-md transition-all"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <h4 className="font-bold text-slate-900 text-base">{group.carName}</h4>
+                        <p className="text-xs text-slate-500 flex items-center gap-2 mt-0.5">
+                          <span>{group.communityName}</span> • 
+                          <strong className="text-emerald-700 font-bold">{group.verifiedBuyers} Pre-Approved Buyers</strong>
+                        </p>
+                      </div>
+
+                      <span className="px-2.5 py-1 rounded-md text-xs font-mono font-bold bg-slate-100 text-blue-800 border border-slate-200">
+                        {group.city}
+                      </span>
                     </div>
 
-                    <span className="px-2.5 py-1 rounded-md text-xs font-mono font-bold bg-slate-100 text-blue-800 border border-slate-200">
-                      {group.city}
-                    </span>
+                    <div className="grid grid-cols-3 gap-3 p-3 bg-slate-50 rounded-xl text-xs border border-slate-100">
+                      <div>
+                        <span className="text-slate-500 font-medium">Pool Target:</span>
+                        <div className="font-bold text-slate-800">{group.targetBuyers} Buyers</div>
+                      </div>
+                      <div>
+                        <span className="text-slate-500 font-medium">Joined Buyers:</span>
+                        <div className="font-bold text-slate-900">{group.currentBuyers} Ready</div>
+                      </div>
+                      <div>
+                        <span className="text-slate-500 font-medium">Lowest Showroom Offer:</span>
+                        <div className="font-bold font-mono text-emerald-700">₹{group.currentBestGroupPrice.toLocaleString('en-IN')}</div>
+                      </div>
+                    </div>
+
+                    {winningBid && (
+                      <div className="text-[11px] bg-amber-50/70 border border-amber-200 rounded-lg p-2 flex items-center justify-between text-amber-950">
+                        <span><strong>Current Leading Showroom:</strong> {winningBid.dealerName} (-₹{winningBid.exShowroomDiscount.toLocaleString('en-IN')} discount)</span>
+                        <span className="font-mono font-bold text-emerald-800">{winningBid.deliveryDays} Days Delivery</span>
+                      </div>
+                    )}
+
+                    {/* Quick Submit Bid form */}
+                    <form onSubmit={(e) => handleDealerBid(e, group.id)} className="pt-2 border-t border-slate-100 grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs items-end">
+                      <div>
+                        <label className="block text-slate-600 font-medium text-[11px] mb-1">Your Cash Discount (₹)</label>
+                        <input
+                          type="number"
+                          step="1000"
+                          defaultValue={bidDiscount}
+                          onChange={(e) => setBidDiscount(Number(e.target.value))}
+                          className="w-full bg-slate-50 border border-slate-300 rounded-lg px-2.5 py-1.5 text-slate-900 font-mono font-bold focus:bg-white focus:border-amber-600"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-slate-600 font-medium text-[11px] mb-1">Delivery Time (Days)</label>
+                        <input
+                          type="number"
+                          min="1"
+                          max="30"
+                          defaultValue={deliveryDays}
+                          onChange={(e) => setDeliveryDays(Number(e.target.value))}
+                          className="w-full bg-slate-50 border border-slate-300 rounded-lg px-2.5 py-1.5 text-slate-900 font-mono font-bold focus:bg-white focus:border-amber-600"
+                        />
+                      </div>
+
+                      <button
+                        type="submit"
+                        disabled={isSubmittingBid}
+                        className="py-2 rounded-lg bg-amber-700 hover:bg-amber-800 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-xs cursor-pointer disabled:opacity-50"
+                      >
+                        <Gavel className="w-3.5 h-3.5" />
+                        <span>{isSubmittingBid ? 'Submitting...' : 'Submit Dealer Bid'}</span>
+                      </button>
+                    </form>
                   </div>
-
-                  <div className="grid grid-cols-3 gap-3 p-3 bg-slate-50 rounded-xl text-xs border border-slate-100">
-                    <div>
-                      <span className="text-slate-500 font-medium">Pool Target:</span>
-                      <div className="font-bold text-slate-800">{group.targetBuyers} Buyers</div>
-                    </div>
-                    <div>
-                      <span className="text-slate-500 font-medium">Joined Buyers:</span>
-                      <div className="font-bold text-slate-900">{group.currentBuyers} Ready</div>
-                    </div>
-                    <div>
-                      <span className="text-slate-500 font-medium">Lowest Showroom Offer:</span>
-                      <div className="font-bold font-mono text-emerald-700">₹{group.currentBestGroupPrice.toLocaleString('en-IN')}</div>
-                    </div>
-                  </div>
-
-                  {winningBid && (
-                    <div className="text-[11px] bg-amber-50/70 border border-amber-200 rounded-lg p-2 flex items-center justify-between text-amber-950">
-                      <span><strong>Current Leading Showroom:</strong> {winningBid.dealerName} (-₹{winningBid.exShowroomDiscount.toLocaleString('en-IN')} discount)</span>
-                      <span className="font-mono font-bold text-emerald-800">{winningBid.deliveryDays} Days Delivery</span>
-                    </div>
-                  )}
-
-                  {/* Quick Submit Bid form */}
-                  <form onSubmit={(e) => handleDealerBid(e, group.id)} className="pt-2 border-t border-slate-100 grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs items-end">
-                    <div>
-                      <label className="block text-slate-600 font-medium text-[11px] mb-1">Your Cash Discount (₹)</label>
-                      <input
-                        type="number"
-                        step="1000"
-                        defaultValue={bidDiscount}
-                        onChange={(e) => setBidDiscount(Number(e.target.value))}
-                        className="w-full bg-slate-50 border border-slate-300 rounded-lg px-2.5 py-1.5 text-slate-900 font-mono font-bold focus:bg-white focus:border-amber-600"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-slate-600 font-medium text-[11px] mb-1">Delivery Time (Days)</label>
-                      <input
-                        type="number"
-                        min="1"
-                        max="30"
-                        defaultValue={deliveryDays}
-                        onChange={(e) => setDeliveryDays(Number(e.target.value))}
-                        className="w-full bg-slate-50 border border-slate-300 rounded-lg px-2.5 py-1.5 text-slate-900 font-mono font-bold focus:bg-white focus:border-amber-600"
-                      />
-                    </div>
-
-                    <button
-                      type="submit"
-                      disabled={isSubmittingBid}
-                      className="py-2 rounded-lg bg-amber-700 hover:bg-amber-800 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-xs cursor-pointer disabled:opacity-50"
-                    >
-                      <Gavel className="w-3.5 h-3.5" />
-                      <span>{isSubmittingBid ? 'Submitting...' : 'Submit Dealer Bid'}</span>
-                    </button>
-                  </form>
-                </div>
-              );
-            })}
-          </div>
+                );
+              })}
+            </div>
+          )}
         </div>
 
         {/* Right: DealLock OTP Verification Portal */}
@@ -588,6 +911,318 @@ export const DealerPortalView: React.FC<DealerPortalViewProps> = ({ selectedCity
           </div>
         </div>
       </div>
+
+      {/* ADD SHOWROOM VEHICLE MODAL */}
+      {isAddCarModalOpen && (
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white border border-slate-200 rounded-3xl max-w-2xl w-full p-6 sm:p-8 space-y-6 shadow-2xl relative my-8">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+              <div>
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-200 mb-1">
+                  <PlusCircle className="w-3.5 h-3.5" />
+                  <span>Showroom Inventory Addition</span>
+                </div>
+                <h3 className="text-xl font-extrabold text-slate-900">
+                  Add New Vehicle to Showroom Fleet
+                </h3>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  This vehicle will become immediately visible on the Buyer portal with your photos, specs, and price.
+                </p>
+              </div>
+              <button
+                onClick={() => setIsAddCarModalOpen(false)}
+                className="p-2 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-100 cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleAddVehicleSubmit} className="space-y-5 text-xs">
+              {/* Brand & Model */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Vehicle Brand *</label>
+                  <select
+                    value={formBrand}
+                    onChange={(e) => setFormBrand(e.target.value)}
+                    className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 font-bold text-slate-900 focus:bg-white focus:border-emerald-600"
+                  >
+                    <option value="Tata">Tata Motors</option>
+                    <option value="Maruti Suzuki">Maruti Suzuki</option>
+                    <option value="Hyundai">Hyundai India</option>
+                    <option value="Mahindra">Mahindra & Mahindra</option>
+                    <option value="Kia">Kia India</option>
+                    <option value="Toyota">Toyota Kirloskar</option>
+                    <option value="Honda">Honda Cars</option>
+                    <option value="MG">MG Motor India</option>
+                    <option value="Skoda">Skoda Auto</option>
+                    <option value="Volkswagen">Volkswagen</option>
+                    <option value="Other">Other (Custom Brand)</option>
+                  </select>
+                  {formBrand === 'Other' && (
+                    <input
+                      type="text"
+                      placeholder="Enter brand name"
+                      value={formCustomBrand}
+                      onChange={(e) => setFormCustomBrand(e.target.value)}
+                      className="mt-2 w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-bold"
+                      required
+                    />
+                  )}
+                </div>
+
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Vehicle Model Name *</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Brezza, Nexon, Creta, Scorpio-N"
+                    value={formModel}
+                    onChange={(e) => setFormModel(e.target.value)}
+                    className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 font-bold text-slate-900 focus:bg-white focus:border-emerald-600"
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* Variant & Segment */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Exact Variant Name</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. ZXi+ Dual Tone AT / AX7L Diesel"
+                    value={formVariant}
+                    onChange={(e) => setFormVariant(e.target.value)}
+                    className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 text-slate-900 focus:bg-white focus:border-emerald-600 font-medium"
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Segment</label>
+                  <select
+                    value={formSegment}
+                    onChange={(e) => setFormSegment(e.target.value)}
+                    className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 text-slate-900 font-medium"
+                  >
+                    <option value="Compact SUV">Compact SUV</option>
+                    <option value="Mid-Size SUV">Mid-Size SUV</option>
+                    <option value="Premium 7-Seater">Premium 7-Seater SUV</option>
+                    <option value="Premium Hatchback">Premium Hatchback</option>
+                    <option value="Sedan">Executive Sedan</option>
+                    <option value="EV">Electric Vehicle (EV)</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Price, Fuel & Transmission */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Ex-Showroom Price (₹) *</label>
+                  <input
+                    type="number"
+                    step="5000"
+                    min="200000"
+                    value={formPrice}
+                    onChange={(e) => setFormPrice(Number(e.target.value))}
+                    className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 font-mono font-bold text-slate-900 focus:bg-white focus:border-emerald-600"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Fuel Type</label>
+                  <select
+                    value={formFuel}
+                    onChange={(e) => setFormFuel(e.target.value)}
+                    className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 font-medium text-slate-900"
+                  >
+                    <option value="Petrol">Petrol</option>
+                    <option value="Diesel">Diesel</option>
+                    <option value="Electric">Electric (EV)</option>
+                    <option value="CNG">CNG</option>
+                    <option value="Hybrid">Strong Hybrid</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Transmission</label>
+                  <select
+                    value={formTransmission}
+                    onChange={(e) => setFormTransmission(e.target.value)}
+                    className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 font-medium text-slate-900"
+                  >
+                    <option value="Manual">Manual (MT)</option>
+                    <option value="Automatic">Automatic (AT / TC)</option>
+                    <option value="AMT">AMT</option>
+                    <option value="DCT">Dual-Clutch (DCT / DCA)</option>
+                    <option value="IVT">IVT / CVT</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Specs: Mileage, Engine CC, Seating */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">ARAI Mileage</label>
+                  <input
+                    type="text"
+                    value={formMileage}
+                    onChange={(e) => setFormMileage(e.target.value)}
+                    placeholder="e.g. 19.8 kmpl"
+                    className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-slate-900"
+                  />
+                </div>
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Engine Displacement (cc)</label>
+                  <input
+                    type="number"
+                    value={formEngineCc}
+                    onChange={(e) => setFormEngineCc(Number(e.target.value))}
+                    placeholder="e.g. 1462"
+                    className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-slate-900"
+                  />
+                </div>
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Seating Capacity</label>
+                  <select
+                    value={formSeating}
+                    onChange={(e) => setFormSeating(Number(e.target.value))}
+                    className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-medium"
+                  >
+                    <option value={5}>5-Seater</option>
+                    <option value={6}>6-Seater Captain Seats</option>
+                    <option value={7}>7-Seater</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Vehicle Photograph & Upload Studio */}
+              <div className="space-y-3 p-4 bg-slate-50 border border-slate-200 rounded-2xl">
+                <div className="flex items-center justify-between">
+                  <label className="block font-bold text-slate-800">Vehicle Stock Photograph *</label>
+                  <span className="text-[10px] text-slate-500">Upload from camera / device or use preset</span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
+                  <div>
+                    <label className="block p-3 border-2 border-dashed border-emerald-300 hover:border-emerald-500 bg-emerald-50/40 rounded-xl text-center cursor-pointer transition-colors">
+                      <Upload className="w-5 h-5 text-emerald-700 mx-auto mb-1" />
+                      <span className="block font-bold text-emerald-950 text-xs">Choose Image File</span>
+                      <span className="block text-[10px] text-emerald-700">PNG, JPG, WebP from your device</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handlePhotoFileUpload}
+                        className="hidden"
+                      />
+                    </label>
+                  </div>
+
+                  <div>
+                    {formImageFilePreview || formImageUrl ? (
+                      <div className="relative rounded-xl overflow-hidden border border-slate-200 aspect-16/9 bg-slate-100">
+                        <img
+                          src={formImageFilePreview || formImageUrl}
+                          alt="Preview"
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute top-1 right-1 bg-emerald-700 text-white text-[9px] font-bold px-1.5 py-0.5 rounded">
+                          Image Selected
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="rounded-xl border border-dashed border-slate-200 aspect-16/9 flex items-center justify-center text-slate-400 text-xs">
+                        No image chosen yet
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div>
+                  <span className="text-[10px] text-slate-500 font-medium block mb-1">Or choose a high-resolution preset:</span>
+                  <div className="flex flex-wrap gap-2">
+                    {samplePhotoPresets.map((preset, idx) => (
+                      <button
+                        key={idx}
+                        type="button"
+                        onClick={() => {
+                          setFormImageUrl(preset.url);
+                          setFormImageFilePreview(null);
+                        }}
+                        className={`px-2.5 py-1 rounded-lg text-[10px] font-bold border transition-colors cursor-pointer ${
+                          formImageUrl === preset.url && !formImageFilePreview
+                            ? 'bg-emerald-700 text-white border-emerald-700'
+                            : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'
+                        }`}
+                      >
+                        {preset.name}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Ready Stock & Buyer Pool Option */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-amber-50/60 border border-amber-200 rounded-2xl">
+                <div>
+                  <label className="block font-bold text-amber-950 mb-1">Ready Showroom Units</label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={formReadyStock}
+                    onChange={(e) => setFormReadyStock(Number(e.target.value))}
+                    className="w-full bg-white border border-amber-300 rounded-xl px-3 py-2 font-bold"
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-bold text-amber-950 mb-1">Units in Transit</label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={formInTransit}
+                    onChange={(e) => setFormInTransit(Number(e.target.value))}
+                    className="w-full bg-white border border-amber-300 rounded-xl px-3 py-2 font-bold"
+                  />
+                </div>
+
+                <div className="sm:col-span-2 pt-2 border-t border-amber-200/80">
+                  <label className="flex items-center gap-2 cursor-pointer font-bold text-slate-800">
+                    <input
+                      type="checkbox"
+                      checked={formCreatePool}
+                      onChange={(e) => setFormCreatePool(e.target.checked)}
+                      className="w-4 h-4 text-emerald-600 rounded"
+                    />
+                    <span>Launch Buyer Pool Immediately for this car in {filterCity === 'All' ? selectedCity : filterCity}</span>
+                  </label>
+                  <p className="text-[10px] text-slate-500 pl-6 mt-0.5">
+                    Creates an active buyer group on the homepage and groups tab so local buyers can instantly reserve spots.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setIsAddCarModalOpen(false)}
+                  className="px-4 py-2.5 rounded-xl border border-slate-300 text-slate-700 font-bold hover:bg-slate-100 cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSubmittingVehicle}
+                  className="px-6 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold shadow-md cursor-pointer disabled:opacity-50 flex items-center gap-1.5"
+                >
+                  <PlusCircle className="w-4 h-4" />
+                  <span>{isSubmittingVehicle ? 'Saving & Publishing...' : 'Publish Vehicle to Showroom'}</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* Gallery Modal */}
       {galleryCar && (

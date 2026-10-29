@@ -58,7 +58,11 @@ export const QuoteTruthAuditor: React.FC<QuoteTruthAuditorProps> = ({
     fetchCars().then(c => {
       setCars(c);
       if (c.length > 0) {
-        handlePreset('nexon-pune');
+        setSelectedCarId(c[0].id);
+        if (c[0].variants && c[0].variants.length > 0) {
+          setSelectedVariantId(c[0].variants[0].id);
+          setExShowroom(c[0].variants[0].exShowroom);
+        }
       }
     });
   }, []);

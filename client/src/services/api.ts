@@ -276,6 +276,43 @@ export const FALLBACK_GROUPS: BuyingGroup[] = [
 // Dynamic LocalStorage Cache for 100% responsive real-time state
 const DYNAMIC_GROUPS_STORAGE = 'carfair_dynamic_groups_v2';
 const INVENTORY_STORAGE_KEY = 'carfair_dealer_inventory';
+const SHOWROOM_CARS_KEY = 'carfair_showroom_cars';
+const DEMO_CLEARED_KEY = 'carfair_demo_cleared_v1';
+
+export function isDemoCleared(): boolean {
+  try {
+    return localStorage.getItem(DEMO_CLEARED_KEY) === 'true';
+  } catch (err) {
+    return false;
+  }
+}
+
+export function setDemoCleared(cleared: boolean): void {
+  try {
+    if (cleared) {
+      localStorage.setItem(DEMO_CLEARED_KEY, 'true');
+    } else {
+      localStorage.removeItem(DEMO_CLEARED_KEY);
+    }
+  } catch (err) {}
+}
+
+export function getStoredShowroomCars(): Car[] {
+  try {
+    const raw = localStorage.getItem(SHOWROOM_CARS_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) return parsed;
+    }
+  } catch (err) {}
+  return [];
+}
+
+export function saveStoredShowroomCars(cars: Car[]): void {
+  try {
+    localStorage.setItem(SHOWROOM_CARS_KEY, JSON.stringify(cars));
+  } catch (err) {}
+}
 
 export interface DealerInventorySettings {
   readyStockCount: number;
@@ -312,10 +349,13 @@ export function getStoredGroups(): BuyingGroup[] {
     const raw = localStorage.getItem(DYNAMIC_GROUPS_STORAGE);
     if (raw) {
       const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      if (Array.isArray(parsed)) {
+        if (isDemoCleared()) return parsed;
+        if (parsed.length > 0) return parsed;
+      }
     }
   } catch (err) {}
-  return FALLBACK_GROUPS;
+  return isDemoCleared() ? [] : FALLBACK_GROUPS;
 }
 
 export function saveStoredGroups(groups: BuyingGroup[]): void {
@@ -331,46 +371,51 @@ export async function fetchCars(): Promise<Car[]> {
       const { data, error } = await supabase
         .from('cars')
         .select('*, variants:car_variants(*)');
-      if (!error && data && data.length > 0) {
-        return data.map((c: any) => ({
-          id: c.id,
-          brand: c.brand,
-          model: c.model,
-          segment: c.segment,
-          image: c.image,
-          tagline: c.tagline,
-          fuelTypes: c.fuel_types || [],
-          transmissions: c.transmissions || [],
-          priceRange: c.price_range,
-          variants: (c.variants || []).map((v: any) => ({
-            id: v.id,
-            name: v.name,
-            exShowroom: Number(v.ex_showroom),
-            fuel: v.fuel,
-            transmission: v.transmission,
-            engineCc: v.engine_cc,
-            seating: v.seating,
-            mileage: v.mileage
-          }))
-        }));
+      if (!error && data) {
+        if (data.length > 0) {
+          const mapped = data.map((c: any) => ({
+            id: c.id,
+            brand: c.brand,
+            model: c.model,
+            segment: c.segment,
+            image: c.image,
+            tagline: c.tagline,
+            fuelTypes: c.fuel_types || [],
+            transmissions: c.transmissions || [],
+            priceRange: c.price_range,
+            variants: (c.variants || []).map((v: any) => ({
+              id: v.id,
+              name: v.name,
+              exShowroom: Number(v.ex_showroom),
+              fuel: v.fuel,
+              transmission: v.transmission,
+              engineCc: v.engine_cc,
+              seating: v.seating,
+              mileage: v.mileage
+            }))
+          }));
+          return mapped;
+        } else if (isDemoCleared()) {
+          return [];
+        }
       }
     } catch (err) {
       console.warn('Supabase fetchCars failed, falling back:', err);
     }
   }
 
-  // 2. Try Local Python API if reachable
-  try {
-    const res = await fetch(`${API_BASE}/cars`);
-    if (res.ok) {
-      const data = await res.json();
-      if (data.cars && data.cars.length > 0) return data.cars;
-    }
-  } catch (err) {
-    // Ignore and proceed to static fallback
+  // 2. Custom Showroom Cars in Local Storage
+  const showroomCars = getStoredShowroomCars();
+  if (showroomCars.length > 0) {
+    return showroomCars;
   }
 
-  // 3. Static High-Quality Fallback
+  // 3. If demo has been cleared, return empty array so only newly added cars show
+  if (isDemoCleared()) {
+    return [];
+  }
+
+  // 4. Static High-Quality Fallback (only for initial preview before clean)
   return FALLBACK_CARS;
 }
 
@@ -394,43 +439,47 @@ export async function fetchGroups(city?: string, brand?: string): Promise<Buying
           error = null;
         }
       }
-      if (!error && data && data.length > 0) {
-        const mapped: BuyingGroup[] = data.map((g: any) => ({
-          id: g.id,
-          carId: g.car_id,
-          variantId: g.variant_id,
-          carName: g.car_name,
-          city: g.city,
-          state: g.state || 'MH',
-          communityName: g.community_name,
-          status: g.status,
-          biddingEndsAt: g.bidding_ends_at,
-          targetBuyers: g.target_buyers,
-          currentBuyers: g.current_buyers,
-          verifiedBuyers: g.verified_buyers,
-          baselineShowroomPrice: Number(g.baseline_showroom_price),
-          currentBestGroupPrice: Number(g.current_best_group_price),
-          verifiedSavingsTotal: Number(g.verified_savings_total),
-          discountTiers: g.discount_tiers || [],
-          currentUnlockedTier: 1,
-          bids: (g.reverse_bids || g.bids || []).map((b: any) => ({
-            id: b.id,
-            dealerId: b.dealer_id,
-            dealerName: b.dealer_name,
-            submittedAt: b.submitted_at,
-            exShowroomDiscount: Number(b.ex_showroom_discount),
-            corporateExchangeBonus: Number(b.corporate_exchange_bonus),
-            freebies: b.freebies || [],
-            insuranceMatchPrice: Number(b.insurance_match_price),
-            waivedHandlingCharges: b.waived_handling_charges,
-            deliveryDays: b.delivery_days,
-            finalOnRoadPerUnit: Number(b.final_on_road_per_unit),
-            isWinning: b.is_winning,
-            terms: b.terms
-          }))
-        }));
-        saveStoredGroups(mapped);
-        return mapped;
+      if (!error && data) {
+        if (data.length > 0) {
+          const mapped: BuyingGroup[] = data.map((g: any) => ({
+            id: g.id,
+            carId: g.car_id,
+            variantId: g.variant_id,
+            carName: g.car_name,
+            city: g.city,
+            state: g.state || 'MH',
+            communityName: g.community_name,
+            status: g.status,
+            biddingEndsAt: g.bidding_ends_at,
+            targetBuyers: g.target_buyers,
+            currentBuyers: g.current_buyers,
+            verifiedBuyers: g.verified_buyers,
+            baselineShowroomPrice: Number(g.baseline_showroom_price),
+            currentBestGroupPrice: Number(g.current_best_group_price),
+            verifiedSavingsTotal: Number(g.verified_savings_total),
+            discountTiers: g.discount_tiers || [],
+            currentUnlockedTier: 1,
+            bids: (g.reverse_bids || g.bids || []).map((b: any) => ({
+              id: b.id,
+              dealerId: b.dealer_id,
+              dealerName: b.dealer_name,
+              submittedAt: b.submitted_at,
+              exShowroomDiscount: Number(b.ex_showroom_discount),
+              corporateExchangeBonus: Number(b.corporate_exchange_bonus),
+              freebies: b.freebies || [],
+              insuranceMatchPrice: Number(b.insurance_match_price),
+              waivedHandlingCharges: b.waived_handling_charges,
+              deliveryDays: b.delivery_days,
+              finalOnRoadPerUnit: Number(b.final_on_road_per_unit),
+              isWinning: b.is_winning,
+              terms: b.terms
+            }))
+          }));
+          saveStoredGroups(mapped);
+          return mapped;
+        } else if (isDemoCleared()) {
+          return [];
+        }
       }
     } catch (err) {
       console.warn('Supabase fetchGroups failed, falling back:', err);
@@ -466,8 +515,7 @@ export async function fetchGroups(city?: string, brand?: string): Promise<Buying
   if (brand && brand !== 'All') {
     filtered = filtered.filter(g => g.carName.toLowerCase().includes(brand.toLowerCase()));
   }
-  // Return matched filtered groups, or all stored groups so active pools are always available
-  return filtered.length > 0 ? filtered : allGroups;
+  return isDemoCleared() ? filtered : (filtered.length > 0 ? filtered : allGroups);
 }
 
 export async function joinGroup(groupId: string, payload: {
@@ -569,6 +617,231 @@ export async function createGroup(payload: any): Promise<{ success: boolean; gro
   }
 
   return { success: true, group: newGroup };
+}
+
+export interface AddShowroomCarPayload {
+  brand: string;
+  model: string;
+  variantName: string;
+  segment?: string;
+  exShowroomPrice: number;
+  fuelType: string;
+  transmission: string;
+  engineCc?: number;
+  seating?: number;
+  mileage?: string;
+  imageUrl?: string;
+  tagline?: string;
+  city?: string;
+  dealerId?: string;
+  dealerName?: string;
+  readyStock?: number;
+  inTransit?: number;
+  createBuyerPool?: boolean;
+  poolTargetBuyers?: number;
+  poolDiscount?: number;
+}
+
+export async function addShowroomVehicle(payload: AddShowroomCarPayload): Promise<{
+  success: boolean;
+  car: Car;
+  group?: BuyingGroup;
+}> {
+  const brandClean = payload.brand.trim();
+  const modelClean = payload.model.trim();
+  const carSlug = `${brandClean.toLowerCase().replace(/[^a-z0-9]/g, '-')}-${modelClean.toLowerCase().replace(/[^a-z0-9]/g, '-')}-${Date.now() % 10000}`;
+  const variantId = `var-${Date.now() % 100000}`;
+  const price = Number(payload.exShowroomPrice) || 1200000;
+  const image = payload.imageUrl?.trim() || 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=1200&q=80';
+
+  const newCar: Car = {
+    id: carSlug,
+    brand: brandClean,
+    model: modelClean,
+    segment: payload.segment || 'SUV',
+    image,
+    tagline: payload.tagline || `${brandClean} ${modelClean} — Showroom Floor Allocation`,
+    fuelTypes: [payload.fuelType || 'Petrol'],
+    transmissions: [payload.transmission || 'Manual'],
+    priceRange: `₹${(price / 100000).toFixed(2)} Lakh`,
+    variants: [
+      {
+        id: variantId,
+        name: payload.variantName || `${modelClean} ${payload.fuelType || 'Petrol'} ${payload.transmission || 'Manual'}`,
+        exShowroom: price,
+        fuel: payload.fuelType || 'Petrol',
+        transmission: payload.transmission || 'Manual',
+        engineCc: payload.engineCc || 1199,
+        seating: payload.seating || 5,
+        mileage: payload.mileage || '18.2 kmpl'
+      }
+    ]
+  };
+
+  // 1. Save car to local storage custom list
+  const existingShowroomCars = getStoredShowroomCars();
+  saveStoredShowroomCars([newCar, ...existingShowroomCars]);
+  setDemoCleared(false); // Active showroom inventory exists
+
+  // 2. Also create a Buyer Group pool so buyers can immediately join and see this car
+  let newGroup: BuyingGroup | undefined;
+  if (payload.createBuyerPool !== false) {
+    const groupId = `grp-${carSlug}-${Date.now() % 1000}`;
+    const poolDiscount = payload.poolDiscount || Math.round(price * 0.045);
+    const targetBuyers = payload.poolTargetBuyers || 15;
+    const finalOnRoad = Math.max(100000, price - poolDiscount);
+
+    newGroup = {
+      id: groupId,
+      carId: newCar.id,
+      variantId: variantId,
+      carName: `${brandClean} ${modelClean} ${payload.variantName}`,
+      city: payload.city || 'Pune',
+      state: 'MH',
+      communityName: `${payload.city || 'Pune'} Ready Showroom Pool`,
+      status: 'ACTIVE_BIDDING',
+      biddingEndsAt: new Date(Date.now() + 7 * 24 * 3600 * 1000).toISOString(),
+      targetBuyers,
+      currentBuyers: 1,
+      verifiedBuyers: 1,
+      baselineShowroomPrice: price,
+      currentBestGroupPrice: finalOnRoad,
+      verifiedSavingsTotal: poolDiscount,
+      discountTiers: [
+        { minBuyers: 5, discountPerBuyer: Math.round(poolDiscount * 0.5), perk: 'Free Underbody Anti-Rust + 7D Mats' },
+        { minBuyers: 10, discountPerBuyer: Math.round(poolDiscount * 0.8), perk: 'Extended 5-Yr Warranty' },
+        { minBuyers: targetBuyers, discountPerBuyer: poolDiscount, perk: 'Maximum OEM Fleet Rebate + Ceramic Detailing' }
+      ],
+      currentUnlockedTier: 1,
+      bids: [
+        {
+          id: `bid-${Date.now()}`,
+          dealerId: payload.dealerId || 'dealer-bafna-tata-pune',
+          dealerName: payload.dealerName || 'Authorized Showroom Partner',
+          submittedAt: 'Just Now',
+          exShowroomDiscount: poolDiscount,
+          corporateExchangeBonus: 15000,
+          freebies: ['5-Yr Extended Warranty', '7D Premium Mats', 'Showroom Fast Allocation'],
+          insuranceMatchPrice: Math.round(price * 0.026 + 3200),
+          waivedHandlingCharges: true,
+          deliveryDays: 6,
+          finalOnRoadPerUnit: finalOnRoad,
+          isWinning: true,
+          terms: 'Confirmed showroom allocation with CarFair price lock guarantee.'
+        }
+      ]
+    };
+
+    const currentGroups = getStoredGroups();
+    saveStoredGroups([newGroup, ...currentGroups]);
+  }
+
+  // 3. Update Showroom Stock Inventory
+  const currentInv = getDealerInventory();
+  saveDealerInventory({
+    ...currentInv,
+    readyStockCount: currentInv.readyStockCount + (payload.readyStock || 4),
+    inTransitCount: currentInv.inTransitCount + (payload.inTransit || 6)
+  });
+
+  // 4. Try Supabase if configured
+  if (isSupabaseConfigured()) {
+    try {
+      await supabase.from('cars').insert({
+        id: newCar.id,
+        brand: newCar.brand,
+        model: newCar.model,
+        segment: newCar.segment,
+        image: newCar.image,
+        tagline: newCar.tagline,
+        fuel_types: newCar.fuelTypes,
+        transmissions: newCar.transmissions,
+        price_range: newCar.priceRange
+      });
+
+      await supabase.from('car_variants').insert({
+        id: variantId,
+        car_id: newCar.id,
+        name: payload.variantName,
+        ex_showroom: price,
+        fuel: payload.fuelType || 'Petrol',
+        transmission: payload.transmission || 'Manual',
+        engine_cc: payload.engineCc || 1199,
+        seating: payload.seating || 5,
+        mileage: payload.mileage || '18.2 kmpl'
+      });
+
+      if (newGroup) {
+        await supabase.from('buying_groups').insert({
+          id: newGroup.id,
+          car_id: newGroup.carId,
+          variant_id: newGroup.variantId,
+          car_name: newGroup.carName,
+          city: newGroup.city,
+          community_name: newGroup.communityName,
+          baseline_showroom_price: newGroup.baselineShowroomPrice,
+          current_best_group_price: newGroup.currentBestGroupPrice,
+          target_buyers: newGroup.targetBuyers,
+          current_buyers: 1,
+          verified_buyers: 1,
+          verified_savings_total: newGroup.verifiedSavingsTotal
+        });
+      }
+    } catch (err) {
+      console.warn('Supabase addShowroomVehicle write error:', err);
+    }
+  }
+
+  return { success: true, car: newCar, group: newGroup };
+}
+
+export async function deleteShowroomVehicle(carId: string): Promise<{ success: boolean }> {
+  // 1. Delete from local storage
+  const cars = getStoredShowroomCars().filter(c => c.id !== carId);
+  saveStoredShowroomCars(cars);
+
+  const groups = getStoredGroups().filter(g => g.carId !== carId);
+  saveStoredGroups(groups);
+
+  if (cars.length === 0) {
+    setDemoCleared(true);
+  }
+
+  // 2. Delete from Supabase if configured
+  if (isSupabaseConfigured()) {
+    try {
+      await supabase.from('buying_groups').delete().eq('car_id', carId);
+      await supabase.from('car_variants').delete().eq('car_id', carId);
+      await supabase.from('cars').delete().eq('id', carId);
+    } catch (err) {
+      console.warn('Supabase deleteShowroomVehicle failed:', err);
+    }
+  }
+
+  return { success: true };
+}
+
+export async function clearAllShowroomData(): Promise<{ success: boolean; message: string }> {
+  // 1. Wipe local dynamic storage
+  saveStoredShowroomCars([]);
+  saveStoredGroups([]);
+  setDemoCleared(true);
+
+  // 2. Wipe Supabase if configured
+  if (isSupabaseConfigured()) {
+    try {
+      await supabase.from('deal_lock_passes').delete().neq('voucher_code', 'NONE');
+      await supabase.from('reverse_bids').delete().neq('dealer_id', 'NONE');
+      await supabase.from('group_members').delete().neq('phone', 'NONE');
+      await supabase.from('buying_groups').delete().neq('id', 'NONE');
+      await supabase.from('car_variants').delete().neq('id', 'NONE');
+      await supabase.from('cars').delete().neq('id', 'NONE');
+    } catch (err) {
+      console.warn('Supabase clearAllShowroomData failed:', err);
+    }
+  }
+
+  return { success: true, message: 'All demo vehicles and groups cleared. The showroom is ready for fresh listings.' };
 }
 
 export async function submitDealerBid(groupId: string, payload: any): Promise<{ success: boolean; group: BuyingGroup }> {

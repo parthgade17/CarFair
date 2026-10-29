@@ -204,7 +204,24 @@ CREATE POLICY "Public audits read" ON public.quotation_audits FOR SELECT USING (
 DROP POLICY IF EXISTS "Public fuel claims read" ON public.fuel_card_claims;
 CREATE POLICY "Public fuel claims read" ON public.fuel_card_claims FOR SELECT USING (true);
 
--- Allow Public Insert & Update Access
+-- Allow Public Insert, Update & Delete Access for Showroom Vehicle Management
+DROP POLICY IF EXISTS "Public cars insert" ON public.cars;
+CREATE POLICY "Public cars insert" ON public.cars FOR INSERT WITH CHECK (true);
+DROP POLICY IF EXISTS "Public cars update" ON public.cars;
+CREATE POLICY "Public cars update" ON public.cars FOR UPDATE USING (true);
+DROP POLICY IF EXISTS "Public cars delete" ON public.cars;
+CREATE POLICY "Public cars delete" ON public.cars FOR DELETE USING (true);
+
+DROP POLICY IF EXISTS "Public variants insert" ON public.car_variants;
+CREATE POLICY "Public variants insert" ON public.car_variants FOR INSERT WITH CHECK (true);
+DROP POLICY IF EXISTS "Public variants update" ON public.car_variants;
+CREATE POLICY "Public variants update" ON public.car_variants FOR UPDATE USING (true);
+DROP POLICY IF EXISTS "Public variants delete" ON public.car_variants;
+CREATE POLICY "Public variants delete" ON public.car_variants FOR DELETE USING (true);
+
+DROP POLICY IF EXISTS "Public buying groups delete" ON public.buying_groups;
+CREATE POLICY "Public buying groups delete" ON public.buying_groups FOR DELETE USING (true);
+
 DROP POLICY IF EXISTS "Public group members insert" ON public.group_members;
 CREATE POLICY "Public group members insert" ON public.group_members FOR INSERT WITH CHECK (true);
 
