@@ -66,8 +66,8 @@ export const Navbar: React.FC<NavbarProps> = ({
       </div>
 
       {/* Main Navbar Header */}
-      <div className="w-full max-w-[1536px] mx-auto px-3 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16 gap-3">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16 gap-2 lg:gap-4">
           
           {/* 1. Official Logo (Left) */}
           <div 
@@ -77,8 +77,8 @@ export const Navbar: React.FC<NavbarProps> = ({
             <CarFairLogo size="sm" showTagline={true} />
           </div>
 
-          {/* 2. Desktop Navigation Links (Center - spacious & neat) */}
-          <div className="hidden xl:flex items-center gap-1 shrink-0">
+          {/* 2. Desktop Navigation Links (Center - compact & clean) */}
+          <div className="hidden lg:flex items-center gap-0.5 xl:gap-1 shrink-0">
             {navLinks.map((link) => {
               const Icon = link.icon;
               const isActive = activeTab === link.id;
@@ -86,7 +86,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <button
                   key={link.id}
                   onClick={() => setActiveTab(link.id)}
-                  className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
+                  className={`flex items-center gap-1.5 px-2 xl:px-2.5 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
                     isActive
                       ? 'text-blue-700 bg-blue-50/90 border border-blue-200 shadow-xs font-bold'
                       : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100 border border-transparent'
@@ -99,17 +99,17 @@ export const Navbar: React.FC<NavbarProps> = ({
             })}
           </div>
 
-          {/* 3. Right User Controls Cluster: Language + City + Role + Account */}
-          <div className="hidden md:flex items-center gap-2 lg:gap-2.5 shrink-0">
+          {/* 3. Right User Controls Cluster: Language + City + Role + Account (Shifted slightly left) */}
+          <div className="hidden md:flex items-center gap-1.5 xl:gap-2 shrink-0 pr-1 sm:pr-3 lg:pr-6">
             
             {/* Language Switcher Pills */}
             <div className="flex items-center bg-slate-100 p-0.5 rounded-xl border border-slate-200 shrink-0 h-9">
-              <span className="pl-2 pr-1 text-slate-400 flex items-center justify-center">
+              <span className="pl-1.5 pr-1 text-slate-400 flex items-center justify-center">
                 <Globe className="w-3.5 h-3.5 shrink-0" />
               </span>
               <button
                 onClick={() => setLanguage('en')}
-                className={`h-7.5 px-2.5 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap flex items-center ${
+                className={`h-7 px-2 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap flex items-center ${
                   language === 'en'
                     ? 'bg-blue-700 text-white shadow-xs'
                     : 'text-slate-600 hover:text-slate-900'
@@ -120,7 +120,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               </button>
               <button
                 onClick={() => setLanguage('mr')}
-                className={`h-7.5 px-2.5 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap flex items-center ${
+                className={`h-7 px-2 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap flex items-center ${
                   language === 'mr'
                     ? 'bg-emerald-700 text-white shadow-xs'
                     : 'text-slate-600 hover:text-slate-900'
@@ -131,7 +131,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               </button>
               <button
                 onClick={() => setLanguage('hi')}
-                className={`h-7.5 px-2.5 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap flex items-center ${
+                className={`h-7 px-2 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap flex items-center ${
                   language === 'hi'
                     ? 'bg-amber-700 text-white shadow-xs'
                     : 'text-slate-600 hover:text-slate-900'
@@ -146,7 +146,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             <div className="relative shrink-0">
               <button
                 onClick={() => setIsCityDropdownOpen(!isCityDropdownOpen)}
-                className="h-9 flex items-center gap-1.5 px-3 rounded-xl text-xs font-bold bg-white border border-slate-200 text-slate-700 hover:border-slate-300 hover:bg-slate-50 shadow-xs transition-colors cursor-pointer whitespace-nowrap"
+                className="h-9 flex items-center gap-1.5 px-2.5 rounded-xl text-xs font-bold bg-white border border-slate-200 text-slate-700 hover:border-slate-300 hover:bg-slate-50 shadow-xs transition-colors cursor-pointer whitespace-nowrap"
               >
                 <MapPin className="w-3.5 h-3.5 text-blue-700 shrink-0" />
                 <span>{selectedCity}</span>
@@ -179,7 +179,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             <div className="flex items-center bg-slate-100 p-0.5 rounded-xl border border-slate-200 shrink-0 h-9">
               <button
                 onClick={() => setUserRole('BUYER')}
-                className={`h-7.5 px-2.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer whitespace-nowrap ${
+                className={`h-7 px-2.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer whitespace-nowrap ${
                   userRole === 'BUYER'
                     ? 'bg-blue-700 text-white shadow-xs'
                     : 'text-slate-600 hover:text-slate-900'
@@ -190,7 +190,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               </button>
               <button
                 onClick={() => setUserRole('DEALER')}
-                className={`h-7.5 px-2.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer whitespace-nowrap ${
+                className={`h-7 px-2.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer whitespace-nowrap ${
                   userRole === 'DEALER'
                     ? 'bg-amber-700 text-white shadow-xs'
                     : 'text-slate-600 hover:text-slate-900'
@@ -201,13 +201,13 @@ export const Navbar: React.FC<NavbarProps> = ({
               </button>
             </div>
 
-            {/* Dedicated Account Button */}
+            {/* Dedicated Account Button - Highly visible & shifted slightly left */}
             <button
               onClick={() => setActiveTab('account')}
-              className={`h-9 flex items-center gap-1.5 px-3.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap shrink-0 shadow-xs ${
+              className={`h-9 flex items-center gap-1.5 px-3 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap shrink-0 shadow-xs ${
                 activeTab === 'account'
                   ? 'bg-blue-700 text-white border border-blue-700 shadow-sm'
-                  : 'bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 hover:border-slate-300'
+                  : 'bg-blue-50/80 hover:bg-blue-100 text-blue-900 border border-blue-200 hover:border-blue-300'
               }`}
               title={t.navAccount}
             >
@@ -217,7 +217,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           </div>
 
           {/* Mobile Menu Hamburger Button */}
-          <div className="flex xl:hidden items-center gap-2">
+          <div className="flex lg:hidden items-center gap-2">
             <button
               onClick={() => setActiveTab('account')}
               className={`p-2 rounded-xl text-xs font-bold flex items-center gap-1 cursor-pointer border ${
@@ -241,7 +241,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
       {/* Mobile Drawer */}
       {isMobileMenuOpen && (
-        <div className="xl:hidden bg-white border-b border-slate-200 px-4 pt-3 pb-6 space-y-3.5 shadow-lg">
+        <div className="lg:hidden bg-white border-b border-slate-200 px-4 pt-3 pb-6 space-y-3.5 shadow-lg">
           {/* Mobile Language Switcher */}
           <div className="flex items-center justify-between pb-3 border-b border-slate-100">
             <div className="flex items-center gap-1.5 text-xs text-slate-600 font-bold">
