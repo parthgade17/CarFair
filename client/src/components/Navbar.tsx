@@ -66,8 +66,8 @@ export const Navbar: React.FC<NavbarProps> = ({
       </div>
 
       {/* Main Navbar Header */}
-      <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16 gap-3 lg:gap-5">
+      <div className="w-full px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16 gap-3 lg:gap-6">
           
           {/* 1. Official Logo (Left) */}
           <div 
@@ -77,8 +77,8 @@ export const Navbar: React.FC<NavbarProps> = ({
             <CarFairLogo size="sm" showTagline={true} />
           </div>
 
-          {/* 2. Desktop Navigation Links (Center / Rightward) */}
-          <div className="hidden lg:flex items-center gap-1 xl:gap-1.5 shrink-0">
+          {/* 2. Desktop Navigation Links (Shifted smoothly to the right using ml-auto) */}
+          <div className="hidden lg:flex items-center gap-1 xl:gap-1.5 shrink-0 ml-auto">
             {navLinks.map((link) => {
               const Icon = link.icon;
               const isActive = activeTab === link.id;
@@ -99,7 +99,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             })}
           </div>
 
-          {/* 3. Right User Controls Cluster: Language + City + Role + Account (Shifted to the right) */}
+          {/* 3. Right User Controls Cluster: Language + City + Role + Account */}
           <div className="hidden md:flex items-center gap-2 xl:gap-2.5 shrink-0">
             
             {/* Language Switcher Pills */}
