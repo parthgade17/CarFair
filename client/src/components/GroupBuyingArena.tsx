@@ -116,7 +116,7 @@ export const GroupBuyingArena: React.FC<GroupBuyingArenaProps> = ({
             Buy Together, Save More Money
           </h2>
           <p className="text-sm text-slate-600 mt-1 max-w-2xl">
-            When 15–20 people buy the same car together in your city, official showrooms compete with bulk discounts. Joining is <strong>100% free</strong> with no middlemen.
+            Join verified car pools in {selectedCity} and unlock bulk showroom discounts with zero agent fees.
           </p>
         </div>
 

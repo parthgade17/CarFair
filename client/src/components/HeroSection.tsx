@@ -95,10 +95,9 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
               </span>
             </h1>
 
-            {/* Clean Subtitle */}
-            <p className="text-base sm:text-lg text-slate-600 font-normal leading-relaxed max-w-2xl">
-              We bring together ready car buyers in {selectedCity === 'All Cities' ? 'your city' : selectedCity}. 
-              Authorised brand dealerships compete with their best bulk discounts—so you get fleet-level pricing without individual showroom haggling.
+            {/* Modern Punchy Tagline */}
+            <p className="text-lg sm:text-xl text-slate-600 font-medium leading-relaxed max-w-2xl">
+              <span className="text-slate-900 font-bold">Never negotiate alone.</span> Group together with verified buyers in {selectedCity === 'All Cities' ? 'your city' : selectedCity}, let authorized showrooms compete, and drive home for less.
             </p>
 
             {/* CTA Buttons */}
