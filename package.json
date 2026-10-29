@@ -1,0 +1,28 @@
+{
+  "name": "carfair",
+  "version": "1.0.0",
+  "description": "CarFair - India's Verified Group Car-Buying & Quotation Auditing Platform",
+  "private": true,
+  "scripts": {
+    "install:all": "npm install --prefix client && npm install --prefix server",
+    "dev:client": "npm run dev --prefix client",
+    "dev:server": "npm run dev --prefix server",
+    "build:client": "npm run build --prefix client",
+    "start": "npm start --prefix server"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/parthgade17/CarFair.git"
+  },
+  "keywords": [
+    "car-buying",
+    "group-buying",
+    "quotation-auditor",
+    "quotetruth",
+    "deallock",
+    "savingsproof",
+    "india-automotive"
+  ],
+  "author": "Parth Gade",
+  "license": "MIT"
+}
