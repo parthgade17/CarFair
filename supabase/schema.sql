@@ -1,12 +1,10 @@
 -- ==============================================================================
 -- CARFAIR POSTGRESQL DATABASE SCHEMA (SUPABASE)
 -- India's Verified Group Car-Buying & Quotation Auditing Platform
+-- Fully Idempotent: Can be run repeatedly without errors.
 -- ==============================================================================
 
--- 1. EXTENSIONS
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-
--- 2. AUTOMOTIVE CATALOG TABLES
+-- 1. AUTOMOTIVE CATALOG TABLES
 CREATE TABLE IF NOT EXISTS public.cars (
     id TEXT PRIMARY KEY,
     brand TEXT NOT NULL,
@@ -33,22 +31,27 @@ CREATE TABLE IF NOT EXISTS public.car_variants (
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 3. AUTHORIZED SHOWROOM DEALERS
+-- 2. AUTHORIZED SHOWROOM DEALERS
 CREATE TABLE IF NOT EXISTS public.dealers (
     id TEXT PRIMARY KEY,
     name TEXT NOT NULL,
     brand TEXT NOT NULL,
     city TEXT NOT NULL,
     area TEXT,
+    location TEXT,
     contact_person TEXT,
     phone TEXT,
     email TEXT,
-    rating NUMERIC(2,1) DEFAULT 4.8,
+    rating NUMERIC(3,1) DEFAULT 4.8,
+    reviews_count INT DEFAULT 1420,
+    verified_status TEXT DEFAULT 'OEM Authorised Platinum Partner',
+    inventory_ready_count INT DEFAULT 18,
+    response_time_avg TEXT DEFAULT '20 mins',
     is_verified BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 4. BUYING GROUPS (CAR POOLS)
+-- 3. BUYING GROUPS (CAR POOLS)
 CREATE TABLE IF NOT EXISTS public.buying_groups (
     id TEXT PRIMARY KEY,
     car_id TEXT REFERENCES public.cars(id) ON DELETE RESTRICT,
@@ -69,9 +72,9 @@ CREATE TABLE IF NOT EXISTS public.buying_groups (
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 5. GROUP MEMBERS (BUYERS WHO JOINED)
+-- 4. GROUP MEMBERS (BUYERS WHO JOINED)
 CREATE TABLE IF NOT EXISTS public.group_members (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     group_id TEXT REFERENCES public.buying_groups(id) ON DELETE CASCADE,
     name TEXT NOT NULL,
     phone TEXT NOT NULL,
@@ -80,9 +83,9 @@ CREATE TABLE IF NOT EXISTS public.group_members (
     joined_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 6. DEALERSHIP COMPETING BIDS (REVERSE AUCTIONS)
+-- 5. DEALERSHIP COMPETING BIDS (REVERSE AUCTIONS)
 CREATE TABLE IF NOT EXISTS public.reverse_bids (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     group_id TEXT REFERENCES public.buying_groups(id) ON DELETE CASCADE,
     dealer_id TEXT REFERENCES public.dealers(id) ON DELETE RESTRICT,
     dealer_name TEXT NOT NULL,
@@ -98,9 +101,9 @@ CREATE TABLE IF NOT EXISTS public.reverse_bids (
     submitted_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 7. PRICE LOCK PASSES (BUYER FULFILLMENT CERTIFICATES)
+-- 6. PRICE LOCK PASSES (BUYER FULFILLMENT CERTIFICATES)
 CREATE TABLE IF NOT EXISTS public.deal_lock_passes (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     voucher_code TEXT UNIQUE NOT NULL,
     group_id TEXT REFERENCES public.buying_groups(id) ON DELETE RESTRICT,
     car_name TEXT NOT NULL,
@@ -119,9 +122,9 @@ CREATE TABLE IF NOT EXISTS public.deal_lock_passes (
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 8. SHOWROOM VEHICLE PHOTOS (IMAGE GALLERY)
+-- 7. SHOWROOM VEHICLE PHOTOS (IMAGE GALLERY)
 CREATE TABLE IF NOT EXISTS public.showroom_photos (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     car_id TEXT REFERENCES public.cars(id) ON DELETE CASCADE,
     url TEXT NOT NULL,
     caption TEXT,
@@ -130,9 +133,9 @@ CREATE TABLE IF NOT EXISTS public.showroom_photos (
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 9. QUOTETRUTH AUDITS (AI INVOICE CHECKER)
+-- 8. QUOTETRUTH AUDITS (AI INVOICE CHECKER)
 CREATE TABLE IF NOT EXISTS public.quotation_audits (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     car_model TEXT NOT NULL,
     city TEXT NOT NULL,
     ex_showroom BIGINT NOT NULL,
@@ -145,9 +148,9 @@ CREATE TABLE IF NOT EXISTS public.quotation_audits (
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 10. FUEL CARD CLAIMS & REWARDS
+-- 9. FUEL CARD CLAIMS & REWARDS
 CREATE TABLE IF NOT EXISTS public.fuel_card_claims (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     voucher_code TEXT NOT NULL,
     invoice_number TEXT NOT NULL,
     total_paid BIGINT NOT NULL,
@@ -170,26 +173,60 @@ ALTER TABLE public.showroom_photos ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.quotation_audits ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.fuel_card_claims ENABLE ROW LEVEL SECURITY;
 
--- Allow Public Read Access
+-- Allow Public Read Access (Drop if exists first to prevent conflicts)
+DROP POLICY IF EXISTS "Public cars read" ON public.cars;
 CREATE POLICY "Public cars read" ON public.cars FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Public variants read" ON public.car_variants;
 CREATE POLICY "Public variants read" ON public.car_variants FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Public dealers read" ON public.dealers;
 CREATE POLICY "Public dealers read" ON public.dealers FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Public groups read" ON public.buying_groups;
 CREATE POLICY "Public groups read" ON public.buying_groups FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Public group members read" ON public.group_members;
 CREATE POLICY "Public group members read" ON public.group_members FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Public reverse bids read" ON public.reverse_bids;
 CREATE POLICY "Public reverse bids read" ON public.reverse_bids FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Public deal lock read" ON public.deal_lock_passes;
 CREATE POLICY "Public deal lock read" ON public.deal_lock_passes FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Public photos read" ON public.showroom_photos;
 CREATE POLICY "Public photos read" ON public.showroom_photos FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Public audits read" ON public.quotation_audits;
 CREATE POLICY "Public audits read" ON public.quotation_audits FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Public fuel claims read" ON public.fuel_card_claims;
 CREATE POLICY "Public fuel claims read" ON public.fuel_card_claims FOR SELECT USING (true);
 
--- Allow Public Insert Access (for web users joining groups, dealers uploading photos, submitting bids)
+-- Allow Public Insert & Update Access
+DROP POLICY IF EXISTS "Public group members insert" ON public.group_members;
 CREATE POLICY "Public group members insert" ON public.group_members FOR INSERT WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Public buying groups insert" ON public.buying_groups;
 CREATE POLICY "Public buying groups insert" ON public.buying_groups FOR INSERT WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Public buying groups update" ON public.buying_groups;
 CREATE POLICY "Public buying groups update" ON public.buying_groups FOR UPDATE USING (true);
+
+DROP POLICY IF EXISTS "Public reverse bids insert" ON public.reverse_bids;
 CREATE POLICY "Public reverse bids insert" ON public.reverse_bids FOR INSERT WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Public deal lock insert" ON public.deal_lock_passes;
 CREATE POLICY "Public deal lock insert" ON public.deal_lock_passes FOR INSERT WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Public photos insert" ON public.showroom_photos;
 CREATE POLICY "Public photos insert" ON public.showroom_photos FOR INSERT WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Public audits insert" ON public.quotation_audits;
 CREATE POLICY "Public audits insert" ON public.quotation_audits FOR INSERT WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Public fuel claims insert" ON public.fuel_card_claims;
 CREATE POLICY "Public fuel claims insert" ON public.fuel_card_claims FOR INSERT WITH CHECK (true);
 
 -- ==============================================================================
@@ -213,10 +250,10 @@ INSERT INTO public.car_variants (id, car_id, name, ex_showroom, fuel, transmissi
 ON CONFLICT (id) DO NOTHING;
 
 -- Seed Dealers
-INSERT INTO public.dealers (id, name, brand, city, area, contact_person, phone, email, rating, is_verified) VALUES
-('dealer-bafna-tata-pune', 'Bafna Tata Motors Flagship', 'Tata', 'Pune', 'Shivajinagar', 'Rajesh Kulkarni', '+91 98220 99887', 'bafna.tata@example.com', 4.9, TRUE),
-('dealer-garve-hyundai-pune', 'Garve Hyundai Premium', 'Hyundai', 'Pune', 'Baner', 'Sameer Deshmukh', '+91 98221 44556', 'garve.hyundai@example.com', 4.8, TRUE),
-('dealer-silver-jubilee-mahindra-pune', 'Silver Jubilee Mahindra', 'Mahindra', 'Pune', 'Camp / Pune Cantonment', 'Virendra Pawar', '+91 98222 77889', 'silverjubilee@example.com', 4.9, TRUE)
+INSERT INTO public.dealers (id, name, brand, city, area, location, contact_person, phone, email, rating, is_verified) VALUES
+('dealer-bafna-tata-pune', 'Bafna Tata Motors Flagship', 'Tata', 'Pune', 'Shivajinagar', 'Shivajinagar & Baner', 'Rajesh Kulkarni', '+91 98220 99887', 'bafna.tata@example.com', 4.9, TRUE),
+('dealer-garve-hyundai-pune', 'Garve Hyundai Premium', 'Hyundai', 'Pune', 'Baner', 'Baner & Aundh', 'Sameer Deshmukh', '+91 98221 44556', 'garve.hyundai@example.com', 4.8, TRUE),
+('dealer-silver-jubilee-mahindra-pune', 'Silver Jubilee Mahindra', 'Mahindra', 'Pune', 'Camp', 'Camp / Pune Cantonment', 'Virendra Pawar', '+91 98222 77889', 'silverjubilee@example.com', 4.9, TRUE)
 ON CONFLICT (id) DO NOTHING;
 
 -- Seed Buying Groups
@@ -233,4 +270,5 @@ INSERT INTO public.showroom_photos (car_id, url, caption, category, uploaded_by)
 ('tata-nexon', 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1200&q=80', 'Connected X-Factor LED Taillight & Dual-Tone Aero Roof', 'REAR', 'Bafna Tata Motors Flagship (Shivajinagar Pune)'),
 ('tata-nexon', 'https://images.unsplash.com/photo-1583121274602-3e2820c69888?auto=format&fit=crop&w=1200&q=80', 'Showroom Stock Ready for PDI & 7-Day Fast Delivery', 'SHOWROOM_FLOOR', 'Bafna Tata Motors Flagship (Shivajinagar Pune)'),
 ('hyundai-creta', 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1200&q=80', 'Parametric Jewel Chrome Grille & Horizon LED Positioning Lamp', 'EXTERIOR', 'Garve Hyundai (Baner Pune)'),
-('hyundai-creta', 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=1200&q=80', 'Seamless Dual 10.25-inch Display & Ventilated Front Seats', 'COCKPIT', 'Garve Hyundai (Baner Pune)');
+('hyundai-creta', 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=1200&q=80', 'Seamless Dual 10.25-inch Display & Ventilated Front Seats', 'COCKPIT', 'Garve Hyundai (Baner Pune)')
+ON CONFLICT DO NOTHING;
