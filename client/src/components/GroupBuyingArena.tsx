@@ -580,7 +580,7 @@ export const GroupBuyingArena: React.FC<GroupBuyingArenaProps> = ({
           carName={galleryCar.name}
           images={getCarPhotos(galleryCar.id)}
           userRole={userRole}
-          onOpenUpload={(cId, cName) => setUploadCar({ id: cId, name: cName })}
+          onOpenUpload={userRole === 'DEALER' ? (cId, cName) => setUploadCar({ id: cId, name: cName }) : undefined}
         />
       )}
 

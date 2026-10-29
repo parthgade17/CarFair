@@ -619,7 +619,7 @@ export const AccountView: React.FC<AccountViewProps> = ({
           carName={galleryCar.name}
           images={getCarPhotos(galleryCar.id)}
           userRole={accountRole}
-          onOpenUpload={(cId, cName) => setUploadCar({ id: cId, name: cName })}
+          onOpenUpload={accountRole === 'DEALER' ? (cId, cName) => setUploadCar({ id: cId, name: cName }) : undefined}
         />
       )}
 

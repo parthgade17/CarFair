@@ -101,8 +101,8 @@ export const CarGalleryModal: React.FC<CarGalleryModalProps> = ({
           </div>
 
           <div className="flex items-center gap-2">
-            {/* Showroom Upload Button (Accessible anytime from gallery) */}
-            {onOpenUpload && (
+            {/* Showroom Upload Button (ONLY visible for verified Showroom Dealers, NOT for buyers) */}
+            {userRole === 'DEALER' && onOpenUpload && (
               <button
                 onClick={() => {
                   onClose();
@@ -211,8 +211,8 @@ export const CarGalleryModal: React.FC<CarGalleryModalProps> = ({
             </button>
           ))}
 
-          {/* Showroom quick upload tile in thumbnail strip */}
-          {onOpenUpload && (
+          {/* Showroom quick upload tile in thumbnail strip (DEALER role only) */}
+          {userRole === 'DEALER' && onOpenUpload && (
             <button
               onClick={() => {
                 onClose();
