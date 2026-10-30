@@ -15,7 +15,11 @@ import {
   User,
   Globe,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Sparkles,
+  ShieldCheck,
+  Zap,
+  TrendingUp
 } from 'lucide-react';
 import { CarFairLogo } from './Logo';
 import { useLanguage } from '../context/LanguageContext';
@@ -65,14 +69,70 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   return (
     <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-xs transition-all">
-      {/* Top Banner Alert */}
-      <div className="bg-slate-900 px-4 py-1.5 text-xs text-center text-slate-200 flex items-center justify-center gap-2">
-        <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-600 text-white shrink-0 tracking-wide uppercase">
-          PILOT LIVE
-        </span>
-        <span className="text-slate-300 text-xs truncate sm:text-clip">
-          <strong className="text-white font-semibold">{selectedCity === 'All Cities' ? 'Pune & Metros' : selectedCity}:</strong> Compare real dealer quotes and see what a collective buyer group could save.
-        </span>
+      {/* Floating Looping Notification Marquee (Moving Towards Right) */}
+      <div className="relative bg-slate-950 text-slate-200 border-b border-slate-800/80 overflow-hidden py-1.5 select-none shadow-xs">
+        {/* Subtle left & right gradient fade masks for clean floating entry/exit */}
+        <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-10 bg-gradient-to-r from-slate-950 to-transparent z-10" />
+        <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-10 bg-gradient-to-l from-slate-950 to-transparent z-10" />
+
+        {/* Marquee Track moving to the right in an infinite seamless loop */}
+        <div className="animate-marquee-right flex items-center cursor-default">
+          {[0, 1].map((copyIndex) => (
+            <div key={copyIndex} className="flex items-center gap-8 px-4 shrink-0">
+              {/* Item 1 */}
+              <div className="flex items-center gap-2 text-xs">
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 uppercase tracking-wider">
+                  <Sparkles className="w-3 h-3 text-emerald-400 animate-pulse" />
+                  PILOT LIVE
+                </span>
+                <span className="text-slate-300 font-medium whitespace-nowrap">
+                  <strong className="text-white font-bold">{selectedCity === 'All Cities' ? 'Pune & Metros' : selectedCity}:</strong> Compare real dealer quotes & see what collective buying saves.
+                </span>
+              </div>
+
+              <span className="text-slate-700 font-bold">•</span>
+
+              {/* Item 2 */}
+              <div className="flex items-center gap-2 text-xs">
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black bg-blue-500/20 text-blue-400 border border-blue-500/30 uppercase tracking-wider">
+                  <ShieldCheck className="w-3 h-3 text-blue-400" />
+                  QUOTETRUTH AI
+                </span>
+                <span className="text-slate-300 font-medium whitespace-nowrap">
+                  Upload dealer quotation to catch hidden insurance markups & illegal handling fees.
+                </span>
+              </div>
+
+              <span className="text-slate-700 font-bold">•</span>
+
+              {/* Item 3 */}
+              <div className="flex items-center gap-2 text-xs">
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black bg-amber-500/20 text-amber-400 border border-amber-500/30 uppercase tracking-wider">
+                  <Zap className="w-3 h-3 text-amber-400" />
+                  SMART DEAL
+                </span>
+                <span className="text-slate-300 font-medium whitespace-nowrap">
+                  <strong className="text-amber-300">Smart Buyers Ki Smart Deal:</strong> 100% Free for buyers • Direct showroom allocation • Zero broker commission.
+                </span>
+              </div>
+
+              <span className="text-slate-700 font-bold">•</span>
+
+              {/* Item 4 */}
+              <div className="flex items-center gap-2 text-xs">
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black bg-purple-500/20 text-purple-400 border border-purple-500/30 uppercase tracking-wider">
+                  <TrendingUp className="w-3 h-3 text-purple-400" />
+                  REVERSE BIDDING
+                </span>
+                <span className="text-slate-300 font-medium whitespace-nowrap">
+                  Authorized dealerships compete with lowest on-road prices and guaranteed delivery SLA.
+                </span>
+              </div>
+
+              <span className="text-slate-700 font-bold">•</span>
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Main Navbar Header */}
