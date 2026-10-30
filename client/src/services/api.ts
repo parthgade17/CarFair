@@ -37,6 +37,9 @@ export function saveActiveRegisteredDealer(dealer: Dealer | null): void {
     } else {
       localStorage.removeItem(REGISTERED_DEALER_KEY);
     }
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('carfair:dealers_updated', { detail: dealer }));
+    }
   } catch (err) {}
 }
 
@@ -78,6 +81,10 @@ export async function registerShowroomDealer(payload: {
 
   saveActiveRegisteredDealer(newDealer);
 
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent('carfair:dealers_updated', { detail: newDealer }));
+  }
+
   if (isSupabaseConfigured()) {
     try {
       await supabase.from('dealers').insert({
@@ -101,6 +108,9 @@ export async function registerShowroomDealer(payload: {
 
 export function logoutRegisteredDealer(): void {
   saveActiveRegisteredDealer(null);
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent('carfair:dealers_updated', { detail: null }));
+  }
 }
 
 export function isDemoCleared(): boolean {
@@ -1091,23 +1101,27 @@ export async function fetchDealers(): Promise<Dealer[]> {
   const cars = getStoredShowroomCars();
   const readyTotal = cars.reduce((acc, c: any) => acc + (c.readyStock || 0), 0);
 
+  let supabaseDealers: Dealer[] = [];
   if (isSupabaseConfigured()) {
     try {
       const { data, error } = await supabase.from('dealers').select('*');
       if (!error && data && data.length > 0) {
-        return data.map((d: any) => ({
+        const dynamicOnly = data.filter((d: any) => 
+          d.id && !d.id.includes('bafna-tata-pune') && !d.id.includes('garve-hyundai-pune') && !d.id.includes('silver-jubilee-mahindra-pune') && !d.id.includes('modi-hyundai') && !d.id.includes('sai-maruti') && !d.id.includes('sireesh-mahindra') && !d.id.includes('frontier-hyundai')
+        );
+        supabaseDealers = dynamicOnly.map((d: any) => ({
           id: d.id,
           name: d.name,
           brand: d.brand,
           city: d.city,
-          location: d.area || d.location || 'Flagship Store',
-          rating: Number(d.rating) || 4.8,
-          reviewsCount: 142,
-          verifiedStatus: d.is_verified ? 'OEM Authorised Platinum Partner' : 'Registered Dealer',
+          location: d.area || d.location || 'Showroom Outlet',
+          rating: Number(d.rating) || 4.9,
+          reviewsCount: d.reviews_count || 1,
+          verifiedStatus: d.is_verified ? 'OEM Authorised Platinum Partner' : (d.verified_status || 'Registered Dealer'),
           inventoryReadyCount: readyTotal,
-          responseTimeAvg: '20 mins',
+          responseTimeAvg: d.response_time_avg || '15 mins',
           contactPerson: d.contact_person || 'Sales Manager',
-          phone: d.phone || '+91 98220 44100'
+          phone: d.phone || '+91 98000 00000'
         }));
       }
     } catch (err) {
@@ -1115,13 +1129,75 @@ export async function fetchDealers(): Promise<Dealer[]> {
     }
   }
 
-  // Purely dynamic: return registered showroom partners
+  // Combine purely registered showrooms from Supabase and LocalStorage
   const stored = getStoredRegisteredDealers();
   const active = getActiveRegisteredDealer();
-  if (active && !stored.some(d => d.id === active.id)) {
-    return [active, ...stored];
+
+  const map = new Map<string, Dealer>();
+
+  // 1. Supabase persistent registered showrooms
+  for (const d of supabaseDealers) {
+    if (d && d.name && d.city) {
+      map.set(d.id, d);
+    }
   }
-  return stored;
+
+  // 2. Stored registered showrooms in localStorage
+  for (const d of stored) {
+    if (d && d.name && d.city) {
+      map.set(d.id, d);
+    }
+  }
+
+  // 3. Current active showroom session
+  if (active && active.name && active.city) {
+    map.set(active.id, active);
+  }
+
+  return Array.from(map.values());
+}
+
+/**
+ * Real-time subscription to dealer updates across localStorage, tab events, and Supabase realtime.
+ */
+export function subscribeToDealers(callback: (dealers: Dealer[]) => void): () => void {
+  // Initial immediate fetch
+  fetchDealers().then(callback).catch(() => {});
+
+  const handleUpdate = () => {
+    fetchDealers().then(callback).catch(() => {});
+  };
+
+  if (typeof window !== 'undefined') {
+    window.addEventListener('carfair:dealers_updated', handleUpdate);
+    window.addEventListener('storage', handleUpdate);
+  }
+
+  let channel: any = null;
+  if (isSupabaseConfigured()) {
+    try {
+      channel = supabase
+        .channel('realtime:dealers_subscription')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'dealers' }, () => {
+          handleUpdate();
+        })
+        .subscribe();
+    } catch (err) {
+      // Supabase realtime fallback
+    }
+  }
+
+  return () => {
+    if (typeof window !== 'undefined') {
+      window.removeEventListener('carfair:dealers_updated', handleUpdate);
+      window.removeEventListener('storage', handleUpdate);
+    }
+    if (channel && isSupabaseConfigured()) {
+      try {
+        supabase.removeChannel(channel);
+      } catch (e) {}
+    }
+  };
 }
 
 export async function estimateOldCarExchange(payload: any): Promise<any> {

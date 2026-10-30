@@ -186,3 +186,189 @@ export const ALL_INDIAN_CITIES: string[] = [
 ];
 
 export const BUYER_NAV_CITIES = ['All Cities', ...ALL_INDIAN_CITIES];
+
+/**
+ * Regional Transport Office (RTO) / Registration series mapping for Indian automotive hubs.
+ */
+export const CITY_RTO_MAP: Record<string, string> = {
+  // Maharashtra & Western Hubs
+  'Pune': 'MH-12 / MH-14',
+  'Mumbai': 'MH-01 / MH-02 / MH-03',
+  'Navi Mumbai': 'MH-43',
+  'Thane': 'MH-04',
+  'Pimpri-Chinchwad': 'MH-14',
+  'Nashik': 'MH-15',
+  'Nagpur': 'MH-31 / MH-49',
+  'Chhatrapati Sambhajinagar (Aurangabad)': 'MH-20',
+  'Kolhapur': 'MH-09',
+  'Solapur': 'MH-13',
+  'Satara': 'MH-11',
+  'Sangli': 'MH-10',
+  'Amravati': 'MH-27',
+  'Nanded': 'MH-26',
+  'Jalgaon': 'MH-19',
+  'Ahmednagar': 'MH-17',
+  'Panaji (Goa)': 'GA-07',
+  'Margao (Goa)': 'GA-08',
+  'Surat': 'GJ-05',
+  'Ahmedabad': 'GJ-01 / GJ-27',
+  'Vadodara': 'GJ-06',
+  'Rajkot': 'GJ-03',
+  'Gandhinagar': 'GJ-18',
+  'Bhavnagar': 'GJ-04',
+  'Jamnagar': 'GJ-10',
+  'Junagadh': 'GJ-11',
+  'Anand': 'GJ-23',
+
+  // North India & NCR Corridor
+  'Delhi NCR': 'DL / HR-26 / UP-16',
+  'New Delhi': 'DL-01 / DL-02 / DL-03',
+  'Gurugram (Gurgaon)': 'HR-26 / HR-55',
+  'Noida': 'UP-16',
+  'Greater Noida': 'UP-16',
+  'Ghaziabad': 'UP-14',
+  'Faridabad': 'HR-38 / HR-51',
+  'Chandigarh': 'CH-01',
+  'Mohali': 'PB-65',
+  'Panchkula': 'HR-03',
+  'Ludhiana': 'PB-10',
+  'Amritsar': 'PB-02',
+  'Jalandhar': 'PB-08',
+  'Patiala': 'PB-11',
+  'Bathinda': 'PB-03',
+  'Dehradun': 'UK-07',
+  'Haridwar': 'UK-08',
+  'Rishikesh': 'UK-14',
+  'Roorkee': 'UK-17',
+  'Jaipur': 'RJ-14 / RJ-45',
+  'Jodhpur': 'RJ-19',
+  'Udaipur': 'RJ-27',
+  'Kota': 'RJ-20',
+  'Bikaner': 'RJ-07',
+  'Ajmer': 'RJ-01',
+  'Alwar': 'RJ-02',
+  'Bhilwara': 'RJ-06',
+  'Lucknow': 'UP-32',
+  'Kanpur': 'UP-78',
+  'Varanasi': 'UP-65',
+  'Prayagraj (Allahabad)': 'UP-70',
+  'Agra': 'UP-80',
+  'Meerut': 'UP-15',
+  'Bareilly': 'UP-25',
+  'Aligarh': 'UP-81',
+  'Moradabad': 'UP-21',
+  'Saharanpur': 'UP-11',
+  'Gorakhpur': 'UP-53',
+  'Jhansi': 'UP-93',
+  'Jammu': 'JK-02',
+  'Srinagar': 'JK-01',
+  'Shimla': 'HP-03',
+
+  // South India
+  'Bengaluru': 'KA-01 / KA-03 / KA-05',
+  'Mysuru (Mysore)': 'KA-09',
+  'Mangaluru (Mangalore)': 'KA-19',
+  'Hubballi-Dharwad': 'KA-25',
+  'Belagavi (Belgaum)': 'KA-22',
+  'Kalaburagi (Gulbarga)': 'KA-32',
+  'Davangere': 'KA-17',
+  'Ballari (Bellary)': 'KA-34',
+  'Shivamogga (Shimoga)': 'KA-14',
+  'Tumakuru (Tumkur)': 'KA-06',
+  'Chennai': 'TN-01 / TN-02 / TN-07',
+  'Coimbatore': 'TN-37 / TN-38 / TN-66',
+  'Madurai': 'TN-58 / TN-59',
+  'Tiruchirappalli (Trichy)': 'TN-45 / TN-81',
+  'Salem': 'TN-30 / TN-54',
+  'Tirunelveli': 'TN-72',
+  'Erode': 'TN-33',
+  'Vellore': 'TN-23',
+  'Thoothukudi': 'TN-69',
+  'Hyderabad': 'TS-07 / TS-08 / TS-09',
+  'Secunderabad': 'TS-10',
+  'Warangal': 'TS-03',
+  'Nizamabad': 'TS-16',
+  'Karimnagar': 'TS-02',
+  'Khammam': 'TS-04',
+  'Visakhapatnam': 'AP-31 / AP-32 / AP-33',
+  'Vijayawada': 'AP-16',
+  'Guntur': 'AP-07',
+  'Nellore': 'AP-26',
+  'Kurnool': 'AP-21',
+  'Rajahmundry': 'AP-05',
+  'Tirupati': 'AP-03',
+  'Kakinada': 'AP-05',
+  'Kochi (Cochin)': 'KL-07',
+  'Thiruvananthapuram (Trivandrum)': 'KL-01',
+  'Kozhikode (Calicut)': 'KL-11',
+  'Thrissur': 'KL-08',
+  'Kollam': 'KL-02',
+  'Kannur': 'KL-13',
+  'Alappuzha': 'KL-04',
+  'Kottayam': 'KL-05',
+
+  // East & Central India
+  'Kolkata': 'WB-01 / WB-02 / WB-06',
+  'Howrah': 'WB-12',
+  'Siliguri': 'WB-73 / WB-74',
+  'Durgapur': 'WB-39 / WB-40',
+  'Asansol': 'WB-38',
+  'Bhubaneswar': 'OD-02 / OD-33',
+  'Cuttack': 'OD-05',
+  'Rourkela': 'OD-14',
+  'Sambalpur': 'OD-15',
+  'Berhampur': 'OD-07',
+  'Patna': 'BR-01',
+  'Gaya': 'BR-02',
+  'Muzaffarpur': 'BR-06',
+  'Bhagalpur': 'BR-10',
+  'Darbhanga': 'BR-07',
+  'Ranchi': 'JH-01',
+  'Jamshedpur': 'JH-05',
+  'Dhanbad': 'JH-10',
+  'Bokaro': 'JH-09',
+  'Raipur': 'CG-04',
+  'Bilaspur': 'CG-10',
+  'Durg-Bhilai': 'CG-07',
+  'Korba': 'CG-12',
+  'Indore': 'MP-09',
+  'Bhopal': 'MP-04',
+  'Jabalpur': 'MP-20',
+  'Gwalior': 'MP-07',
+  'Ujjain': 'MP-13',
+  'Sagar': 'MP-15',
+
+  // North-East & Eastern Gateways
+  'Guwahati': 'AS-01',
+  'Silchar': 'AS-11',
+  'Dibrugarh': 'AS-06',
+  'Jorhat': 'AS-03',
+  'Agartala': 'TR-01',
+  'Shillong': 'ML-05',
+  'Imphal': 'MN-01',
+  'Aizawl': 'MZ-01',
+  'Dimapur': 'NL-07',
+  'Kohima': 'NL-01',
+  'Gangtok': 'SK-01',
+  'Itanagar': 'AR-01'
+};
+
+export function getCityRtoCode(city: string): string {
+  if (!city) return 'IN-HUB';
+  const cleanCity = city.trim();
+  if (CITY_RTO_MAP[cleanCity]) return CITY_RTO_MAP[cleanCity];
+
+  // If city name contains parentheses (e.g. "Kochi (Cochin)"), match the first part
+  const baseName = cleanCity.split('(')[0].trim();
+  if (CITY_RTO_MAP[baseName]) return CITY_RTO_MAP[baseName];
+
+  // Try case-insensitive lookup
+  const lower = cleanCity.toLowerCase();
+  for (const [key, val] of Object.entries(CITY_RTO_MAP)) {
+    if (key.toLowerCase() === lower || key.toLowerCase().includes(lower) || lower.includes(key.toLowerCase())) {
+      return val;
+    }
+  }
+
+  return 'IN-RTO';
+}

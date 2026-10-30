@@ -199,7 +199,23 @@ function AppContent() {
         )}
       </main>
 
-      <Footer onNavigate={(tab) => setActiveTab(tab)} />
+      <Footer
+        onNavigate={(tab) => {
+          if (tab === 'dealer') {
+            setUserRole('DEALER');
+            setActiveTab('groups');
+          } else {
+            setActiveTab(tab);
+          }
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+        onSelectCity={(city) => {
+          setSelectedCity(city);
+          setActiveTab('groups');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+        selectedCity={selectedCity}
+      />
     </div>
   );
 }

@@ -25,7 +25,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { Language } from '../translations';
 import { CarFairLogo } from './Logo';
 import { Car, BuyingGroup } from '../types';
-import { fetchCars, getStoredGroups, getDealerInventory, getActiveRegisteredDealer } from '../services/api';
+import { fetchCars, getStoredGroups, getDealerInventory, getActiveRegisteredDealer, saveActiveRegisteredDealer } from '../services/api';
 import { getCarPhotos } from '../services/photoStorage';
 import { CarGalleryModal } from './CarGalleryModal';
 import { UploadCarPhotoModal } from './UploadCarPhotoModal';
@@ -476,10 +476,31 @@ export const AccountView: React.FC<AccountViewProps> = ({
                 />
               </div>
 
-              <div className="pt-2">
+              <div className="pt-2 flex flex-col sm:flex-row gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const current = getActiveRegisteredDealer();
+                    if (current) {
+                      const updated = {
+                        ...current,
+                        name: dealerName.trim() || current.name,
+                        city: dealerCity.trim() || current.city,
+                        contactPerson: dealerManager.trim() || current.contactPerson,
+                        phone: dealerPhone.trim() || current.phone
+                      };
+                      saveActiveRegisteredDealer(updated);
+                      alert('Showroom profile details updated successfully!');
+                    }
+                  }}
+                  className="w-full py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-xs transition-all cursor-pointer"
+                >
+                  <Building2 className="w-3.5 h-3.5" />
+                  <span>Save Showroom Details</span>
+                </button>
                 <button
                   onClick={() => onNavigateToTab('bidding')}
-                  className="w-full py-3 rounded-xl bg-amber-700 hover:bg-amber-800 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-xs transition-all cursor-pointer"
+                  className="w-full py-2.5 rounded-xl bg-amber-700 hover:bg-amber-800 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-xs transition-all cursor-pointer"
                 >
                   <span>Submit Group Bids Now</span>
                 </button>
