@@ -25,7 +25,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { Language } from '../translations';
 import { CarFairLogo } from './Logo';
 import { Car, BuyingGroup } from '../types';
-import { fetchCars, getStoredGroups, getDealerInventory } from '../services/api';
+import { fetchCars, getStoredGroups, getDealerInventory, getActiveRegisteredDealer } from '../services/api';
 import { getCarPhotos } from '../services/photoStorage';
 import { CarGalleryModal } from './CarGalleryModal';
 import { UploadCarPhotoModal } from './UploadCarPhotoModal';
@@ -50,10 +50,11 @@ export const AccountView: React.FC<AccountViewProps> = ({
   const [profileSaved, setProfileSaved] = useState(false);
 
   // Showroom Form state
-  const [dealerName, setDealerName] = useState('Bafna Tata Motors Flagship');
-  const [dealerCity, setDealerCity] = useState('Pune (Shivajinagar)');
-  const [dealerManager, setDealerManager] = useState('Rajesh Kulkarni (Sales Head)');
-  const [dealerPhone, setDealerPhone] = useState('+91 98220 99887');
+  const registered = getActiveRegisteredDealer();
+  const [dealerName, setDealerName] = useState(registered?.name || '');
+  const [dealerCity, setDealerCity] = useState(registered?.city || selectedCity || 'Pune');
+  const [dealerManager, setDealerManager] = useState(registered?.contactPerson || '');
+  const [dealerPhone, setDealerPhone] = useState(registered?.phone || '');
 
   // Showroom Photo Management State
   const [galleryCar, setGalleryCar] = useState<{ id: string; name: string } | null>(null);

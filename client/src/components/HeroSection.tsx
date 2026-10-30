@@ -455,7 +455,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                     type="text"
                     value={dealerName}
                     onChange={(e) => setDealerName(e.target.value)}
-                    placeholder="e.g. Bafna Motors Flagship"
+                    placeholder="e.g. Kothari Auto Link / Premier Dealership"
                     required
                     className="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 font-medium"
                   />

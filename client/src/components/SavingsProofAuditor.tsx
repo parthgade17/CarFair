@@ -45,7 +45,7 @@ export const SavingsProofAuditor: React.FC<SavingsProofAuditorProps> = ({
       voucherCode: 'CF-LOCK-MH-9421',
       buyer: { name: 'Parth Gade', phone: '9890123456', city: 'Pune' },
       vehicle: { carName: 'Tata Nexon', variantName: 'Creative+ 1.2 AMT' },
-      dealer: { dealerId: 'dealer-bafna', dealerName: 'Bafna Tata Motors (Shivajinagar)', city: 'Pune' },
+      dealer: { dealerId: 'dealer-showroom', dealerName: 'Authorized Showroom Partner', city: 'Pune' },
       financialLock: {
         lockedOnRoadPrice: 1294000,
         baselineShowroomPrice: 1362000,

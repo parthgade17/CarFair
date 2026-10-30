@@ -13,6 +13,95 @@ const DYNAMIC_GROUPS_STORAGE = 'carfair_dynamic_groups_v3';
 const INVENTORY_STORAGE_KEY = 'carfair_dealer_inventory_v4';
 const SHOWROOM_CARS_KEY = 'carfair_showroom_cars';
 const DEMO_CLEARED_KEY = 'carfair_demo_cleared_v2';
+const REGISTERED_DEALER_KEY = 'carfair_active_registered_dealer_v1';
+const REGISTERED_DEALERS_LIST_KEY = 'carfair_registered_dealers_list_v1';
+
+export function getActiveRegisteredDealer(): Dealer | null {
+  try {
+    const raw = localStorage.getItem(REGISTERED_DEALER_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (parsed && parsed.id && parsed.name) return parsed;
+    }
+  } catch (err) {}
+  return null;
+}
+
+export function saveActiveRegisteredDealer(dealer: Dealer | null): void {
+  try {
+    if (dealer) {
+      localStorage.setItem(REGISTERED_DEALER_KEY, JSON.stringify(dealer));
+      const list = getStoredRegisteredDealers();
+      const filtered = list.filter(d => d.id !== dealer.id);
+      localStorage.setItem(REGISTERED_DEALERS_LIST_KEY, JSON.stringify([dealer, ...filtered]));
+    } else {
+      localStorage.removeItem(REGISTERED_DEALER_KEY);
+    }
+  } catch (err) {}
+}
+
+export function getStoredRegisteredDealers(): Dealer[] {
+  try {
+    const raw = localStorage.getItem(REGISTERED_DEALERS_LIST_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) return parsed;
+    }
+  } catch (err) {}
+  return [];
+}
+
+export async function registerShowroomDealer(payload: {
+  name: string;
+  brand: string;
+  city: string;
+  location: string;
+  contactPerson: string;
+  phone: string;
+  email?: string;
+  dealerCode?: string;
+}): Promise<{ success: boolean; dealer: Dealer }> {
+  const newDealer: Dealer = {
+    id: `dealer-${Date.now()}`,
+    name: payload.name.trim(),
+    brand: payload.brand || 'Tata',
+    city: payload.city || 'Pune',
+    location: payload.location.trim() || 'Showroom Outlet',
+    rating: 4.9,
+    reviewsCount: 1,
+    verifiedStatus: 'OEM Authorised Platinum Partner',
+    inventoryReadyCount: 0,
+    responseTimeAvg: '15 mins',
+    contactPerson: payload.contactPerson.trim() || 'Sales Manager',
+    phone: payload.phone.trim() || '+91 98000 00000'
+  };
+
+  saveActiveRegisteredDealer(newDealer);
+
+  if (isSupabaseConfigured()) {
+    try {
+      await supabase.from('dealers').insert({
+        id: newDealer.id,
+        name: newDealer.name,
+        brand: newDealer.brand,
+        city: newDealer.city,
+        location: newDealer.location,
+        rating: newDealer.rating,
+        is_verified: true,
+        contact_person: newDealer.contactPerson,
+        phone: newDealer.phone
+      });
+    } catch (err) {
+      console.warn('Supabase dealer registration note:', err);
+    }
+  }
+
+  return { success: true, dealer: newDealer };
+}
+
+export function logoutRegisteredDealer(): void {
+  saveActiveRegisteredDealer(null);
+}
 
 export function isDemoCleared(): boolean {
   try {
@@ -482,8 +571,8 @@ export async function addShowroomVehicle(payload: AddShowroomCarPayload): Promis
       bids: [
         {
           id: `bid-${Date.now()}`,
-          dealerId: payload.dealerId || 'dealer-bafna-tata-pune',
-          dealerName: payload.dealerName || 'Authorized Showroom Partner',
+          dealerId: payload.dealerId || getActiveRegisteredDealer()?.id || 'dealer-showroom',
+          dealerName: payload.dealerName || getActiveRegisteredDealer()?.name || 'Authorized Showroom Partner',
           submittedAt: 'Just Now',
           exShowroomDiscount: poolDiscount,
           corporateExchangeBonus: 15000,
@@ -630,8 +719,8 @@ export async function submitDealerBid(groupId: string, payload: any): Promise<{ 
 
   const newBid: ReverseBid = {
     id: `bid-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
-    dealerId: payload.dealerId || 'dealer-bafna-tata-pune',
-    dealerName: payload.dealerName || 'Bafna Tata Motors',
+    dealerId: payload.dealerId || getActiveRegisteredDealer()?.id || 'dealer-showroom',
+    dealerName: payload.dealerName || getActiveRegisteredDealer()?.name || 'Authorized Showroom Partner',
     submittedAt: 'Just Now',
     exShowroomDiscount: discount,
     corporateExchangeBonus: Number(payload.corporateExchangeBonus) || 15000,
@@ -662,8 +751,8 @@ export async function submitDealerBid(groupId: string, payload: any): Promise<{ 
     try {
       await supabase.from('reverse_bids').insert({
         group_id: groupId,
-        dealer_id: payload.dealerId || 'dealer-bafna-tata-pune',
-        dealer_name: payload.dealerName || 'Bafna Tata Motors',
+        dealer_id: payload.dealerId || getActiveRegisteredDealer()?.id || 'dealer-showroom',
+        dealer_name: payload.dealerName || getActiveRegisteredDealer()?.name || 'Authorized Showroom Partner',
         ex_showroom_discount: discount,
         corporate_exchange_bonus: Number(payload.corporateExchangeBonus) || 15000,
         freebies: payload.freebies || ['5-Yr Extended Warranty', '7D Mats'],
@@ -907,8 +996,8 @@ export async function generateDealLockVoucher(payload: any): Promise<DealLockVou
       variantName: payload.variantName || '1.2 Turbo AMT Dual Tone'
     },
     dealer: {
-      dealerId: payload.dealerId || 'dealer-bafna-tata-pune',
-      dealerName: payload.dealerName || 'Bafna Tata Motors Flagship (Shivajinagar)',
+      dealerId: payload.dealerId || getActiveRegisteredDealer()?.id || 'dealer-showroom',
+      dealerName: payload.dealerName || getActiveRegisteredDealer()?.name || 'Authorized Showroom Partner',
       city: payload.city || 'Pune'
     },
     financialLock: {
@@ -1026,36 +1115,13 @@ export async function fetchDealers(): Promise<Dealer[]> {
     }
   }
 
-  return [
-    {
-      id: 'dealer-bafna-tata-pune',
-      name: 'Bafna Tata Motors (Authorised Flagship)',
-      brand: 'Tata',
-      city: 'Pune',
-      location: 'Shivajinagar & Baner',
-      rating: 4.8,
-      reviewsCount: 142,
-      verifiedStatus: 'OEM Authorised Platinum Partner',
-      inventoryReadyCount: readyTotal,
-      responseTimeAvg: '22 mins',
-      contactPerson: 'Kunal Deshmukh (Group Sales Head)',
-      phone: '+91 98220 44100'
-    },
-    {
-      id: 'dealer-garve-hyundai-pune',
-      name: 'Garve Hyundai Premium',
-      brand: 'Hyundai',
-      city: 'Pune',
-      location: 'Baner & Aundh',
-      rating: 4.8,
-      reviewsCount: 98,
-      verifiedStatus: 'OEM Authorised Elite Partner',
-      inventoryReadyCount: readyTotal,
-      responseTimeAvg: '25 mins',
-      contactPerson: 'Sameer Deshmukh',
-      phone: '+91 98221 44556'
-    }
-  ];
+  // Purely dynamic: return registered showroom partners
+  const stored = getStoredRegisteredDealers();
+  const active = getActiveRegisteredDealer();
+  if (active && !stored.some(d => d.id === active.id)) {
+    return [active, ...stored];
+  }
+  return stored;
 }
 
 export async function estimateOldCarExchange(payload: any): Promise<any> {

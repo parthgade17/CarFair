@@ -21,7 +21,8 @@ import {
   Trash2,
   Image as ImageIcon,
   X,
-  ExternalLink
+  ExternalLink,
+  Tag
 } from 'lucide-react';
 import { Dealer, BuyingGroup, CarImageItem, Car } from '../types';
 import { 
@@ -36,7 +37,10 @@ import {
   deleteShowroomVehicle,
   clearAllShowroomData,
   isDemoCleared,
-  DealerInventorySettings
+  DealerInventorySettings,
+  getActiveRegisteredDealer,
+  registerShowroomDealer,
+  logoutRegisteredDealer
 } from '../services/api';
 import { getCarPhotos } from '../services/photoStorage';
 import { CarGalleryModal } from './CarGalleryModal';
@@ -44,14 +48,31 @@ import { UploadCarPhotoModal } from './UploadCarPhotoModal';
 
 interface DealerPortalViewProps {
   selectedCity?: string;
+  onSwitchToBuyer?: () => void;
 }
 
-export const DealerPortalView: React.FC<DealerPortalViewProps> = ({ selectedCity = 'Pune' }) => {
+export const DealerPortalView: React.FC<DealerPortalViewProps> = ({ 
+  selectedCity = 'Pune',
+  onSwitchToBuyer
+}) => {
+  const [registeredDealer, setRegisteredDealer] = useState<Dealer | null>(getActiveRegisteredDealer());
   const [dealers, setDealers] = useState<Dealer[]>([]);
   const [groups, setGroups] = useState<BuyingGroup[]>([]);
   const [showroomCars, setShowroomCars] = useState<Car[]>([]);
-  const [selectedDealerId, setSelectedDealerId] = useState('dealer-bafna-tata-pune');
+  const [selectedDealerId, setSelectedDealerId] = useState(registeredDealer?.id || '');
   const [filterCity, setFilterCity] = useState(selectedCity === 'All Cities' ? 'All' : selectedCity);
+
+  // Showroom Registration Form State
+  const [regName, setRegName] = useState('');
+  const [regBrand, setRegBrand] = useState('Tata');
+  const [regCity, setRegCity] = useState(selectedCity === 'All Cities' ? 'Pune' : selectedCity);
+  const [regLocation, setRegLocation] = useState('');
+  const [regContactPerson, setRegContactPerson] = useState('');
+  const [regPhone, setRegPhone] = useState('');
+  const [regEmail, setRegEmail] = useState('');
+  const [regDealerCode, setRegDealerCode] = useState('');
+  const [isRegistering, setIsRegistering] = useState(false);
+  const [regError, setRegError] = useState<string | null>(null);
 
   // Dynamic Inventory & Target Stock State
   const [inventory, setInventory] = useState<DealerInventorySettings>(getDealerInventory());
@@ -113,12 +134,70 @@ export const DealerPortalView: React.FC<DealerPortalViewProps> = ({ selectedCity
   const [isSubmittingBid, setIsSubmittingBid] = useState(false);
 
   useEffect(() => {
+    const active = getActiveRegisteredDealer();
+    setRegisteredDealer(active);
+    if (active) {
+      setSelectedDealerId(active.id);
+      setFormBrand(active.brand);
+    }
     fetchDealers().then(d => {
       setDealers(d);
-      if (d.length > 0) setSelectedDealerId(d[0].id);
+      if (!active && d.length > 0) {
+        setSelectedDealerId(d[0].id);
+      }
     });
     loadAllData();
   }, [filterCity]);
+
+  const handleRegisterShowroom = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!regName.trim()) {
+      setRegError('Please enter your Showroom / Dealership name.');
+      return;
+    }
+    if (!regLocation.trim()) {
+      setRegError('Please enter your Showroom area / location.');
+      return;
+    }
+    if (!regContactPerson.trim()) {
+      setRegError('Please enter the Sales Manager or GM contact name.');
+      return;
+    }
+    if (!regPhone.trim()) {
+      setRegError('Please enter an official contact phone number.');
+      return;
+    }
+
+    setIsRegistering(true);
+    setRegError(null);
+
+    const res = await registerShowroomDealer({
+      name: regName.trim(),
+      brand: regBrand,
+      city: regCity,
+      location: regLocation.trim(),
+      contactPerson: regContactPerson.trim(),
+      phone: regPhone.trim(),
+      email: regEmail.trim(),
+      dealerCode: regDealerCode.trim()
+    });
+
+    if (res.success) {
+      setRegisteredDealer(res.dealer);
+      setSelectedDealerId(res.dealer.id);
+      setFormBrand(res.dealer.brand);
+      setStatusNotice(`🎉 Showroom successfully registered! Welcome, ${res.dealer.name}.`);
+      await loadAllData();
+    }
+    setIsRegistering(false);
+  };
+
+  const handleLogoutDealer = () => {
+    if (confirm('Are you sure you want to log out of this showroom? You can register or log in with another showroom at any time.')) {
+      logoutRegisteredDealer();
+      setRegisteredDealer(null);
+    }
+  };
 
   useEffect(() => {
     if (selectedPhotoCar) {
@@ -175,7 +254,7 @@ export const DealerPortalView: React.FC<DealerPortalViewProps> = ({ selectedCity
       return;
     }
     setIsSubmittingVehicle(true);
-    const currentDealer = dealers.find(d => d.id === selectedDealerId);
+    const currentDealer = registeredDealer || dealers.find(d => d.id === selectedDealerId);
     const finalImage = formImageFilePreview || formImageUrl;
     if (!finalImage) {
       alert('Please upload a vehicle photograph from your device/camera or enter a photo URL.');
@@ -196,9 +275,9 @@ export const DealerPortalView: React.FC<DealerPortalViewProps> = ({ selectedCity
       mileage: formMileage,
       imageUrl: finalImage,
       tagline: formTagline,
-      city: filterCity === 'All' ? selectedCity : filterCity,
-      dealerId: selectedDealerId,
-      dealerName: currentDealer?.name || 'Authorized Showroom Partner',
+      city: registeredDealer?.city || (filterCity === 'All' ? selectedCity : filterCity),
+      dealerId: registeredDealer?.id || selectedDealerId || 'dealer-showroom',
+      dealerName: registeredDealer?.name || currentDealer?.name || 'Authorized Showroom Partner',
       readyStock: Number(formReadyStock),
       inTransit: Number(formInTransit),
       createBuyerPool: formCreatePool,
@@ -275,10 +354,10 @@ export const DealerPortalView: React.FC<DealerPortalViewProps> = ({ selectedCity
   const handleDealerBid = async (e: React.FormEvent, groupId: string) => {
     e.preventDefault();
     setIsSubmittingBid(true);
-    const currentDealer = dealers.find(d => d.id === selectedDealerId);
+    const currentDealer = registeredDealer || dealers.find(d => d.id === selectedDealerId);
     const res = await submitDealerBid(groupId, {
-      dealerId: selectedDealerId,
-      dealerName: currentDealer?.name || 'Authorized Dealership',
+      dealerId: registeredDealer?.id || selectedDealerId || 'dealer-showroom',
+      dealerName: registeredDealer?.name || currentDealer?.name || 'Authorized Dealership',
       exShowroomDiscount: bidDiscount,
       corporateExchangeBonus: 15000,
       freebies: ['5-Yr Extended Warranty', '7D Premium Mats', 'Ceramic Polish'],
@@ -296,7 +375,245 @@ export const DealerPortalView: React.FC<DealerPortalViewProps> = ({ selectedCity
     setIsSubmittingBid(false);
   };
 
-  const currentDealer = dealers.find(d => d.id === selectedDealerId) || dealers[0];
+  // If showroom is not registered yet, display the dedicated Showroom Registration Gateway
+  if (!registeredDealer) {
+    return (
+      <div className="min-h-[80vh] py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-amber-50/40 via-white to-slate-50">
+        <div className="max-w-3xl mx-auto space-y-8">
+          {/* Top navigation */}
+          <div className="flex items-center justify-between">
+            {onSwitchToBuyer ? (
+              <button
+                onClick={onSwitchToBuyer}
+                className="text-xs font-bold text-slate-600 hover:text-blue-900 inline-flex items-center gap-1.5 cursor-pointer bg-white px-3.5 py-2 rounded-xl border border-slate-200 shadow-2xs transition-colors"
+              >
+                ← Return to Buyer Platform
+              </button>
+            ) : <div />}
+            <span className="text-[11px] font-bold text-amber-900 bg-amber-100 border border-amber-300 px-3 py-1 rounded-full uppercase tracking-wider">
+              Dealership Gateway
+            </span>
+          </div>
+
+          {/* Heading Banner */}
+          <div className="text-center space-y-3">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold bg-amber-50 text-amber-900 border border-amber-300 shadow-2xs">
+              <Building2 className="w-3.5 h-3.5 text-amber-700" />
+              <span>OEM Authorised Dealership Onboarding</span>
+            </div>
+            <h2 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
+              Register Your Dealership Showroom
+            </h2>
+            <p className="text-sm text-slate-600 max-w-xl mx-auto leading-relaxed">
+              Register your showroom to unlock verified buyer pools in your city, manage vehicle catalog photos, and compete for ready group deliveries.
+            </p>
+          </div>
+
+          {/* Registration Form Card */}
+          <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6">
+            <div className="border-b border-slate-100 pb-4">
+              <h3 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
+                <ShieldCheck className="w-5 h-5 text-emerald-700" />
+                <span>Showroom Profile & Contact Credentials</span>
+              </h3>
+              <p className="text-xs text-slate-500 mt-0.5">
+                These credentials will be documented on your binding price quotations and Price Lock passes issued to buyers.
+              </p>
+            </div>
+
+            {regError && (
+              <div className="p-3.5 rounded-xl bg-red-50 border border-red-200 text-xs text-red-900 flex items-center gap-2 font-medium">
+                <AlertCircle className="w-4 h-4 text-red-600 shrink-0" />
+                <span>{regError}</span>
+              </div>
+            )}
+
+            <form onSubmit={handleRegisterShowroom} className="space-y-5 text-xs">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {/* Showroom Name */}
+                <div className="sm:col-span-2">
+                  <label className="block text-slate-700 font-bold mb-1">
+                    Showroom / Dealership Legal Name <span className="text-red-600">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Kothari Wheels Flagship / Garve Automotive"
+                    value={regName}
+                    onChange={(e) => setRegName(e.target.value)}
+                    className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-slate-900 text-xs focus:bg-white focus:border-amber-600 font-semibold"
+                  />
+                </div>
+
+                {/* Brand Franchise */}
+                <div>
+                  <label className="block text-slate-700 font-bold mb-1">
+                    OEM Brand Franchise <span className="text-red-600">*</span>
+                  </label>
+                  <select
+                    value={regBrand}
+                    onChange={(e) => setRegBrand(e.target.value)}
+                    className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-slate-900 text-xs focus:bg-white focus:border-amber-600 font-bold cursor-pointer"
+                  >
+                    <option value="Tata">Tata Motors</option>
+                    <option value="Hyundai">Hyundai</option>
+                    <option value="Maruti Suzuki">Maruti Suzuki / Nexa</option>
+                    <option value="Mahindra">Mahindra & Mahindra</option>
+                    <option value="Kia">Kia Motors</option>
+                    <option value="Toyota">Toyota</option>
+                    <option value="Honda">Honda</option>
+                    <option value="MG">MG Motor</option>
+                    <option value="Volkswagen">Volkswagen</option>
+                    <option value="Skoda">Skoda</option>
+                    <option value="Other">Other Brand</option>
+                  </select>
+                </div>
+
+                {/* City */}
+                <div>
+                  <label className="block text-slate-700 font-bold mb-1">
+                    Showroom City <span className="text-red-600">*</span>
+                  </label>
+                  <select
+                    value={regCity}
+                    onChange={(e) => setRegCity(e.target.value)}
+                    className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-slate-900 text-xs focus:bg-white focus:border-amber-600 font-bold cursor-pointer"
+                  >
+                    <option value="Pune">Pune</option>
+                    <option value="Mumbai">Mumbai</option>
+                    <option value="Bengaluru">Bengaluru</option>
+                    <option value="Delhi NCR">Delhi NCR</option>
+                    <option value="Hyderabad">Hyderabad</option>
+                    <option value="Ahmedabad">Ahmedabad</option>
+                  </select>
+                </div>
+
+                {/* Showroom Location / Branch Area */}
+                <div className="sm:col-span-2">
+                  <label className="block text-slate-700 font-bold mb-1">
+                    Showroom Location / Branch Area <span className="text-red-600">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Baner Road & Aundh Flagship Store"
+                    value={regLocation}
+                    onChange={(e) => setRegLocation(e.target.value)}
+                    className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-slate-900 text-xs focus:bg-white focus:border-amber-600 font-semibold"
+                  />
+                </div>
+
+                {/* General Manager / Contact Person */}
+                <div>
+                  <label className="block text-slate-700 font-bold mb-1">
+                    Sales Head / General Manager <span className="text-red-600">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Kunal Deshmukh (Group Sales Head)"
+                    value={regContactPerson}
+                    onChange={(e) => setRegContactPerson(e.target.value)}
+                    className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-slate-900 text-xs focus:bg-white focus:border-amber-600 font-semibold"
+                  />
+                </div>
+
+                {/* Official Contact Phone */}
+                <div>
+                  <label className="block text-slate-700 font-bold mb-1">
+                    Official Contact Phone / Mobile <span className="text-red-600">*</span>
+                  </label>
+                  <input
+                    type="tel"
+                    required
+                    placeholder="e.g. +91 98220 44100"
+                    value={regPhone}
+                    onChange={(e) => setRegPhone(e.target.value)}
+                    className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-slate-900 text-xs focus:bg-white focus:border-amber-600 font-mono font-semibold"
+                  />
+                </div>
+
+                {/* Official Email */}
+                <div>
+                  <label className="block text-slate-700 font-bold mb-1">
+                    Official Dealership Email
+                  </label>
+                  <input
+                    type="email"
+                    placeholder="e.g. sales@kothariwheels.com"
+                    value={regEmail}
+                    onChange={(e) => setRegEmail(e.target.value)}
+                    className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-slate-900 text-xs focus:bg-white focus:border-amber-600 font-semibold"
+                  />
+                </div>
+
+                {/* OEM Dealer Code */}
+                <div>
+                  <label className="block text-slate-700 font-bold mb-1">
+                    OEM Dealer Code / GST (Optional)
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. OEM-MH-4091"
+                    value={regDealerCode}
+                    onChange={(e) => setRegDealerCode(e.target.value)}
+                    className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-slate-900 text-xs focus:bg-white focus:border-amber-600 font-mono"
+                  />
+                </div>
+              </div>
+
+              {/* Submit CTA */}
+              <div className="pt-3">
+                <button
+                  type="submit"
+                  disabled={isRegistering}
+                  className="w-full py-3.5 rounded-xl bg-amber-700 hover:bg-amber-800 text-white font-extrabold text-sm flex items-center justify-center gap-2 shadow-md cursor-pointer transition-all hover:scale-[1.01]"
+                >
+                  <Building2 className="w-4 h-4" />
+                  <span>{isRegistering ? 'Registering Showroom...' : 'Register Showroom & Access Portal →'}</span>
+                </button>
+              </div>
+            </form>
+          </div>
+
+          {/* Value props */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs text-slate-600">
+            <div className="p-4 rounded-2xl bg-white border border-slate-200 space-y-1">
+              <div className="font-bold text-slate-900 flex items-center gap-1.5">
+                <Users className="w-4 h-4 text-emerald-700" />
+                <span>Pre-Approved Buyers</span>
+              </div>
+              <p className="text-[11px] text-slate-500">
+                Direct cohorts of 15–20 buyers ready to buy in your city with verified intent.
+              </p>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-white border border-slate-200 space-y-1">
+              <div className="font-bold text-slate-900 flex items-center gap-1.5">
+                <Tag className="w-4 h-4 text-blue-700" />
+                <span>Volume Bonus Slabs</span>
+              </div>
+              <p className="text-[11px] text-slate-500">
+                Unlock monthly OEM volume quarterly bonus slabs with bulk allocation.
+              </p>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-white border border-slate-200 space-y-1">
+              <div className="font-bold text-slate-900 flex items-center gap-1.5">
+                <Key className="w-4 h-4 text-amber-700" />
+                <span>6-Digit PIN Check-In</span>
+              </div>
+              <p className="text-[11px] text-slate-500">
+                Verify buyers with Price Lock PINs at your showroom counter before delivery.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const currentDealer = registeredDealer;
   const targetPercent = Math.min(100, Math.round((inventory.monthlyTargetAchieved / inventory.monthlyTargetCount) * 100));
 
   return (
@@ -336,23 +653,30 @@ export const DealerPortalView: React.FC<DealerPortalViewProps> = ({ selectedCity
             <span>{isClearingData ? 'Clearing...' : 'Clear Demo Data'}</span>
           </button>
 
-          {/* Dealer Switcher */}
-          {dealers.length > 0 && (
-            <div className="bg-white border border-slate-300 rounded-xl p-2 flex items-center gap-2 shadow-xs">
-              <span className="text-xs text-slate-500 font-medium pl-1">Showroom:</span>
-              <select
-                value={selectedDealerId}
-                onChange={(e) => setSelectedDealerId(e.target.value)}
-                className="bg-slate-50 border border-slate-300 text-slate-900 text-xs rounded-lg px-2 py-1 focus:bg-white focus:outline-none focus:border-amber-600 font-bold cursor-pointer"
-              >
-                {dealers.map((d) => (
-                  <option key={d.id} value={d.id}>
-                    {d.name} ({d.city})
-                  </option>
-                ))}
-              </select>
+          {/* Registered Showroom Profile Pill (Replaced dropdown selector) */}
+          <div className="bg-white border border-slate-300 rounded-2xl px-3.5 py-2 flex items-center gap-2.5 shadow-xs">
+            <div className="w-8 h-8 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-900 flex items-center justify-center font-bold shrink-0">
+              <Building2 className="w-4 h-4 text-amber-700" />
             </div>
-          )}
+            <div className="min-w-0 pr-1">
+              <div className="text-xs font-bold text-slate-900 flex items-center gap-1.5 truncate">
+                <span className="truncate">{registeredDealer.name}</span>
+                <span className="text-[9px] bg-emerald-100 text-emerald-800 font-extrabold px-1.5 py-0.2 rounded border border-emerald-300 shrink-0">
+                  {registeredDealer.brand}
+                </span>
+              </div>
+              <div className="text-[10px] text-slate-500 truncate">
+                {registeredDealer.location}, {registeredDealer.city} • {registeredDealer.contactPerson}
+              </div>
+            </div>
+            <button
+              onClick={handleLogoutDealer}
+              className="text-[11px] font-bold text-slate-500 hover:text-red-700 hover:bg-red-50 px-2.5 py-1 rounded-lg border border-slate-200 hover:border-red-200 transition-colors cursor-pointer shrink-0"
+              title="Switch or re-register showroom credentials"
+            >
+              Switch
+            </button>
+          </div>
         </div>
       </div>
 
@@ -1239,7 +1563,7 @@ export const DealerPortalView: React.FC<DealerPortalViewProps> = ({ selectedCity
           onClose={() => setUploadCar(null)}
           carId={uploadCar.id}
           carName={uploadCar.name}
-          dealerName={dealers.find(d => d.id === selectedDealerId)?.name || 'Authorized Dealership'}
+          dealerName={registeredDealer?.name || 'Authorized Dealership'}
           onPhotoUploaded={() => setPhotoRefreshKey(prev => prev + 1)}
         />
       )}

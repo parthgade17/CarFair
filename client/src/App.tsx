@@ -43,8 +43,8 @@ function AppContent() {
       variantName: 'Selected Variant',
       buyerName: 'Parth Gade',
       buyerPhone: '+91 98901 23456',
-      dealerId: winningBid ? winningBid.dealerId : 'dealer-bafna',
-      dealerName: winningBid ? winningBid.dealerName : 'Bafna Tata Motors Flagship',
+      dealerId: winningBid ? winningBid.dealerId : 'dealer-showroom',
+      dealerName: winningBid ? winningBid.dealerName : 'Authorized Showroom Partner',
       lockedOnRoadPrice: winningBid ? winningBid.finalOnRoadPerUnit : group.currentBestGroupPrice,
       baselineShowroomPrice: group.baselineShowroomPrice,
       guaranteedDeliveryDays: winningBid ? winningBid.deliveryDays : 7,
@@ -107,7 +107,10 @@ function AppContent() {
             selectedCity={selectedCity}
           />
         ) : userRole === 'DEALER' ? (
-          <DealerPortalView selectedCity={selectedCity} />
+          <DealerPortalView 
+            selectedCity={selectedCity} 
+            onSwitchToBuyer={() => setUserRole('BUYER')} 
+          />
         ) : (
           <>
             {activeTab === 'groups' && (
@@ -161,7 +164,7 @@ function AppContent() {
                   validUntil: new Date(Date.now() + 14 * 24 * 3600 * 1000).toISOString(),
                   buyer: { name: 'Parth Gade', phone: '+91 98901 23456', city: selectedCity },
                   vehicle: { carName: 'Tata Nexon Creative+', variantName: '1.2 Turbo AMT Dual Tone' },
-                  dealer: { dealerId: 'dealer-bafna', dealerName: 'Bafna Tata Motors (Shivajinagar)', city: selectedCity },
+                  dealer: { dealerId: 'dealer-showroom', dealerName: 'Authorized Showroom Partner', city: selectedCity },
                   financialLock: {
                     lockedOnRoadPrice: 1294000,
                     baselineShowroomPrice: 1362000,
