@@ -29,6 +29,7 @@ import { fetchCars, getStoredGroups, getDealerInventory, getActiveRegisteredDeal
 import { getCarPhotos } from '../services/photoStorage';
 import { CarGalleryModal } from './CarGalleryModal';
 import { UploadCarPhotoModal } from './UploadCarPhotoModal';
+import { ALL_INDIAN_CITIES } from '../constants/cities';
 
 interface AccountViewProps {
   onNavigateToTab: (tab: string) => void;
@@ -310,14 +311,16 @@ export const AccountView: React.FC<AccountViewProps> = ({
               <div>
                 <label className="block text-slate-700 font-semibold mb-1">{t.buyerCityLabel}</label>
                 <div className="relative">
-                  <input
-                    type="text"
-                    required
+                  <select
                     value={buyerCity}
                     onChange={(e) => setBuyerCity(e.target.value)}
-                    className="w-full bg-slate-50 border border-slate-300 rounded-lg pl-9 pr-3 py-2 text-slate-900 text-xs focus:bg-white focus:border-blue-600"
-                  />
-                  <MapPin className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
+                    className="w-full bg-slate-50 border border-slate-300 rounded-lg pl-9 pr-3 py-2 text-slate-900 text-xs focus:bg-white focus:border-blue-600 font-medium cursor-pointer"
+                  >
+                    {ALL_INDIAN_CITIES.map((c) => (
+                      <option key={c} value={c}>{c}</option>
+                    ))}
+                  </select>
+                  <MapPin className="w-4 h-4 text-slate-400 absolute left-3 top-2.5 pointer-events-none" />
                 </div>
               </div>
 

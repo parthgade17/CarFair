@@ -42,6 +42,7 @@ import {
   registerShowroomDealer,
   logoutRegisteredDealer
 } from '../services/api';
+import { ALL_INDIAN_CITIES } from '../constants/cities';
 import { getCarPhotos } from '../services/photoStorage';
 import { CarGalleryModal } from './CarGalleryModal';
 import { UploadCarPhotoModal } from './UploadCarPhotoModal';
@@ -66,6 +67,7 @@ export const DealerPortalView: React.FC<DealerPortalViewProps> = ({
   const [regName, setRegName] = useState('');
   const [regBrand, setRegBrand] = useState('Tata');
   const [regCity, setRegCity] = useState(selectedCity === 'All Cities' ? 'Pune' : selectedCity);
+  const [regCustomCity, setRegCustomCity] = useState('');
   const [regLocation, setRegLocation] = useState('');
   const [regContactPerson, setRegContactPerson] = useState('');
   const [regPhone, setRegPhone] = useState('');
@@ -168,13 +170,20 @@ export const DealerPortalView: React.FC<DealerPortalViewProps> = ({
       return;
     }
 
+    if (regCity === 'Other City' && !regCustomCity.trim()) {
+      setRegError('Please enter your showroom city name.');
+      return;
+    }
+
     setIsRegistering(true);
     setRegError(null);
+
+    const finalCity = regCity === 'Other City' ? regCustomCity.trim() : regCity;
 
     const res = await registerShowroomDealer({
       name: regName.trim(),
       brand: regBrand,
-      city: regCity,
+      city: finalCity,
       location: regLocation.trim(),
       contactPerson: regContactPerson.trim(),
       phone: regPhone.trim(),
@@ -479,13 +488,20 @@ export const DealerPortalView: React.FC<DealerPortalViewProps> = ({
                     onChange={(e) => setRegCity(e.target.value)}
                     className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-slate-900 text-xs focus:bg-white focus:border-amber-600 font-bold cursor-pointer"
                   >
-                    <option value="Pune">Pune</option>
-                    <option value="Mumbai">Mumbai</option>
-                    <option value="Bengaluru">Bengaluru</option>
-                    <option value="Delhi NCR">Delhi NCR</option>
-                    <option value="Hyderabad">Hyderabad</option>
-                    <option value="Ahmedabad">Ahmedabad</option>
+                    {ALL_INDIAN_CITIES.map((city) => (
+                      <option key={city} value={city}>{city}</option>
+                    ))}
                   </select>
+                  {regCity === 'Other City' && (
+                    <input
+                      type="text"
+                      required
+                      placeholder="Enter your showroom city name"
+                      value={regCustomCity}
+                      onChange={(e) => setRegCustomCity(e.target.value)}
+                      className="mt-2 w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2 text-slate-900 text-xs focus:bg-white focus:border-amber-600 font-semibold"
+                    />
+                  )}
                 </div>
 
                 {/* Showroom Location / Branch Area */}
@@ -1041,13 +1057,12 @@ export const DealerPortalView: React.FC<DealerPortalViewProps> = ({
               <select
                 value={filterCity}
                 onChange={(e) => setFilterCity(e.target.value)}
-                className="text-xs font-bold text-slate-700 bg-white border border-slate-200 rounded-lg px-2 py-1 cursor-pointer"
+                className="text-xs font-bold text-slate-700 bg-white border border-slate-200 rounded-lg px-2 py-1 cursor-pointer max-w-[170px]"
               >
                 <option value="All">All Cities</option>
-                <option value="Pune">Pune</option>
-                <option value="Mumbai">Mumbai</option>
-                <option value="Bengaluru">Bengaluru</option>
-                <option value="Delhi NCR">Delhi NCR</option>
+                {ALL_INDIAN_CITIES.filter((c) => c !== 'Other City').map((c) => (
+                  <option key={c} value={c}>{c}</option>
+                ))}
               </select>
             </div>
           </div>

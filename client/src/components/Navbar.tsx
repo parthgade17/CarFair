@@ -19,11 +19,13 @@ import {
   Sparkles,
   ShieldCheck,
   Zap,
-  TrendingUp
+  TrendingUp,
+  Search
 } from 'lucide-react';
 import { CarFairLogo } from './Logo';
 import { useLanguage } from '../context/LanguageContext';
 import { Language } from '../translations';
+import { BUYER_NAV_CITIES } from '../constants/cities';
 
 interface NavbarProps {
   activeTab: string;
@@ -34,7 +36,7 @@ interface NavbarProps {
   setUserRole: (role: 'BUYER' | 'DEALER' | 'COMMUNITY') => void;
 }
 
-export const CITIES = ['All Cities', 'Pune', 'Mumbai', 'Bengaluru', 'Delhi NCR', 'Hyderabad', 'Ahmedabad'];
+export const CITIES = BUYER_NAV_CITIES;
 
 export const Navbar: React.FC<NavbarProps> = ({
   activeTab,
@@ -47,6 +49,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   const { language, setLanguage, t } = useLanguage();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isCityDropdownOpen, setIsCityDropdownOpen] = useState(false);
+  const [citySearchTerm, setCitySearchTerm] = useState('');
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   // The 7 core car-buying options in the scrollbar
@@ -265,23 +268,45 @@ export const Navbar: React.FC<NavbarProps> = ({
               </button>
 
               {isCityDropdownOpen && (
-                <div className="absolute right-0 mt-2 w-44 rounded-2xl bg-white border border-slate-200 shadow-xl py-1 z-50">
-                  {CITIES.map((city) => (
-                    <button
-                      key={city}
-                      onClick={() => {
-                        setSelectedCity(city);
-                        setIsCityDropdownOpen(false);
-                      }}
-                      className={`w-full text-left px-3.5 py-2 text-xs font-medium transition-colors cursor-pointer ${
-                        selectedCity === city
-                          ? 'bg-blue-50 text-blue-700 font-bold'
-                          : 'text-slate-700 hover:bg-slate-50'
-                      }`}
-                    >
-                      {city}
-                    </button>
-                  ))}
+                <div className="absolute right-0 mt-2 w-60 rounded-2xl bg-white border border-slate-200 shadow-xl overflow-hidden z-50 animate-in fade-in zoom-in-95">
+                  <div className="p-2 border-b border-slate-100 bg-slate-50/50">
+                    <div className="relative">
+                      <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5" />
+                      <input
+                        type="text"
+                        placeholder="Search 100+ cities..."
+                        value={citySearchTerm}
+                        onChange={(e) => setCitySearchTerm(e.target.value)}
+                        className="w-full bg-white border border-slate-200 rounded-lg pl-8 pr-2.5 py-1.5 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-500 font-medium"
+                        autoFocus
+                      />
+                    </div>
+                  </div>
+                  <div className="max-h-72 overflow-y-auto py-1">
+                    {CITIES.filter(c => c.toLowerCase().includes(citySearchTerm.toLowerCase())).map((city) => (
+                      <button
+                        key={city}
+                        onClick={() => {
+                          setSelectedCity(city);
+                          setIsCityDropdownOpen(false);
+                          setCitySearchTerm('');
+                        }}
+                        className={`w-full text-left px-3.5 py-2 text-xs font-medium transition-colors cursor-pointer flex items-center justify-between ${
+                          selectedCity === city
+                            ? 'bg-blue-50 text-blue-750 font-bold'
+                            : 'text-slate-700 hover:bg-slate-50'
+                        }`}
+                      >
+                        <span>{city}</span>
+                        {selectedCity === city && <span className="text-[10px] text-blue-700 font-bold">✓</span>}
+                      </button>
+                    ))}
+                    {CITIES.filter(c => c.toLowerCase().includes(citySearchTerm.toLowerCase())).length === 0 && (
+                      <div className="py-4 text-center text-xs text-slate-400">
+                        No matching city found
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
             </div>

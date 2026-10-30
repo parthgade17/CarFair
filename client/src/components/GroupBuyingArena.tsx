@@ -23,6 +23,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { getCarPhotos } from '../services/photoStorage';
 import { CarGalleryModal } from './CarGalleryModal';
 import { UploadCarPhotoModal } from './UploadCarPhotoModal';
+import { ALL_INDIAN_CITIES } from '../constants/cities';
 
 interface GroupBuyingArenaProps {
   selectedCity: string;
@@ -61,7 +62,8 @@ export const GroupBuyingArena: React.FC<GroupBuyingArenaProps> = ({
   // Create Group Modal
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [newCarId, setNewCarId] = useState('');
-  const [newCommunityName, setNewCommunityName] = useState(`${selectedCity} Metro Pool`);
+  const [newGroupCity, setNewGroupCity] = useState(selectedCity === 'All Cities' ? 'Pune' : selectedCity);
+  const [newCommunityName, setNewCommunityName] = useState(`${selectedCity === 'All Cities' ? 'Pune' : selectedCity} Metro Pool`);
   const [newTargetBuyers, setNewTargetBuyers] = useState(20);
 
   const loadData = async () => {
@@ -109,8 +111,8 @@ export const GroupBuyingArena: React.FC<GroupBuyingArenaProps> = ({
     e.preventDefault();
     const res = await createGroup({
       carId: newCarId,
-      city: selectedCity === 'All Cities' ? 'Pune' : selectedCity,
-      state: 'MH',
+      city: newGroupCity,
+      state: 'IN',
       communityName: newCommunityName,
       targetBuyers: newTargetBuyers,
       initiatorName: buyerName || 'Parth Gade',
@@ -575,6 +577,24 @@ export const GroupBuyingArena: React.FC<GroupBuyingArenaProps> = ({
                     <option key={c.id} value={c.id}>
                       {c.brand} {c.model} ({c.segment})
                     </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-slate-700 font-semibold mb-1">Target City</label>
+                <select
+                  value={newGroupCity}
+                  onChange={(e) => {
+                    setNewGroupCity(e.target.value);
+                    if (newCommunityName.endsWith('Metro Pool') || newCommunityName === '') {
+                      setNewCommunityName(`${e.target.value} Metro Pool`);
+                    }
+                  }}
+                  className="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-900 text-xs focus:bg-white focus:border-blue-600 font-medium cursor-pointer"
+                >
+                  {ALL_INDIAN_CITIES.filter((c) => c !== 'Other City').map((c) => (
+                    <option key={c} value={c}>{c}</option>
                   ))}
                 </select>
               </div>

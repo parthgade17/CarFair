@@ -65,8 +65,8 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
               <li>Mumbai (MH-01 / MH-02 / MH-03)</li>
               <li>Bengaluru (KA-01 / KA-03 / KA-05)</li>
               <li>Delhi NCR (DL / HR-26 / UP-16)</li>
-              <li>Hyderabad (TS-07 / TS-08 / TS-09)</li>
-              <li>Ahmedabad (GJ-01 / GJ-27)</li>
+              <li>Hyderabad, Chennai, Kolkata, Ahmedabad</li>
+              <li className="text-blue-400 font-semibold pt-1">✨ 100+ Cities & Showrooms Pan-India</li>
             </ul>
           </div>
 

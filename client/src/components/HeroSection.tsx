@@ -17,6 +17,7 @@ import {
   Info
 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
+import { ALL_INDIAN_CITIES } from '../constants/cities';
 
 interface HeroSectionProps {
   onExploreGroups: () => void;
@@ -362,11 +363,9 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                       onChange={(e) => setBuyerCity(e.target.value)}
                       className="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 font-medium"
                     >
-                      <option value="Pune">Pune</option>
-                      <option value="Mumbai">Mumbai</option>
-                      <option value="Bengaluru">Bengaluru</option>
-                      <option value="Delhi NCR">Delhi NCR</option>
-                      <option value="Hyderabad">Hyderabad</option>
+                      {ALL_INDIAN_CITIES.map((c) => (
+                        <option key={c} value={c}>{c}</option>
+                      ))}
                     </select>
                   </div>
                   <div>
@@ -478,14 +477,15 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                   </div>
                   <div>
                     <label className="block text-slate-700 font-semibold mb-1">City</label>
-                    <input
-                      type="text"
+                    <select
                       value={dealerCity}
                       onChange={(e) => setDealerCity(e.target.value)}
-                      placeholder="e.g. Pune"
-                      required
                       className="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 font-medium"
-                    />
+                    >
+                      {ALL_INDIAN_CITIES.map((c) => (
+                        <option key={c} value={c}>{c}</option>
+                      ))}
+                    </select>
                   </div>
                 </div>
 
