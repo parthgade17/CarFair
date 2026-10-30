@@ -280,36 +280,36 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
           </div>
         </div>
 
-        {/* Priority 1: Labelled Pilot Metrics (Transparent & Verifiable) */}
+        {/* Priority 1: Labelled Pilot Metrics & Trust Pillars */}
         <div className="space-y-3">
           <div className="flex items-center justify-between text-xs text-slate-500">
-            <span className="font-bold uppercase tracking-wider text-slate-700">Pilot Cohort Projections (Pune & Metros)</span>
-            <span className="italic text-[11px]">*Figures based on pilot group calculations and dealer quote audits.</span>
+            <span className="font-bold uppercase tracking-wider text-slate-700">CarFair Buyer Protection Pillars</span>
+            <span className="italic text-[11px]">*Operating in Pune & major metro pilot corridors.</span>
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="bg-white border border-slate-200 rounded-2xl p-4 text-center shadow-xs">
-              <div className="text-2xl sm:text-3xl font-black text-emerald-700 font-mono">₹68,000</div>
-              <div className="text-xs text-slate-600 mt-1 font-semibold">Typical Group Saving Found</div>
-              <div className="text-[10px] text-slate-400">Sample: Nexon Creative+ Pool</div>
+              <div className="text-2xl sm:text-3xl font-black text-emerald-700 font-mono">100% Free</div>
+              <div className="text-xs text-slate-700 mt-1 font-bold">Zero Cost to Buyers</div>
+              <div className="text-[10px] text-slate-500">No booking or advisory fees</div>
             </div>
 
             <div className="bg-white border border-slate-200 rounded-2xl p-4 text-center shadow-xs">
-              <div className="text-2xl sm:text-3xl font-black text-blue-900 font-mono">3 Bids</div>
-              <div className="text-xs text-slate-600 mt-1 font-semibold">Average Competing Quotes</div>
-              <div className="text-[10px] text-slate-400">Per Active Car Pool</div>
+              <div className="text-2xl sm:text-3xl font-black text-blue-900 font-mono">Direct OEM</div>
+              <div className="text-xs text-slate-700 mt-1 font-bold">Authorised Showrooms</div>
+              <div className="text-[10px] text-slate-500">Direct invoicing & delivery</div>
             </div>
 
             <div className="bg-white border border-slate-200 rounded-2xl p-4 text-center shadow-xs">
-              <div className="text-2xl sm:text-3xl font-black text-amber-700 font-mono">₹22,000</div>
-              <div className="text-xs text-slate-600 mt-1 font-semibold">Illegal Fees Flagged</div>
-              <div className="text-[10px] text-slate-400">Handling & Logistics Fees</div>
+              <div className="text-2xl sm:text-3xl font-black text-amber-700 font-mono">QuoteTruth</div>
+              <div className="text-xs text-slate-700 mt-1 font-bold">Itemised Price Audit</div>
+              <div className="text-[10px] text-slate-500">Separates taxes from illegal fees</div>
             </div>
 
             <div className="bg-white border border-slate-200 rounded-2xl p-4 text-center shadow-xs">
-              <div className="text-2xl sm:text-3xl font-black text-slate-900 font-mono">7 Days</div>
-              <div className="text-xs text-slate-600 mt-1 font-semibold">Fast Showroom Delivery</div>
-              <div className="text-[10px] text-slate-400">From Pool Close to PDI</div>
+              <div className="text-2xl sm:text-3xl font-black text-slate-900 font-mono">Price Lock</div>
+              <div className="text-xs text-slate-700 mt-1 font-bold">Verified 6-Digit PIN</div>
+              <div className="text-[10px] text-slate-500">Deal honour protection at delivery</div>
             </div>
           </div>
         </div>

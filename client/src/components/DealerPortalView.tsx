@@ -112,13 +112,6 @@ export const DealerPortalView: React.FC<DealerPortalViewProps> = ({ selectedCity
   const [bidSuccessMessage, setBidSuccessMessage] = useState('');
   const [isSubmittingBid, setIsSubmittingBid] = useState(false);
 
-  const samplePhotoPresets = [
-    { name: 'Red Compact SUV', url: 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=1200&q=80' },
-    { name: 'White Mid-Size SUV', url: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1200&q=80' },
-    { name: 'Silver 7-Seater', url: 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=1200&q=80' },
-    { name: 'Navy Blue Urban SUV', url: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=1200&q=80' }
-  ];
-
   useEffect(() => {
     fetchDealers().then(d => {
       setDealers(d);
@@ -149,6 +142,12 @@ export const DealerPortalView: React.FC<DealerPortalViewProps> = ({ selectedCity
     if (c.length > 0 && !selectedPhotoCar) {
       setSelectedPhotoCar(c[0].id);
     }
+    const inv = getDealerInventory();
+    setInventory(inv);
+    setEditFloorStock(inv.readyStockCount);
+    setEditTransitStock(inv.inTransitCount);
+    setEditDeliveryDays(inv.fastDeliveryDays);
+    setEditTargetCount(inv.monthlyTargetCount);
   };
 
   const handlePhotoFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -177,7 +176,12 @@ export const DealerPortalView: React.FC<DealerPortalViewProps> = ({ selectedCity
     }
     setIsSubmittingVehicle(true);
     const currentDealer = dealers.find(d => d.id === selectedDealerId);
-    const finalImage = formImageFilePreview || formImageUrl || samplePhotoPresets[0].url;
+    const finalImage = formImageFilePreview || formImageUrl;
+    if (!finalImage) {
+      alert('Please upload a vehicle photograph from your device/camera or enter a photo URL.');
+      setIsSubmittingVehicle(false);
+      return;
+    }
 
     const res = await addShowroomVehicle({
       brand: finalBrand,
@@ -383,7 +387,7 @@ export const DealerPortalView: React.FC<DealerPortalViewProps> = ({ selectedCity
               )}
             </div>
             <p className="text-xs text-slate-700">
-              <strong>{currentDealer?.name}:</strong> {inventory.monthlyTargetCount - inventory.monthlyTargetAchieved} more deliveries needed to unlock the {inventory.quarterlyBonusAmount} OEM quarterly bonus slab.
+              <strong>{currentDealer?.name}:</strong> {showroomCars.length === 0 ? 'Showroom catalog is clean (0 vehicles). Add vehicles below to activate live stock tracking and buyer group offers.' : `${inventory.monthlyTargetCount - inventory.monthlyTargetAchieved} more deliveries needed to unlock the ${inventory.quarterlyBonusAmount} OEM quarterly bonus slab.`}
             </p>
           </div>
 
@@ -1139,26 +1143,17 @@ export const DealerPortalView: React.FC<DealerPortalViewProps> = ({ selectedCity
                 </div>
 
                 <div>
-                  <span className="text-[10px] text-slate-500 font-medium block mb-1">Or choose a high-resolution preset:</span>
-                  <div className="flex flex-wrap gap-2">
-                    {samplePhotoPresets.map((preset, idx) => (
-                      <button
-                        key={idx}
-                        type="button"
-                        onClick={() => {
-                          setFormImageUrl(preset.url);
-                          setFormImageFilePreview(null);
-                        }}
-                        className={`px-2.5 py-1 rounded-lg text-[10px] font-bold border transition-colors cursor-pointer ${
-                          formImageUrl === preset.url && !formImageFilePreview
-                            ? 'bg-emerald-700 text-white border-emerald-700'
-                            : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'
-                        }`}
-                      >
-                        {preset.name}
-                      </button>
-                    ))}
-                  </div>
+                  <label className="block text-slate-700 font-bold mb-1">Or Paste Image URL directly:</label>
+                  <input
+                    type="url"
+                    placeholder="https://example.com/vehicle-stock-photo.jpg"
+                    value={formImageUrl}
+                    onChange={(e) => {
+                      setFormImageUrl(e.target.value);
+                      setFormImageFilePreview(null);
+                    }}
+                    className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-slate-900"
+                  />
                 </div>
               </div>
 

@@ -32,8 +32,9 @@ export const QuoteTruthAuditor: React.FC<QuoteTruthAuditorProps> = ({
 }) => {
   const { t } = useLanguage();
   const [cars, setCars] = useState<Car[]>([]);
-  const [selectedCarId, setSelectedCarId] = useState('tata-nexon');
-  const [selectedVariantId, setSelectedVariantId] = useState('nexon-creative-plus');
+  const [selectedCarId, setSelectedCarId] = useState('');
+  const [selectedVariantId, setSelectedVariantId] = useState('');
+  const [customModelName, setCustomModelName] = useState('');
   const [selectedState, setSelectedState] = useState('MH');
 
   // Quotation inputs
@@ -90,81 +91,33 @@ export const QuoteTruthAuditor: React.FC<QuoteTruthAuditorProps> = ({
   };
 
   const handlePreset = async (presetType: string) => {
-    let payload;
-    if (presetType === 'nexon-pune') {
-      setSelectedCarId('tata-nexon');
-      setSelectedVariantId('nexon-creative-plus');
-      setSelectedState('MH');
-      setExShowroom(1169000);
-      setRto(134000);
-      setInsurance(58000);
-      setHandlingCharges(22000);
-      setAccessoryPack(24000);
-      setExtendedWarranty(16500);
-      setDiscounts(15000);
-      payload = {
-        carId: 'tata-nexon',
-        variantId: 'nexon-creative-plus',
-        state: 'MH',
-        exShowroomPrice: 1169000,
-        rtoCharges: 134000,
-        insurancePrice: 58000,
-        handlingCharges: 22000,
-        handlingChargeLabel: 'Logistics, Depot & PDI Charges',
-        accessoryPack: 24000,
-        extendedWarranty: 16500,
-        discounts: 15000
-      };
-    } else if (presetType === 'creta-mumbai') {
-      setSelectedCarId('hyundai-creta');
-      setSelectedVariantId('creta-sx-tech');
-      setSelectedState('MH');
-      setExShowroom(1598000);
-      setRto(182000);
-      setInsurance(72000);
-      setHandlingCharges(28000);
-      setAccessoryPack(32000);
-      setExtendedWarranty(21000);
-      setDiscounts(20000);
-      payload = {
-        carId: 'hyundai-creta',
-        variantId: 'creta-sx-tech',
-        state: 'MH',
-        exShowroomPrice: 1598000,
-        rtoCharges: 182000,
-        insurancePrice: 72000,
-        handlingCharges: 28000,
-        handlingChargeLabel: 'Incidental & Showroom Handling Surcharge',
-        accessoryPack: 32000,
-        extendedWarranty: 21000,
-        discounts: 20000
-      };
-    } else {
-      setSelectedCarId('mahindra-xuv700');
-      setSelectedVariantId('xuv700-ax7');
-      setSelectedState('KA');
-      setExShowroom(2199000);
-      setRto(342000);
-      setInsurance(92000);
-      setHandlingCharges(35000);
-      setAccessoryPack(38000);
-      setExtendedWarranty(28000);
-      setDiscounts(25000);
-      payload = {
-        carId: 'mahindra-xuv700',
-        variantId: 'xuv700-ax7',
-        state: 'KA',
-        exShowroomPrice: 2199000,
-        rtoCharges: 342000,
-        insurancePrice: 92000,
-        handlingCharges: 35000,
-        handlingChargeLabel: 'Stockyard Logistics & Transit Insurance Fee',
-        accessoryPack: 38000,
-        extendedWarranty: 28000,
-        discounts: 25000
-      };
-    }
+    const targetCarId = cars.length > 0 ? cars[0].id : '';
+    const targetVariantId = cars.length > 0 && cars[0].variants?.[0]?.id ? cars[0].variants[0].id : '';
+    const firstCarPrice = cars.length > 0 && cars[0].variants?.[0]?.exShowroom ? cars[0].variants[0].exShowroom : 1100000;
 
+    setSelectedCarId(targetCarId);
+    setSelectedVariantId(targetVariantId);
+    setSelectedState('MH');
+    setExShowroom(firstCarPrice);
+    setRto(Math.round(firstCarPrice * 0.11));
+    setInsurance(48000);
+    setHandlingCharges(22000);
+    setAccessoryPack(24000);
+    setExtendedWarranty(16500);
+    setDiscounts(15000);
+    const payload = {
+      carId: targetCarId || 'custom-car',
+      variantId: targetVariantId || 'custom-variant',
+      state: 'MH',
+      exShowroomPrice: firstCarPrice,
+      rtoCharges: Math.round(firstCarPrice * 0.11),
+      insurancePrice: 48000,
+      handlingCharges: 22000,
+      handlingChargeLabel: 'Logistics, Depot & PDI Charges',
+      accessoryPack: 24000,
+      extendedWarranty: 16500,
+      discounts: 15000
+    };
     setLoading(true);
     const res = await auditQuotation(payload);
     setAuditResult(res);
@@ -237,18 +190,11 @@ export const QuoteTruthAuditor: React.FC<QuoteTruthAuditorProps> = ({
 
         {/* Quick Sample Quotes */}
         <div className="flex flex-wrap items-center gap-2">
-          <span className="text-xs text-slate-500 font-semibold">Try sample quotes:</span>
           <button
-            onClick={() => handlePreset('nexon-pune')}
-            className="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-white border border-slate-300 hover:border-blue-500 text-slate-700 hover:text-blue-700 shadow-xs transition-colors cursor-pointer"
+            onClick={() => handlePreset('sample')}
+            className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-white border border-slate-300 hover:border-blue-500 text-slate-700 hover:text-blue-700 shadow-xs transition-colors cursor-pointer"
           >
-            Nexon (Pune)
-          </button>
-          <button
-            onClick={() => handlePreset('creta-mumbai')}
-            className="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-white border border-slate-300 hover:border-blue-500 text-slate-700 hover:text-blue-700 shadow-xs transition-colors cursor-pointer"
-          >
-            Creta (Mumbai)
+            Load Sample Dealer Quotation
           </button>
         </div>
       </div>
@@ -517,9 +463,9 @@ export const QuoteTruthAuditor: React.FC<QuoteTruthAuditorProps> = ({
                     <thead>
                       <tr className="border-b border-slate-200 bg-slate-50/70 text-slate-600">
                         <th className="py-2.5 px-3 font-bold">Price Component</th>
-                        <th className="py-2.5 px-3 font-bold text-slate-800">Dealer A (Bafna)</th>
-                        <th className="py-2.5 px-3 font-bold text-emerald-800 bg-emerald-50/60">Dealer B (Garve - Best Total)</th>
-                        <th className="py-2.5 px-3 font-bold text-slate-800">Dealer C (Sahyadri)</th>
+                        <th className="py-2.5 px-3 font-bold text-slate-800">Dealer A</th>
+                        <th className="py-2.5 px-3 font-bold text-emerald-800 bg-emerald-50/60">Dealer B (Lowest Total)</th>
+                        <th className="py-2.5 px-3 font-bold text-slate-800">Dealer C</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100 font-mono">

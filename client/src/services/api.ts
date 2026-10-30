@@ -1,283 +1,18 @@
 import { Car, BuyingGroup, QuoteTruthAudit, DealLockVoucher, SavingsProofResult, Dealer, ReverseBid } from '../types';
 import { supabase, isSupabaseConfigured } from './supabase';
+import { addShowroomPhoto, clearAllPhotos } from './photoStorage';
 
 const API_BASE = '/api';
 
-// Fallback Indian Cars Catalog for 100% reliable static operation
-export const FALLBACK_CARS: Car[] = [
-  {
-    id: 'tata-nexon',
-    brand: 'Tata',
-    model: 'Nexon',
-    segment: 'Compact SUV',
-    image: 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=1200&q=80',
-    tagline: "India's 5-Star BNCAP Best-Selling Compact SUV",
-    fuelTypes: ['Petrol', 'Diesel', 'EV'],
-    transmissions: ['Manual', 'DCA / AMT'],
-    priceRange: '₹8.15 Lakh - ₹15.80 Lakh',
-    variants: [
-      {
-        id: 'nexon-creative-plus',
-        name: 'Creative+ 1.2 Turbo Petrol 6AMT',
-        exShowroom: 1169000,
-        fuel: 'Petrol',
-        transmission: 'AMT',
-        engineCc: 1199,
-        seating: 5,
-        mileage: '17.1 kmpl'
-      },
-      {
-        id: 'nexon-smart-plus',
-        name: 'Smart+ 1.2 Revotron Petrol 5MT',
-        exShowroom: 899000,
-        fuel: 'Petrol',
-        transmission: 'Manual',
-        engineCc: 1199,
-        seating: 5,
-        mileage: '17.44 kmpl'
-      }
-    ]
-  },
-  {
-    id: 'hyundai-creta',
-    brand: 'Hyundai',
-    model: 'Creta',
-    segment: 'Mid-size SUV',
-    image: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1200&q=80',
-    tagline: 'The Undisputed King of Indian Mid-Size SUVs',
-    fuelTypes: ['Petrol', 'Diesel'],
-    transmissions: ['Manual', 'IVT', '7DCT'],
-    priceRange: '₹11.00 Lakh - ₹20.15 Lakh',
-    variants: [
-      {
-        id: 'creta-sx-tech',
-        name: 'SX (Tech) 1.5 MPi Petrol IVT Automatic',
-        exShowroom: 1598000,
-        fuel: 'Petrol',
-        transmission: 'Automatic (IVT)',
-        engineCc: 1497,
-        seating: 5,
-        mileage: '17.7 kmpl'
-      }
-    ]
-  },
-  {
-    id: 'mahindra-xuv700',
-    brand: 'Mahindra',
-    model: 'XUV700',
-    segment: 'Premium SUV',
-    image: 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=1200&q=80',
-    tagline: 'ADAS-Equipped Powerhouse for Highway Cruising',
-    fuelTypes: ['Petrol', 'Diesel'],
-    transmissions: ['Manual', 'Automatic Torque Converter'],
-    priceRange: '₹13.99 Lakh - ₹26.04 Lakh',
-    variants: [
-      {
-        id: 'xuv700-ax7',
-        name: 'AX7 2.2 mHawk Diesel AT (7-Seater)',
-        exShowroom: 2199000,
-        fuel: 'Diesel',
-        transmission: 'Automatic',
-        engineCc: 2184,
-        seating: 7,
-        mileage: '16.5 kmpl'
-      }
-    ]
-  },
-  {
-    id: 'mahindra-scorpio-n',
-    brand: 'Mahindra',
-    model: 'Scorpio-N',
-    segment: 'Body-on-frame SUV',
-    image: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=1200&q=80',
-    tagline: 'The Big Daddy of Authentic 4x4 Road Presence',
-    fuelTypes: ['Petrol', 'Diesel'],
-    transmissions: ['Manual', 'Automatic 4XPLOR'],
-    priceRange: '₹13.85 Lakh - ₹24.54 Lakh',
-    variants: [
-      {
-        id: 'scorpio-z4',
-        name: 'Z4 2.2 mHawk Diesel MT (7-Seater)',
-        exShowroom: 1545000,
-        fuel: 'Diesel',
-        transmission: 'Manual',
-        engineCc: 2184,
-        seating: 7,
-        mileage: '15.2 kmpl'
-      }
-    ]
-  },
-  {
-    id: 'maruti-brezza',
-    brand: 'Maruti Suzuki',
-    model: 'Brezza',
-    segment: 'Compact SUV',
-    image: 'https://images.unsplash.com/photo-1583121274602-3e2820c69888?auto=format&fit=crop&w=1200&q=80',
-    tagline: 'Urban Compact SUV with Electric Sunroof & 360 Camera',
-    fuelTypes: ['Petrol', 'CNG'],
-    transmissions: ['Manual', 'Automatic'],
-    priceRange: '₹8.34 Lakh - ₹14.14 Lakh',
-    variants: [
-      {
-        id: 'brezza-zxi-plus',
-        name: 'ZXi+ 1.5 DualJet 6AT',
-        exShowroom: 1398000,
-        fuel: 'Petrol',
-        transmission: 'Automatic',
-        engineCc: 1462,
-        seating: 5,
-        mileage: '19.8 kmpl'
-      },
-      {
-        id: 'brezza-vxi',
-        name: 'VXi 1.5 Smart Hybrid 5MT',
-        exShowroom: 969000,
-        fuel: 'Petrol',
-        transmission: 'Manual',
-        engineCc: 1462,
-        seating: 5,
-        mileage: '17.38 kmpl'
-      }
-    ]
-  }
-];
-
-// Fallback Buying Groups for 100% reliable static operation
-export const FALLBACK_GROUPS: BuyingGroup[] = [
-  {
-    id: 'grp-brezza-pune-7721',
-    carId: 'maruti-brezza',
-    variantId: 'brezza-zxi-plus',
-    carName: 'Maruti Suzuki Brezza ZXi+ 1.5 AT',
-    city: 'Pune',
-    state: 'MH',
-    communityName: 'Viman Nagar & Kalyani Nagar Buyers Pool',
-    status: 'ACTIVE_BIDDING',
-    biddingEndsAt: new Date(Date.now() + 6 * 24 * 3600 * 1000).toISOString(),
-    targetBuyers: 20,
-    currentBuyers: 18,
-    verifiedBuyers: 15,
-    baselineShowroomPrice: 1545000,
-    currentBestGroupPrice: 1482000,
-    verifiedSavingsTotal: 63000,
-    discountTiers: [
-      { minBuyers: 5, discountPerBuyer: 25000, perk: 'Free Underbody Coating + Body Cover' },
-      { minBuyers: 10, discountPerBuyer: 42000, perk: 'Extended 5-Yr Warranty Pack' },
-      { minBuyers: 20, discountPerBuyer: 63000, perk: 'Bulk Cash Discount + Free Accessories Kit' }
-    ],
-    currentUnlockedTier: 2,
-    bids: [
-      {
-        id: 'bid-seva-1',
-        dealerId: 'dealer-seva-maruti-pune',
-        dealerName: 'Seva Maruti Suzuki Arena (Shivajinagar)',
-        submittedAt: 'Today',
-        exShowroomDiscount: 45000,
-        corporateExchangeBonus: 18000,
-        freebies: ['5-Yr Extended Warranty', '7D Floor Mats', 'Anti-Rust Coating'],
-        insuranceMatchPrice: 28000,
-        waivedHandlingCharges: true,
-        deliveryDays: 6,
-        finalOnRoadPerUnit: 1482000,
-        isWinning: true,
-        terms: 'Authorized arena delivery batch allocation.'
-      }
-    ]
-  },
-  {
-    id: 'grp-nexon-pune-8841',
-    carId: 'tata-nexon',
-    variantId: 'nexon-creative-plus',
-    carName: 'Tata Nexon Creative+ 1.2 AMT',
-    city: 'Pune',
-    state: 'MH',
-    communityName: 'Hinjewadi Tech Parks & Baner Buyers',
-    status: 'ACTIVE_BIDDING',
-    biddingEndsAt: new Date(Date.now() + 4 * 24 * 3600 * 1000).toISOString(),
-    targetBuyers: 20,
-    currentBuyers: 18,
-    verifiedBuyers: 14,
-    baselineShowroomPrice: 1362000,
-    currentBestGroupPrice: 1294000,
-    verifiedSavingsTotal: 68000,
-    discountTiers: [
-      { minBuyers: 5, discountPerBuyer: 28000, perk: 'Free Underbody Coating + 7D Mats' },
-      { minBuyers: 10, discountPerBuyer: 45000, perk: 'Extended 5-Yr Warranty + Anti-Rust' },
-      { minBuyers: 20, discountPerBuyer: 68000, perk: 'Fleet Price + 5-Yr Warranty + Free Ceramic Detailing' }
-    ],
-    currentUnlockedTier: 2,
-    bids: [
-      {
-        id: 'bid-bafna-1',
-        dealerId: 'dealer-bafna-tata-pune',
-        dealerName: 'Bafna Tata Motors (Shivajinagar)',
-        submittedAt: 'Today',
-        exShowroomDiscount: 48000,
-        corporateExchangeBonus: 20000,
-        freebies: ['5-Yr Extended Warranty', '7D Premium Mats', 'Underbody Anti-Rust Coating'],
-        insuranceMatchPrice: 31000,
-        waivedHandlingCharges: true,
-        deliveryDays: 7,
-        finalOnRoadPerUnit: 1294000,
-        isWinning: true,
-        terms: 'Authorized flagship allocation for CarFair members with fast-track registration.'
-      }
-    ]
-  },
-  {
-    id: 'grp-creta-pune-4412',
-    carId: 'hyundai-creta',
-    variantId: 'creta-sx-tech',
-    carName: 'Hyundai Creta SX (Tech) IVT',
-    city: 'Pune',
-    state: 'MH',
-    communityName: 'Magarpatta City & Kharadi IT Hub',
-    status: 'ACTIVE_BIDDING',
-    biddingEndsAt: new Date(Date.now() + 3 * 24 * 3600 * 1000).toISOString(),
-    targetBuyers: 15,
-    currentBuyers: 12,
-    verifiedBuyers: 10,
-    baselineShowroomPrice: 1845000,
-    currentBestGroupPrice: 1762000,
-    verifiedSavingsTotal: 83000,
-    discountTiers: [
-      { minBuyers: 5, discountPerBuyer: 35000, perk: 'Free 3M Ceramic Coating' },
-      { minBuyers: 10, discountPerBuyer: 60000, perk: 'Free 5-Yr Shield of Trust' },
-      { minBuyers: 15, discountPerBuyer: 83000, perk: 'Maximum OEM Corporate Bulk Discount' }
-    ],
-    currentUnlockedTier: 1,
-    bids: []
-  },
-  {
-    id: 'grp-xuv700-pune-9932',
-    carId: 'mahindra-xuv700',
-    variantId: 'xuv700-ax7',
-    carName: 'Mahindra XUV700 AX7 Diesel AT (7-Seater)',
-    city: 'Pune',
-    state: 'MH',
-    communityName: 'Kothrud & Aundh Premium Club',
-    status: 'ACTIVE_BIDDING',
-    biddingEndsAt: new Date(Date.now() + 5 * 24 * 3600 * 1000).toISOString(),
-    targetBuyers: 10,
-    currentBuyers: 8,
-    verifiedBuyers: 7,
-    baselineShowroomPrice: 2580000,
-    currentBestGroupPrice: 2485000,
-    verifiedSavingsTotal: 95000,
-    discountTiers: [
-      { minBuyers: 5, discountPerBuyer: 50000, perk: 'Free 7-Seater Luxury Matting Pack' },
-      { minBuyers: 10, discountPerBuyer: 95000, perk: 'Direct Manufacturer Fleet Rebate' }
-    ],
-    currentUnlockedTier: 1,
-    bids: []
-  }
-];
+// Empty by default: ONLY showroom-uploaded cars and groups will be displayed
+export const FALLBACK_CARS: Car[] = [];
+export const FALLBACK_GROUPS: BuyingGroup[] = [];
 
 // Dynamic LocalStorage Cache for 100% responsive real-time state
-const DYNAMIC_GROUPS_STORAGE = 'carfair_dynamic_groups_v2';
-const INVENTORY_STORAGE_KEY = 'carfair_dealer_inventory';
+const DYNAMIC_GROUPS_STORAGE = 'carfair_dynamic_groups_v3';
+const INVENTORY_STORAGE_KEY = 'carfair_dealer_inventory_v4';
 const SHOWROOM_CARS_KEY = 'carfair_showroom_cars';
-const DEMO_CLEARED_KEY = 'carfair_demo_cleared_v1';
+const DEMO_CLEARED_KEY = 'carfair_demo_cleared_v2';
 
 export function isDemoCleared(): boolean {
   try {
@@ -325,15 +60,47 @@ export interface DealerInventorySettings {
 
 export function getDealerInventory(): DealerInventorySettings {
   try {
-    const raw = localStorage.getItem(INVENTORY_STORAGE_KEY);
-    if (raw) return JSON.parse(raw);
+    // Clean up any legacy demo keys
+    localStorage.removeItem('carfair_dealer_inventory');
+    localStorage.removeItem('carfair_dealer_inventory_v2');
+    localStorage.removeItem('carfair_dealer_inventory_v3');
   } catch (err) {}
+
+  const cars = getStoredShowroomCars();
+  // When no showroom cars are uploaded, stock is strictly 0
+  if (cars.length === 0) {
+    return {
+      readyStockCount: 0,
+      inTransitCount: 0,
+      fastDeliveryDays: 7,
+      monthlyTargetCount: 20,
+      monthlyTargetAchieved: 0,
+      quarterlyBonusAmount: '₹45 Lakh'
+    };
+  }
+
+  try {
+    const raw = localStorage.getItem(INVENTORY_STORAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (parsed.inTransitCount === 18) {
+        localStorage.removeItem(INVENTORY_STORAGE_KEY);
+      } else {
+        return parsed;
+      }
+    }
+  } catch (err) {}
+
+  // Compute live stock directly from uploaded cars
+  const readyTotal = cars.reduce((acc, c: any) => acc + (c.readyStock || 0), 0);
+  const transitTotal = cars.reduce((acc, c: any) => acc + (c.inTransit || 0), 0);
+
   return {
-    readyStockCount: 6,
-    inTransitCount: 14,
-    fastDeliveryDays: 6,
+    readyStockCount: readyTotal,
+    inTransitCount: transitTotal,
+    fastDeliveryDays: 7,
     monthlyTargetCount: 20,
-    monthlyTargetAchieved: 16,
+    monthlyTargetAchieved: 0,
     quarterlyBonusAmount: '₹45 Lakh'
   };
 }
@@ -350,12 +117,11 @@ export function getStoredGroups(): BuyingGroup[] {
     if (raw) {
       const parsed = JSON.parse(raw);
       if (Array.isArray(parsed)) {
-        if (isDemoCleared()) return parsed;
-        if (parsed.length > 0) return parsed;
+        return parsed;
       }
     }
   } catch (err) {}
-  return isDemoCleared() ? [] : FALLBACK_GROUPS;
+  return [];
 }
 
 export function saveStoredGroups(groups: BuyingGroup[]): void {
@@ -371,33 +137,28 @@ export async function fetchCars(): Promise<Car[]> {
       const { data, error } = await supabase
         .from('cars')
         .select('*, variants:car_variants(*)');
-      if (!error && data) {
-        if (data.length > 0) {
-          const mapped = data.map((c: any) => ({
-            id: c.id,
-            brand: c.brand,
-            model: c.model,
-            segment: c.segment,
-            image: c.image,
-            tagline: c.tagline,
-            fuelTypes: c.fuel_types || [],
-            transmissions: c.transmissions || [],
-            priceRange: c.price_range,
-            variants: (c.variants || []).map((v: any) => ({
-              id: v.id,
-              name: v.name,
-              exShowroom: Number(v.ex_showroom),
-              fuel: v.fuel,
-              transmission: v.transmission,
-              engineCc: v.engine_cc,
-              seating: v.seating,
-              mileage: v.mileage
-            }))
-          }));
-          return mapped;
-        } else if (isDemoCleared()) {
-          return [];
-        }
+      if (!error && data && data.length > 0) {
+        return data.map((c: any) => ({
+          id: c.id,
+          brand: c.brand,
+          model: c.model,
+          segment: c.segment,
+          image: c.image,
+          tagline: c.tagline,
+          fuelTypes: c.fuel_types || [],
+          transmissions: c.transmissions || [],
+          priceRange: c.price_range,
+          variants: (c.variants || []).map((v: any) => ({
+            id: v.id,
+            name: v.name,
+            exShowroom: Number(v.ex_showroom),
+            fuel: v.fuel,
+            transmission: v.transmission,
+            engineCc: v.engine_cc,
+            seating: v.seating,
+            mileage: v.mileage
+          }))
+        }));
       }
     } catch (err) {
       console.warn('Supabase fetchCars failed, falling back:', err);
@@ -410,13 +171,8 @@ export async function fetchCars(): Promise<Car[]> {
     return showroomCars;
   }
 
-  // 3. If demo has been cleared, return empty array so only newly added cars show
-  if (isDemoCleared()) {
-    return [];
-  }
-
-  // 4. Static High-Quality Fallback (only for initial preview before clean)
-  return FALLBACK_CARS;
+  // 3. Clean slate: only showroom uploaded cars are returned
+  return [];
 }
 
 export async function fetchGroups(city?: string, brand?: string): Promise<BuyingGroup[]> {
@@ -477,7 +233,7 @@ export async function fetchGroups(city?: string, brand?: string): Promise<Buying
           }));
           saveStoredGroups(mapped);
           return mapped;
-        } else if (isDemoCleared()) {
+        } else {
           return [];
         }
       }
@@ -506,7 +262,7 @@ export async function fetchGroups(city?: string, brand?: string): Promise<Buying
     // Proceed to dynamic fallback
   }
 
-  // 3. Dynamic Local & Static Fallback
+  // 3. Dynamic Local Storage (Showroom uploaded groups only)
   let allGroups = getStoredGroups();
   let filtered = [...allGroups];
   if (city && city !== 'All Cities' && city !== 'All') {
@@ -515,7 +271,7 @@ export async function fetchGroups(city?: string, brand?: string): Promise<Buying
   if (brand && brand !== 'All') {
     filtered = filtered.filter(g => g.carName.toLowerCase().includes(brand.toLowerCase()));
   }
-  return isDemoCleared() ? filtered : (filtered.length > 0 ? filtered : allGroups);
+  return filtered;
 }
 
 export async function joinGroup(groupId: string, payload: {
@@ -683,6 +439,16 @@ export async function addShowroomVehicle(payload: AddShowroomCarPayload): Promis
   saveStoredShowroomCars([newCar, ...existingShowroomCars]);
   setDemoCleared(false); // Active showroom inventory exists
 
+  // Register image in showroom photo storage if provided
+  if (image) {
+    addShowroomPhoto(newCar.id, {
+      url: image,
+      caption: `${brandClean} ${modelClean} - Showroom Stock Ready for Delivery`,
+      category: 'SHOWROOM_FLOOR',
+      uploadedBy: payload.dealerName || 'Authorized Showroom Partner'
+    });
+  }
+
   // 2. Also create a Buyer Group pool so buyers can immediately join and see this car
   let newGroup: BuyingGroup | undefined;
   if (payload.createBuyerPool !== false) {
@@ -822,14 +588,24 @@ export async function deleteShowroomVehicle(carId: string): Promise<{ success: b
 }
 
 export async function clearAllShowroomData(): Promise<{ success: boolean; message: string }> {
-  // 1. Wipe local dynamic storage
+  // 1. Wipe local dynamic storage & photo gallery
   saveStoredShowroomCars([]);
   saveStoredGroups([]);
+  clearAllPhotos();
+  saveDealerInventory({
+    readyStockCount: 0,
+    inTransitCount: 0,
+    fastDeliveryDays: 7,
+    monthlyTargetCount: 20,
+    monthlyTargetAchieved: 0,
+    quarterlyBonusAmount: '₹45 Lakh'
+  });
   setDemoCleared(true);
 
   // 2. Wipe Supabase if configured
   if (isSupabaseConfigured()) {
     try {
+      await supabase.from('showroom_photos').delete().neq('id', '00000000-0000-0000-0000-000000000000');
       await supabase.from('deal_lock_passes').delete().neq('voucher_code', 'NONE');
       await supabase.from('reverse_bids').delete().neq('dealer_id', 'NONE');
       await supabase.from('group_members').delete().neq('phone', 'NONE');
@@ -1223,6 +999,9 @@ export async function auditFinalInvoice(payload: any): Promise<SavingsProofResul
 }
 
 export async function fetchDealers(): Promise<Dealer[]> {
+  const cars = getStoredShowroomCars();
+  const readyTotal = cars.reduce((acc, c: any) => acc + (c.readyStock || 0), 0);
+
   if (isSupabaseConfigured()) {
     try {
       const { data, error } = await supabase.from('dealers').select('*');
@@ -1234,9 +1013,9 @@ export async function fetchDealers(): Promise<Dealer[]> {
           city: d.city,
           location: d.area || d.location || 'Flagship Store',
           rating: Number(d.rating) || 4.8,
-          reviewsCount: 1420,
+          reviewsCount: 142,
           verifiedStatus: d.is_verified ? 'OEM Authorised Platinum Partner' : 'Registered Dealer',
-          inventoryReadyCount: 18,
+          inventoryReadyCount: readyTotal,
           responseTimeAvg: '20 mins',
           contactPerson: d.contact_person || 'Sales Manager',
           phone: d.phone || '+91 98220 44100'
@@ -1255,9 +1034,9 @@ export async function fetchDealers(): Promise<Dealer[]> {
       city: 'Pune',
       location: 'Shivajinagar & Baner',
       rating: 4.8,
-      reviewsCount: 1420,
+      reviewsCount: 142,
       verifiedStatus: 'OEM Authorised Platinum Partner',
-      inventoryReadyCount: 18,
+      inventoryReadyCount: readyTotal,
       responseTimeAvg: '22 mins',
       contactPerson: 'Kunal Deshmukh (Group Sales Head)',
       phone: '+91 98220 44100'
@@ -1269,9 +1048,9 @@ export async function fetchDealers(): Promise<Dealer[]> {
       city: 'Pune',
       location: 'Baner & Aundh',
       rating: 4.8,
-      reviewsCount: 980,
+      reviewsCount: 98,
       verifiedStatus: 'OEM Authorised Elite Partner',
-      inventoryReadyCount: 12,
+      inventoryReadyCount: readyTotal,
       responseTimeAvg: '25 mins',
       contactPerson: 'Sameer Deshmukh',
       phone: '+91 98221 44556'
@@ -1300,11 +1079,15 @@ export async function estimateOldCarExchange(payload: any): Promise<any> {
 }
 
 export async function fetchStats(): Promise<any> {
+  const cars = getStoredShowroomCars();
+  const groups = getStoredGroups();
+  const totalReady = cars.reduce((acc, c: any) => acc + (c.readyStock || 0), 0);
   return {
-    totalBuyers: 1420,
-    totalSavedRupees: 14200000,
-    averageSavingPerCar: 68400,
-    activeShowrooms: 24,
-    averageDeliveryDays: 7
+    totalBuyers: groups.reduce((acc, g) => acc + (g.currentBuyers || 0), 0),
+    totalSavedRupees: 0,
+    averageSavingPerCar: 0,
+    activeShowrooms: cars.length > 0 ? 1 : 0,
+    averageDeliveryDays: 7,
+    inventoryReadyCount: totalReady
   };
 }

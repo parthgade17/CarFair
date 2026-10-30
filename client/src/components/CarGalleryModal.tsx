@@ -54,7 +54,55 @@ export const CarGalleryModal: React.FC<CarGalleryModalProps> = ({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, activeIndex, images.length]);
 
-  if (!isOpen || images.length === 0) return null;
+  if (!isOpen) return null;
+
+  // Empty gallery state when no photos are uploaded
+  if (images.length === 0) {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md animate-fade-in">
+        <div 
+          className="relative w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 text-center text-white space-y-4 shadow-2xl"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 mx-auto">
+            <Camera className="w-7 h-7" />
+          </div>
+          <div>
+            <h3 className="text-lg font-bold text-white">{carName} Gallery</h3>
+            <p className="text-xs text-slate-400 mt-1 leading-relaxed">
+              No showroom photographs uploaded yet for this vehicle.
+            </p>
+          </div>
+
+          {userRole === 'DEALER' && onOpenUpload ? (
+            <div className="pt-2">
+              <button
+                onClick={() => {
+                  onClose();
+                  onOpenUpload(carId, carName);
+                }}
+                className="w-full py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs flex items-center justify-center gap-1.5 shadow-md cursor-pointer transition-all"
+              >
+                <Upload className="w-4 h-4" />
+                <span>+ Upload Showroom Photo Now</span>
+              </button>
+            </div>
+          ) : (
+            <p className="text-[11px] text-slate-500 italic">
+              Verified multi-angle showroom stock photos will appear here the moment the authorized showroom dealership uploads them.
+            </p>
+          )}
+
+          <button
+            onClick={onClose}
+            className="w-full py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs cursor-pointer transition-colors"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   const currentImage = images[activeIndex] || images[0];
 

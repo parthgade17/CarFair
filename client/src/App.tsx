@@ -141,28 +141,10 @@ function AppContent() {
 
             {activeTab === 'bidding' && (
               <LiveReverseBiddingView
-                group={activeGroupForBidding || defaultGroup || {
-                  id: 'grp-default',
-                  carId: 'tata-nexon',
-                  variantId: 'nexon-creative-plus',
-                  carName: 'Tata Nexon Creative+ 1.2 AMT',
-                  city: selectedCity === 'All Cities' ? 'Pune' : selectedCity,
-                  state: 'MH',
-                  communityName: 'Verified Metro Buyers',
-                  status: 'ACTIVE_BIDDING',
-                  biddingEndsAt: new Date().toISOString(),
-                  targetBuyers: 20,
-                  currentBuyers: 18,
-                  verifiedBuyers: 14,
-                  discountTiers: [],
-                  currentUnlockedTier: 2,
-                  baselineShowroomPrice: 1362000,
-                  currentBestGroupPrice: 1294000,
-                  verifiedSavingsTotal: 68000,
-                  bids: []
-                }}
+                group={activeGroupForBidding || defaultGroup}
                 onLockDeal={handleLockDealFromBid}
                 onBackToGroups={() => setActiveTab('groups')}
+                onSwitchToShowroom={() => setUserRole('DEALER')}
               />
             )}
 

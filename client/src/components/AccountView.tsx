@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   User, 
   Building2, 
@@ -6,7 +6,7 @@ import {
   ShieldCheck, 
   Check, 
   Key, 
-  Car, 
+  Car as CarIcon, 
   Award, 
   Fuel, 
   FileCheck, 
@@ -24,6 +24,8 @@ import {
 import { useLanguage } from '../context/LanguageContext';
 import { Language } from '../translations';
 import { CarFairLogo } from './Logo';
+import { Car, BuyingGroup } from '../types';
+import { fetchCars, getStoredGroups, getDealerInventory } from '../services/api';
 import { getCarPhotos } from '../services/photoStorage';
 import { CarGalleryModal } from './CarGalleryModal';
 import { UploadCarPhotoModal } from './UploadCarPhotoModal';
@@ -57,6 +59,17 @@ export const AccountView: React.FC<AccountViewProps> = ({
   const [galleryCar, setGalleryCar] = useState<{ id: string; name: string } | null>(null);
   const [uploadCar, setUploadCar] = useState<{ id: string; name: string } | null>(null);
   const [photoRefreshKey, setPhotoRefreshKey] = useState(0);
+
+  // Dynamic Showroom & User Group State
+  const [showroomCars, setShowroomCars] = useState<Car[]>([]);
+  const [userGroups, setUserGroups] = useState<BuyingGroup[]>([]);
+  const [inventory, setInventory] = useState(getDealerInventory());
+
+  useEffect(() => {
+    fetchCars().then(setShowroomCars);
+    setUserGroups(getStoredGroups());
+    setInventory(getDealerInventory());
+  }, [photoRefreshKey]);
 
   // PIN validation in dealer mode
   const [pinInput, setPinInput] = useState('');
@@ -326,25 +339,40 @@ export const AccountView: React.FC<AccountViewProps> = ({
                   <Users className="w-4 h-4 text-blue-700" />
                   <span>{t.myActiveGroups}</span>
                 </h4>
-                <span className="text-[10px] font-bold bg-emerald-100 text-emerald-900 px-2 py-0.5 rounded border border-emerald-300">
-                  Active Member
-                </span>
+                {userGroups.length > 0 && (
+                  <span className="text-[10px] font-bold bg-emerald-100 text-emerald-900 px-2 py-0.5 rounded border border-emerald-300">
+                    Active Member
+                  </span>
+                )}
               </div>
 
-              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div>
-                  <div className="text-base font-bold text-slate-900">Tata Nexon Creative+ AMT</div>
-                  <p className="text-xs text-slate-500 mt-0.5">Amanora Park Town Pune Pool • 18/20 Buyers Joined</p>
-                  <p className="text-xs text-emerald-700 font-bold mt-1">Unlocked Bulk Discount: -₹68,000</p>
+              {userGroups.length > 0 ? (
+                <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div>
+                    <div className="text-base font-bold text-slate-900">{userGroups[0].carName}</div>
+                    <p className="text-xs text-slate-500 mt-0.5">{userGroups[0].communityName} • {userGroups[0].currentBuyers}/{userGroups[0].targetBuyers} Buyers Joined</p>
+                    <p className="text-xs text-emerald-700 font-bold mt-1">Status: {userGroups[0].status.replace('_', ' ')}</p>
+                  </div>
+
+                  <button
+                    onClick={() => onNavigateToTab('bidding')}
+                    className="px-4 py-2 rounded-xl bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold shrink-0 cursor-pointer"
+                  >
+                    View Competing Bids
+                  </button>
                 </div>
-
-                <button
-                  onClick={() => onNavigateToTab('deallock')}
-                  className="px-4 py-2 rounded-xl bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold shrink-0 cursor-pointer"
-                >
-                  {t.navPriceLock}
-                </button>
-              </div>
+              ) : (
+                <div className="py-6 px-4 bg-slate-50 border border-dashed border-slate-200 rounded-2xl text-center space-y-2">
+                  <p className="text-xs text-slate-600 font-medium">You haven't joined any active car buying groups yet.</p>
+                  <button
+                    onClick={() => onNavigateToTab('groups')}
+                    className="px-3.5 py-1.5 rounded-xl bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold cursor-pointer inline-flex items-center gap-1.5"
+                  >
+                    <Users className="w-3.5 h-3.5" />
+                    <span>Explore Active Groups</span>
+                  </button>
+                </div>
+              )}
             </div>
 
             {/* Price Lock Pass Reference */}
@@ -354,22 +382,13 @@ export const AccountView: React.FC<AccountViewProps> = ({
                   <ShieldCheck className="w-4 h-4 text-emerald-700" />
                   <span>{t.myPriceLockPasses}</span>
                 </h4>
-                <span className="font-mono text-xs font-bold text-blue-700">CF-LOCK-MH-9421</span>
               </div>
 
-              <div className="p-4 rounded-2xl bg-amber-50/80 border border-amber-300 flex items-center justify-between">
-                <div>
-                  <span className="text-[10px] font-bold uppercase text-amber-900">Showroom Check-In PIN</span>
-                  <div className="font-mono text-2xl font-black text-amber-900 tracking-widest mt-0.5">849201</div>
-                  <p className="text-[11px] text-slate-600 mt-0.5">Give this to the Sales Head at Bafna Tata Motors Pune</p>
-                </div>
-
-                <button
-                  onClick={() => onNavigateToTab('deallock')}
-                  className="px-3.5 py-1.5 rounded-lg bg-white border border-amber-300 text-amber-900 text-xs font-bold shadow-xs cursor-pointer hover:bg-amber-100"
-                >
-                  View Full Pass
-                </button>
+              <div className="py-6 px-4 bg-slate-50 border border-dashed border-slate-200 rounded-2xl text-center space-y-1.5">
+                <p className="text-xs text-slate-600 font-medium">No active Price Lock Pass yet.</p>
+                <p className="text-[11px] text-slate-400">
+                  Join a car pool and once a showroom accepts the cohort deal, your verified 6-digit showroom check-in PIN will be generated here.
+                </p>
               </div>
             </div>
 
@@ -473,18 +492,25 @@ export const AccountView: React.FC<AccountViewProps> = ({
                   {t.dealerQuotaLabel}
                 </span>
                 <span className="text-xs font-black bg-amber-200 text-amber-950 px-2 py-0.5 rounded">
-                  88% Achieved
+                  {Math.round(((inventory.monthlyTargetAchieved || 0) / (inventory.monthlyTargetCount || 20)) * 100)}% Achieved
                 </span>
               </div>
               <p className="text-xs text-slate-700">
-                12 more CarFair group deliveries required this month to unlock ₹45 Lakh manufacturer quarterly bonus slab.
+                {showroomCars.length === 0
+                  ? 'Showroom catalog is clean. Add vehicles to activate buyer pools and volume target bonuses.'
+                  : `${Math.max(0, (inventory.monthlyTargetCount || 20) - (inventory.monthlyTargetAchieved || 0))} more CarFair group deliveries required this month to unlock ${inventory.quarterlyBonusAmount || '₹45 Lakh'} manufacturer quarterly bonus slab.`}
               </p>
               <div className="w-full bg-amber-200/60 h-2.5 rounded-full overflow-hidden mt-2">
-                <div className="bg-amber-700 h-full rounded-full" style={{ width: '88%' }} />
+                <div
+                  className="bg-amber-700 h-full rounded-full transition-all duration-500"
+                  style={{
+                    width: `${Math.min(100, Math.round(((inventory.monthlyTargetAchieved || 0) / (inventory.monthlyTargetCount || 20)) * 100))}%`
+                  }}
+                />
               </div>
               <div className="flex justify-between text-[11px] text-slate-600 pt-1">
-                <span>Completed: 88 Units</span>
-                <span className="font-bold text-amber-900">Target: 100 Units</span>
+                <span>Completed: {inventory.monthlyTargetAchieved || 0} Units</span>
+                <span className="font-bold text-amber-900">Target: {inventory.monthlyTargetCount || 20} Units</span>
               </div>
             </div>
 
@@ -524,7 +550,7 @@ export const AccountView: React.FC<AccountViewProps> = ({
               {pinStatus === 'SUCCESS' && (
                 <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-300 text-emerald-950 text-xs flex items-center gap-2">
                   <Check className="w-4 h-4 text-emerald-600 shrink-0" />
-                  <span>PIN Verified! Tata Nexon Creative+ group price locked successfully.</span>
+                  <span>PIN Verified! Buyer Price Lock Pass confirmed and VIN allocated successfully.</span>
                 </div>
               )}
 
@@ -542,69 +568,78 @@ export const AccountView: React.FC<AccountViewProps> = ({
                   <Camera className="w-4 h-4 text-amber-700" />
                   <h4 className="text-sm font-bold text-slate-900">Showroom Vehicle Photos & Stock Gallery</h4>
                 </div>
-                <button
-                  onClick={() => setUploadCar({ id: 'tata-nexon', name: 'Tata Nexon' })}
-                  className="px-3 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-xs cursor-pointer transition-all"
-                >
-                  <Upload className="w-3.5 h-3.5" />
-                  <span>+ Upload Photos</span>
-                </button>
+                {showroomCars.length > 0 && (
+                  <button
+                    onClick={() => setUploadCar({ id: showroomCars[0].id, name: `${showroomCars[0].brand} ${showroomCars[0].model}` })}
+                    className="px-3 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-xs cursor-pointer transition-all"
+                  >
+                    <Upload className="w-3.5 h-3.5" />
+                    <span>+ Upload Photos</span>
+                  </button>
+                )}
               </div>
 
               <p className="text-xs text-slate-600">
                 Buyers in car groups can view authentic photos of cars currently in your showroom inventory.
               </p>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-                {[
-                  { id: 'tata-nexon', name: 'Tata Nexon Creative+ / Smart+' },
-                  { id: 'hyundai-creta', name: 'Hyundai Creta SX (Tech)' },
-                  { id: 'mahindra-xuv700', name: 'Mahindra XUV700 AX7' },
-                  { id: 'mahindra-scorpio-n', name: 'Mahindra Scorpio-N Z4' }
-                ].map((item) => {
-                  const photos = getCarPhotos(item.id);
-                  const thumb = photos[0]?.url;
-                  return (
-                    <div
-                      key={item.id}
-                      className="p-3 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-between gap-3 hover:bg-white hover:border-amber-300 transition-all"
-                    >
-                      <div className="flex items-center gap-2.5 min-w-0">
-                        {thumb && (
-                          <img
-                            src={thumb}
-                            alt={item.name}
-                            className="w-12 h-10 object-cover rounded-xl shrink-0 border border-slate-200"
-                          />
-                        )}
-                        <div className="min-w-0">
-                          <h5 className="font-bold text-xs text-slate-900 truncate">{item.name}</h5>
-                          <span className="text-[10px] font-semibold text-slate-500">
-                            {photos.length} Verified Photos
-                          </span>
+              {showroomCars.length === 0 ? (
+                <div className="py-8 px-4 bg-slate-50 border border-dashed border-slate-200 rounded-2xl text-center space-y-2">
+                  <p className="text-xs text-slate-600 font-medium">No showroom vehicles listed yet.</p>
+                  <button
+                    onClick={() => onNavigateToTab('dealer')}
+                    className="px-3.5 py-1.5 rounded-xl bg-amber-700 hover:bg-amber-800 text-white text-xs font-bold cursor-pointer inline-flex items-center gap-1.5"
+                  >
+                    <span>Add Showroom Vehicle in Portal</span>
+                  </button>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                  {showroomCars.map((car) => {
+                    const photos = getCarPhotos(car.id);
+                    const thumb = photos[0]?.url || car.image;
+                    return (
+                      <div
+                        key={car.id}
+                        className="p-3 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-between gap-3 hover:bg-white hover:border-amber-300 transition-all"
+                      >
+                        <div className="flex items-center gap-2.5 min-w-0">
+                          {thumb && (
+                            <img
+                              src={thumb}
+                              alt={car.model}
+                              className="w-12 h-10 object-cover rounded-xl shrink-0 border border-slate-200"
+                            />
+                          )}
+                          <div className="min-w-0">
+                            <h5 className="font-bold text-xs text-slate-900 truncate">{car.brand} {car.model}</h5>
+                            <span className="text-[10px] font-semibold text-slate-500">
+                              {photos.length} Verified Photos
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-1 shrink-0">
+                          <button
+                            onClick={() => setGalleryCar({ id: car.id, name: `${car.brand} ${car.model}` })}
+                            className="px-2.5 py-1 rounded-lg bg-white border border-slate-300 hover:border-slate-400 text-slate-700 text-[11px] font-bold shadow-2xs cursor-pointer"
+                            title="View buyer gallery preview"
+                          >
+                            View
+                          </button>
+                          <button
+                            onClick={() => setUploadCar({ id: car.id, name: `${car.brand} ${car.model}` })}
+                            className="px-2.5 py-1 rounded-lg bg-amber-600 hover:bg-amber-700 text-white text-[11px] font-bold shadow-2xs cursor-pointer"
+                            title="Upload new photos"
+                          >
+                            + Add
+                          </button>
                         </div>
                       </div>
-
-                      <div className="flex items-center gap-1 shrink-0">
-                        <button
-                          onClick={() => setGalleryCar({ id: item.id, name: item.name })}
-                          className="px-2.5 py-1 rounded-lg bg-white border border-slate-300 hover:border-slate-400 text-slate-700 text-[11px] font-bold shadow-2xs cursor-pointer"
-                          title="View buyer gallery preview"
-                        >
-                          View
-                        </button>
-                        <button
-                          onClick={() => setUploadCar({ id: item.id, name: item.name })}
-                          className="px-2.5 py-1 rounded-lg bg-amber-600 hover:bg-amber-700 text-white text-[11px] font-bold shadow-2xs cursor-pointer"
-                          title="Upload new photos"
-                        >
-                          + Add
-                        </button>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           </div>
         </div>

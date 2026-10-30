@@ -60,8 +60,8 @@ export const GroupBuyingArena: React.FC<GroupBuyingArenaProps> = ({
 
   // Create Group Modal
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [newCarId, setNewCarId] = useState('tata-nexon');
-  const [newCommunityName, setNewCommunityName] = useState('Amanora Park Town, Pune');
+  const [newCarId, setNewCarId] = useState('');
+  const [newCommunityName, setNewCommunityName] = useState(`${selectedCity} Metro Pool`);
   const [newTargetBuyers, setNewTargetBuyers] = useState(20);
 
   const loadData = async () => {
@@ -72,6 +72,11 @@ export const GroupBuyingArena: React.FC<GroupBuyingArenaProps> = ({
     ]);
     setGroups(fetchedGroups);
     setCars(fetchedCars);
+    if (fetchedCars.length > 0) {
+      setNewCarId(fetchedCars[0].id);
+    } else {
+      setNewCarId('');
+    }
     setLoading(false);
   };
 
@@ -174,8 +179,8 @@ export const GroupBuyingArena: React.FC<GroupBuyingArenaProps> = ({
             3
           </div>
           <div>
-            <div className="font-bold text-slate-900">Pick Up & Save ₹50,000+</div>
-            <p className="text-slate-600 text-[11px] mt-0.5">Show your 6-digit Price Lock PIN at the showroom and pay less.</p>
+            <div className="font-bold text-slate-900">Showroom Price Lock</div>
+            <p className="text-slate-600 text-[11px] mt-0.5">Show your 6-digit Price Lock PIN at the showroom and claim verified group savings.</p>
           </div>
         </div>
       </div>
@@ -236,7 +241,7 @@ export const GroupBuyingArena: React.FC<GroupBuyingArenaProps> = ({
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {groups.map((group) => {
             const carDetails = cars.find(c => c.id === group.carId);
-            const imageUrl = carDetails?.image || 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=800&q=80';
+            const imageUrl = carDetails?.image || '';
             const progressPercent = Math.min(100, Math.round((group.currentBuyers / group.targetBuyers) * 100));
             const winningBid = group.bids.find(b => b.isWinning) || group.bids[0];
             const spotsRemaining = Math.max(0, group.targetBuyers - group.currentBuyers);
@@ -251,15 +256,23 @@ export const GroupBuyingArena: React.FC<GroupBuyingArenaProps> = ({
                 {/* Car Image with Badges - Clickable to open gallery */}
                 <div 
                   onClick={() => setGalleryCar({ id: group.carId, name: group.carName })}
-                  className="relative h-48 overflow-hidden bg-slate-100 cursor-pointer group/img"
+                  className="relative h-48 overflow-hidden bg-slate-900 flex items-center justify-center cursor-pointer group/img"
                   title="Click to view full photo gallery"
                 >
-                  <img
-                    src={primaryPhoto}
-                    alt={group.carName}
-                    className="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-500"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-900/70 via-transparent to-transparent" />
+                  {primaryPhoto ? (
+                    <img
+                      src={primaryPhoto}
+                      alt={group.carName}
+                      className="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-500"
+                    />
+                  ) : (
+                    <div className="flex flex-col items-center justify-center p-4 text-center text-slate-400 space-y-1.5">
+                      <CarIcon className="w-10 h-10 text-amber-500" />
+                      <span className="text-xs font-bold text-white">{group.carName}</span>
+                      <span className="text-[10px] text-slate-400">Showroom Stock Unit</span>
+                    </div>
+                  )}
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-900/70 via-transparent to-transparent pointer-events-none" />
 
                   {/* Top Badges */}
                   <div className="absolute top-3 left-3 right-3 flex items-center justify-between">
